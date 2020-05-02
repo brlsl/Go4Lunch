@@ -17,22 +17,13 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/buttonGuest"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="sign in as guest"
-        app:layout_constraintBottom_toTopOf="@+id/buttonGoogle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/login_button"
+        android:id="@+id/buttonFacebook"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
         android:text="@string/fui_sign_in_with_facebook"
-        app:layout_constraintBottom_toTopOf="@+id/buttonGuest"
+        app:layout_constraintBottom_toTopOf="@+id/buttonGoogle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
