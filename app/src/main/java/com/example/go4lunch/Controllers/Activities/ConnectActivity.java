@@ -1,4 +1,4 @@
-package com.example.go4lunch.Controllers.Activities;
+package com.example.go4lunch.controllers.activities;
 
 import androidx.annotation.Nullable;
 

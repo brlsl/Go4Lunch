@@ -4,6 +4,8 @@
     <!--Facebook configuration -->
     <string name="facebook_application_id" translatable="false">239273297312721</string>
     <string name="facebook_login_protocol_scheme" translatable="false">fb239273297312721</string>
+    <string name="navigation_drawer_open" />
+    <string name="navigation_drawer_close" />
 
 
 </resources>

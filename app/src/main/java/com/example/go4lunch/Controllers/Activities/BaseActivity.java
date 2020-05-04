@@ -1,9 +1,8 @@
-package com.example.go4lunch.Controllers.Activities;
+package com.example.go4lunch.controllers.activities;
 
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
