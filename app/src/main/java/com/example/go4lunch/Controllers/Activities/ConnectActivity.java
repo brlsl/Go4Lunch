@@ -17,6 +17,11 @@ public class ConnectActivity extends BaseActivity {
     private static final int RC_SIGN_IN = 123;
 
     @Override
+    public int getFragmentLayout() {
+        return R.layout.connect_layout_transition;
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -28,16 +33,15 @@ public class ConnectActivity extends BaseActivity {
 
     }
 
-    
-    @Override
-    public int getFragmentLayout() {
-        return R.layout.connect_layout_transition;
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         handleResponseAfterSignIn(requestCode,resultCode, data);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 
     AuthMethodPickerLayout customLayout = new AuthMethodPickerLayout
@@ -53,8 +57,8 @@ public class ConnectActivity extends BaseActivity {
                                 new AuthUI.IdpConfig.GoogleBuilder().build() ,
                                 new AuthUI.IdpConfig.FacebookBuilder().build()))
                         .setIsSmartLockEnabled(false, true)
-                        //.setTheme(R.style.AppTheme_NoActionBar)
-                        .setAuthMethodPickerLayout(customLayout)
+                        .setTheme(R.style.AppTheme_LoginTheme)
+                        //.setAuthMethodPickerLayout(customLayout)
                         .build(),
                 RC_SIGN_IN
         );

@@ -1,5 +1,6 @@
 package com.example.go4lunch.controllers.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -13,7 +14,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.go4lunch.R;
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
@@ -22,7 +25,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private androidx.appcompat.widget.Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-    //private BottomNavigationView bottomNavigationView;
+    private BottomNavigationView bottomNavigationView;
 
 
 
@@ -45,6 +48,22 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             case R.id.activity_main_drawer_logout:
                 this.signOutUserFromFirebase();
                 break;
+
+                // TODO: pour le bottom navigationView à déplacer
+                /*
+            case R.id.bottom_navigation_map:
+                //TODO: ouvrir fragment de la carte
+                Toast.makeText(this, "Ouverture de la carte", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.bottom_navigation_restaurant_list:
+                //TODO: ouvrir fragment de la liste de restaurants
+                Toast.makeText(this, "Ouverture de la liste de restaurants", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.bottom_navigation_workmates_list:
+                //TODO: ouvrir fragment de la liste des collègues
+                Toast.makeText(this, "Ouverture de la liste des collègues", Toast.LENGTH_SHORT).show();
+                break;
+                */
             default:
                 break;
 
@@ -54,12 +73,16 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         return true;
     }
 
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.configureToolBar();
         this.configureDrawerLayout();
         this.configureNavigationView();
+       // ne fonctionne pas
+        // this.configureBottomView();
     }
 
     //manage back button
@@ -68,7 +91,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             this.drawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            Intent a = new Intent(Intent.ACTION_MAIN);
+            a.addCategory(Intent.CATEGORY_HOME);
+            a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(a);
         }
     }
 
@@ -92,32 +118,50 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+    // 4 - configure BottomView
+    private void configureBottomView(){
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                return updateMainFragment(item.getItemId());
+            }
+        });
+    }
 
 
-    // configure disconnect button
+    private Boolean updateMainFragment(Integer integer){
+        switch (integer) {
+            case R.id.bottom_navigation_map:
+                //TODO: ouvrir fragment de la carte
+                Toast.makeText(this, "Ouverture de la carte", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.bottom_navigation_restaurant_list:
+                //TODO: ouvrir fragment de la liste de restaurants
+                Toast.makeText(this, "Ouverture de la liste de restaurants", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.bottom_navigation_workmates_list:
+                //TODO: ouvrir fragment de la liste des collègues
+                Toast.makeText(this, "Ouverture de la liste des collègues", Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                break;
 
+        }
+        return true;
+    }
+
+
+    // configure sign out
     private void signOutUserFromFirebase(){
         AuthUI.getInstance()
                 .signOut(this)
-                .addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK));
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // user is now signed out
+                        startActivity(new Intent(MainActivity.this, ConnectActivity.class));
+                        finish();
+                    }
+                });
     }
-
-    //FOR DATA
-    // II - 2 - Identify each Http Request
-    private static final int SIGN_OUT_TASK = 10;
-
-    // II - 3 - Create OnCompleteListener called after tasks ended
-    private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted(final int origin){
-        return new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-               if (origin == SIGN_OUT_TASK){
-                   finish();
-                   System.out.println("log out succès");
-                }
-            }
-        };
-    }
-
 
 }
