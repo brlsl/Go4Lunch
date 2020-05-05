@@ -3,25 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/activity_main_drawer_news"
+    <item
+        android:id="@+id/activity_main_your_meal"
+        android:title="@string/your_meal"
+        android:icon="@drawable/ic_restaurant_menu_white_24dp"
+        />
+    <item
+        android:id="@+id/activity_main_drawer_settings"
+        android:title="@string/settings"
+        android:icon="@drawable/ic_settings_white_24dp"/>
+    <item
+        android:id="@+id/activity_main_drawer_logout"
+        android:title="@string/logout" />
 
-            android:title="Fil d'actualité" />
-    </group>
-
-    <item android:title="Configuration">
-        <menu>
-            <group android:checkableBehavior="single">
-                <item
-                    android:id="@+id/activity_main_drawer_profile"
-
-                    android:title="Profil" />
-                <item
-                    android:id="@+id/activity_main_drawer_settings"
-                    android:title="Paramètres" />
-            </group>
-        </menu>
-    </item>
 
 </menu>
