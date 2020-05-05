@@ -1,6 +1,7 @@
 package com.example.go4lunch.controllers.activities;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -13,6 +14,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.example.go4lunch.R;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -20,6 +22,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private androidx.appcompat.widget.Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+    //private BottomNavigationView bottomNavigationView;
+
 
 
     @Override
@@ -89,6 +93,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
 
+
     // configure disconnect button
 
     private void signOutUserFromFirebase(){
@@ -108,6 +113,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             public void onSuccess(Void aVoid) {
                if (origin == SIGN_OUT_TASK){
                    finish();
+                   System.out.println("log out succès");
                 }
             }
         };

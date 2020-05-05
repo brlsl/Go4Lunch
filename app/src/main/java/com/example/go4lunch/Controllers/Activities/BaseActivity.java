@@ -18,8 +18,6 @@ public abstract class BaseActivity extends AppCompatActivity
 
     public abstract int getFragmentLayout();
 
-
-
     protected FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
 
     protected Boolean isCurrentUserLogged(){ return (this.getCurrentUser() != null); }
