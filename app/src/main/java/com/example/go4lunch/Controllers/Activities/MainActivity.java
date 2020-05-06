@@ -2,8 +2,8 @@ package com.example.go4lunch.controllers.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -11,11 +11,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.controllers.fragments.MapFragment;
+import com.example.go4lunch.controllers.fragments.RestaurantListFragment;
+import com.example.go4lunch.controllers.fragments.WorkmatesFragment;
+import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -23,10 +27,11 @@ import com.google.android.material.navigation.NavigationView;
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private androidx.appcompat.widget.Toolbar toolbar;
-    private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
-    private BottomNavigationView bottomNavigationView;
+    private DrawerLayout mDrawerLayout;
+    private NavigationView mNavigationView;
+    private BottomNavigationView mBottomNavigationView;
 
+    private ActivityMainBinding activityMainBinding;
 
 
     @Override
@@ -49,24 +54,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 this.signOutUserFromFirebase();
                 break;
 
-                // TODO: pour le bottom navigationView à déplacer
-                /*
-            case R.id.bottom_navigation_map:
-                //TODO: ouvrir fragment de la carte
-                Toast.makeText(this, "Ouverture de la carte", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.bottom_navigation_restaurant_list:
-                //TODO: ouvrir fragment de la liste de restaurants
-                Toast.makeText(this, "Ouverture de la liste de restaurants", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.bottom_navigation_workmates_list:
-                //TODO: ouvrir fragment de la liste des collègues
-                Toast.makeText(this, "Ouverture de la liste des collègues", Toast.LENGTH_SHORT).show();
-                break;
-                */
-            default:
-                break;
-
         }
         //close navigation drawer after choice
         //drawerLayout.closeDrawer(GravityCompat.START);
@@ -74,22 +61,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
 
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.configureToolBar();
-        this.configureDrawerLayout();
-        this.configureNavigationView();
-       // ne fonctionne pas
-        // this.configureBottomView();
-    }
-
     //manage back button
     @Override
     public void onBackPressed() {
-        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            this.drawerLayout.closeDrawer(GravityCompat.START);
+        if (this.mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            this.mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
             Intent a = new Intent(Intent.ACTION_MAIN);
             a.addCategory(Intent.CATEGORY_HOME);
@@ -98,32 +74,74 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
     }
 
-    // 1 - Configure Toolbar
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.configureViewBinding();
+        this.configureToolBar();
+        this.configureDrawerLayout();
+        this.configureNavigationView();
+        this.configureBottomView();
+    }
+
+    // 1 configure ViewBinding
+    private void configureViewBinding(){
+        activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
+        View view =  activityMainBinding.getRoot();
+        setContentView(view);
+    }
+
+    // 2 - Configure Toolbar
     private void configureToolBar(){
-        this.toolbar =  findViewById(R.id.activity_main_toolbar);
+        this.toolbar =  activityMainBinding.activityMainToolbar;
         setSupportActionBar(toolbar);
     }
 
-    // 2 - Configure Drawer Layout
+    // 3 - Configure Drawer Layout
     private void configureDrawerLayout(){
-        this.drawerLayout = (DrawerLayout) findViewById(R.id.activity_main_drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawerLayout.addDrawerListener(toggle);
+        this.mDrawerLayout = activityMainBinding.activityMainDrawerLayout;
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
     }
 
-    // 3 - Configure NavigationView
+    // 4 - Configure NavigationView (left menu drawer)
     private void configureNavigationView(){
-        this.navigationView = (NavigationView) findViewById(R.id.activity_main_nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        this.mNavigationView = activityMainBinding.activityMainNavigationView;
+        mNavigationView.setNavigationItemSelectedListener(this);
     }
 
-    // 4 - configure BottomView
+    // 5 - configure BottomView
     private void configureBottomView(){
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+        this.mBottomNavigationView = activityMainBinding.bottomNavigationView;
+
+        // open navigation Fragment by default
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MapFragment()).commit();
+
+        //manage click on nav
+        mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                return updateMainFragment(item.getItemId());
+                Fragment selectedFragment = null;
+                switch (item.getItemId()) {
+                    case R.id.bottom_navigation_map:
+                        selectedFragment = new MapFragment();
+                        break;
+                    case R.id.bottom_navigation_restaurant_list:
+                        selectedFragment = new RestaurantListFragment();
+                        break;
+                    case R.id.bottom_navigation_workmates_list:
+                        selectedFragment = new WorkmatesFragment();
+                        break;
+
+                    default:
+                        break;
+                }
+                //display and replace the fragment container with our selected fragment
+                if (selectedFragment != null) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
+                }
+                return true;
             }
         });
     }
@@ -149,7 +167,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
         return true;
     }
-
 
     // configure sign out
     private void signOutUserFromFirebase(){
