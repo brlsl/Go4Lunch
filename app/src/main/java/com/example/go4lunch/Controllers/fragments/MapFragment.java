@@ -10,10 +10,12 @@ import androidx.annotation.Nullable;
 
 import com.example.go4lunch.R;
 
+
 public class MapFragment extends androidx.fragment.app.Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_maps, container, false);
     }
+
 }

@@ -11,6 +11,8 @@ android {
         versionCode 1
         versionName "1.0"
 
+        multiDexEnabled true
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -54,6 +56,15 @@ dependencies {
     implementation "androidx.navigation:navigation-ui:2.2.2"
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
 
+    // Google Places
+    implementation 'com.google.android.libraries.places:places:2.2.0'
+
+    // multidex
+    implementation 'com.android.support:multidex:1.0.3'
+
+    //glide
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
 }
 

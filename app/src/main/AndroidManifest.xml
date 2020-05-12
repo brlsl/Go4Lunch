@@ -3,6 +3,8 @@
     package="com.example.go4lunch">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/> <!-- current location permission -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -13,7 +15,11 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAuoABTy9XWos-Dgtli_OV9ctmhanrmhx0"/> <!-- Google Map Api Key-->
+            android:value="AIzaSyAuoABTy9XWos-Dgtli_OV9ctmhanrmhx0"/> <!-- Google Maps Api Key-->
+
+        <meta-data
+            android:name="test"
+            android:value="AIzaSyAK366wqKIdy-Td7snXrjIRaI9MkXb2VZE"/> <!--Google Places Api Key -->
 
         <activity
             android:name=".controllers.activities.ConnectActivity"

@@ -1,9 +1,12 @@
 package com.example.go4lunch.controllers.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -13,16 +16,20 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
 import com.example.go4lunch.controllers.fragments.MapFragment;
 import com.example.go4lunch.controllers.fragments.RestaurantListFragment;
 import com.example.go4lunch.controllers.fragments.WorkmatesFragment;
 import com.example.go4lunch.databinding.ActivityMainBinding;
+import com.example.go4lunch.databinding.ActivityMainNavHeaderBinding;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -31,8 +38,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private NavigationView mNavigationView;
     private BottomNavigationView mBottomNavigationView;
 
-    private ActivityMainBinding activityMainBinding;
-
+    //private ActivityMainBinding activityMainBinding;
 
     @Override
     public int getFragmentLayout() {
@@ -77,43 +83,80 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.configureViewBinding();
+       // this.configureViewBinding();
         this.configureToolBar();
         this.configureDrawerLayout();
         this.configureNavigationView();
         this.configureBottomView();
     }
 
+
     // 1 configure ViewBinding
     private void configureViewBinding(){
+       /* // Main Activity Layout
         activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
-        View view =  activityMainBinding.getRoot();
-        setContentView(view);
+        View viewActivityMain =  activityMainBinding.getRoot();
+        setContentView(viewActivityMain);*/
     }
 
     // 2 - Configure Toolbar
     private void configureToolBar(){
-        this.toolbar =  activityMainBinding.activityMainToolbar;
+        this.toolbar =  findViewById(R.id.activity_main_toolbar);
         setSupportActionBar(toolbar);
     }
 
-    // 3 - Configure Drawer Layout
+    // 3 - Configure Drawer Layout (left menu drawer)
     private void configureDrawerLayout(){
-        this.mDrawerLayout = activityMainBinding.activityMainDrawerLayout;
+        this.mDrawerLayout = findViewById(R.id.activity_main_drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
     }
 
-    // 4 - Configure NavigationView (left menu drawer)
+    // 4 - Configure NavigationView
     private void configureNavigationView(){
-        this.mNavigationView = activityMainBinding.activityMainNavigationView;
+        this.mNavigationView = findViewById(R.id.activity_main_navigation_view);
         mNavigationView.setNavigationItemSelectedListener(this);
+        View mHeaderView =  mNavigationView.getHeaderView(0);
+
+        ImageView mUserAvatar = mHeaderView.findViewById(R.id.user_avatar);
+        TextView mUserName = mHeaderView.findViewById(R.id.user_name);
+        TextView mUserEmail = mHeaderView.findViewById(R.id.user_email);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+
+        if (user != null) {
+            // Name, email address, and profile photo Url
+            String name = user.getDisplayName();
+            String email = user.getEmail();
+            Uri photoUrl = user.getPhotoUrl();
+
+            mUserName.setText(name);
+            mUserEmail.setText(email);
+
+            Glide.with(this)
+                    .load(photoUrl)
+                    .circleCrop()
+                    .into(mUserAvatar);
+        }
+
+
+
+/*
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            // Name, email address, and profile photo Url
+            String name = user.getDisplayName();
+            String email = user.getEmail();
+            Uri photoUrl = user.getPhotoUrl();
+        //activityMainNavHeaderBinding.userEmail.setText(email);
+        }*/
     }
 
     // 5 - configure BottomView
     private void configureBottomView(){
-        this.mBottomNavigationView = activityMainBinding.bottomNavigationView;
+        this.mBottomNavigationView = findViewById(R.id.bottom_navigation_view);
 
         // open navigation Fragment by default
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MapFragment()).commit();
