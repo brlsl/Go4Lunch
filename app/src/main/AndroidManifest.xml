@@ -17,10 +17,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAuoABTy9XWos-Dgtli_OV9ctmhanrmhx0"/> <!-- Google Maps Api Key-->
 
-        <meta-data
-            android:name="test"
-            android:value="AIzaSyAK366wqKIdy-Td7snXrjIRaI9MkXb2VZE"/> <!--Google Places Api Key -->
-
         <activity
             android:name=".controllers.activities.ConnectActivity"
             android:theme="@style/AppTheme_LoginTheme"

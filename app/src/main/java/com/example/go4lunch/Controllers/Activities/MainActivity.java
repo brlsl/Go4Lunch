@@ -87,9 +87,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         this.configureToolBar();
         this.configureDrawerLayout();
         this.configureNavigationView();
+        this.configureHeaderNavigationView();
         this.configureBottomView();
     }
-
 
     // 1 configure ViewBinding
     private void configureViewBinding(){
@@ -117,6 +117,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private void configureNavigationView(){
         this.mNavigationView = findViewById(R.id.activity_main_navigation_view);
         mNavigationView.setNavigationItemSelectedListener(this);
+
+    }
+
+
+    private void configureHeaderNavigationView() {
         View mHeaderView =  mNavigationView.getHeaderView(0);
 
         ImageView mUserAvatar = mHeaderView.findViewById(R.id.user_avatar);
@@ -124,7 +129,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         TextView mUserEmail = mHeaderView.findViewById(R.id.user_email);
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
 
         if (user != null) {
             // Name, email address, and profile photo Url
@@ -141,15 +145,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                     .into(mUserAvatar);
         }
 
-
-
-/*
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            // Name, email address, and profile photo Url
-            String name = user.getDisplayName();
-            String email = user.getEmail();
-            Uri photoUrl = user.getPhotoUrl();
+    /*
+    // pour le binding
         //activityMainNavHeaderBinding.userEmail.setText(email);
         }*/
     }
@@ -190,27 +187,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
 
-    private Boolean updateMainFragment(Integer integer){
-        switch (integer) {
-            case R.id.bottom_navigation_map:
-                //TODO: ouvrir fragment de la carte
-                Toast.makeText(this, "Ouverture de la carte", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.bottom_navigation_restaurant_list:
-                //TODO: ouvrir fragment de la liste de restaurants
-                Toast.makeText(this, "Ouverture de la liste de restaurants", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.bottom_navigation_workmates_list:
-                //TODO: ouvrir fragment de la liste des collègues
-                Toast.makeText(this, "Ouverture de la liste des collègues", Toast.LENGTH_SHORT).show();
-                break;
-            default:
-                break;
-
-        }
-        return true;
-    }
-
     // configure sign out
     private void signOutUserFromFirebase(){
         AuthUI.getInstance()
@@ -223,5 +199,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                     }
                 });
     }
+
+
 
 }

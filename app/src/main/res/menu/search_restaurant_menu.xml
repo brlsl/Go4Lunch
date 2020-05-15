@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/restaurant_search_item"
+        android:title="restaurant search"
+        android:icon="@drawable/ic_search_24dp"
+        app:showAsAction="always|collapseActionView" />
+
+</menu>
