@@ -15,14 +15,13 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
 import com.example.go4lunch.controllers.fragments.MapFragment;
 import com.example.go4lunch.controllers.fragments.RestaurantListFragment;
 import com.example.go4lunch.controllers.fragments.WorkmatesFragment;
-import com.example.go4lunch.databinding.ActivityMainBinding;
-import com.example.go4lunch.databinding.ActivityMainNavHeaderBinding;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -39,6 +38,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private BottomNavigationView mBottomNavigationView;
 
     //private ActivityMainBinding activityMainBinding;
+
+    // bottom navigation View fragments configuration
+    final Fragment mMapFragment = new MapFragment();
+    final Fragment mRestaurantListFragment = new RestaurantListFragment();
+    final Fragment mWorkmatesListFragment = new WorkmatesFragment();
+    final FragmentManager fm = getSupportFragmentManager();
+    Fragment active = mMapFragment; // first fragment active when app opens
+
 
     @Override
     public int getFragmentLayout() {
@@ -89,6 +96,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         this.configureNavigationView();
         this.configureHeaderNavigationView();
         this.configureBottomView();
+
+
     }
 
     // 1 configure ViewBinding
@@ -108,7 +117,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     // 3 - Configure Drawer Layout (left menu drawer)
     private void configureDrawerLayout(){
         this.mDrawerLayout = findViewById(R.id.activity_main_drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
     }
@@ -121,6 +131,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
 
+    // 5
     private void configureHeaderNavigationView() {
         View mHeaderView =  mNavigationView.getHeaderView(0);
 
@@ -151,39 +162,35 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }*/
     }
 
-    // 5 - configure BottomView
+    // 6 - configure BottomView
     private void configureBottomView(){
         this.mBottomNavigationView = findViewById(R.id.bottom_navigation_view);
 
-        final Fragment fragment1 = new MapFragment();
-        final Fragment fragment2 = new RestaurantListFragment();
-        final Fragment fragment3 = new WorkmatesFragment();
+        fm.beginTransaction()
+                .add(R.id.fragment_container, mMapFragment)
+                .add(R.id.fragment_container, mRestaurantListFragment).hide(mRestaurantListFragment)
+                .add(R.id.fragment_container, mWorkmatesListFragment).hide(mWorkmatesListFragment)
+                .commit();
 
-        // open navigation Fragment by default
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MapFragment()).commit();
-
-        //manage click on nav
+        //manage click on bottom nav view
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Fragment selectedFragment = null;
                 switch (item.getItemId()) {
                     case R.id.bottom_navigation_map:
-                        selectedFragment = new MapFragment();
-                        break;
+                        fm.beginTransaction().hide(active).show(mMapFragment).commit();
+                        active = mMapFragment;
+                        return true;
                     case R.id.bottom_navigation_restaurant_list:
-                        selectedFragment = new RestaurantListFragment();
-                        break;
+                        fm.beginTransaction().hide(active).show(mRestaurantListFragment).commit();
+                        active = mRestaurantListFragment;
+                        return true;
                     case R.id.bottom_navigation_workmates_list:
-                        selectedFragment = new WorkmatesFragment();
-                        break;
-
+                        fm.beginTransaction().hide(active).show(mWorkmatesListFragment).commit();
+                        active = mWorkmatesListFragment;
+                        return true;
                 }
-                //display and replace the fragment container with our selected fragment
-                if (selectedFragment != null) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
-                }
-                return true;
+                return false;
             }
         });
     }
@@ -201,7 +208,5 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                     }
                 });
     }
-
-
 
 }

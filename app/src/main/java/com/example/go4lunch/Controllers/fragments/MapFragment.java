@@ -23,32 +23,29 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 
 
 public class MapFragment extends androidx.fragment.app.Fragment implements OnMapReadyCallback {
-    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
-    private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
+
     private static final int LOCATION_PERMISSION_REQUEST = 1234;
     private static final String TAG = "MAP FRAGMENT";
     private static final float DEFAULT_ZOOM = 15f;
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
-    private Boolean mLocationPermissionGranted;
+    private int mLocationPermissionGranted = 0; // refused by default
 
     private GoogleMap mMap;
-    private MapView mMapView;
-    private View mView;
     private Location mLastKnownLocation;
 
-    //TODO: 1) régler le problème de l'affichage du GPS après une première installation
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,12 +53,17 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     }
 
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate layout for this fragment
-        mView = inflater.inflate(R.layout.map_fragment, container, false);
+        View mView = inflater.inflate(R.layout.map_fragment, container, false);
+        MapView mMapView =  mView.findViewById(R.id.map);
+        if(mMapView != null){
+            mMapView.onCreate(null);
+            mMapView.onResume();
+            mMapView.getMapAsync(this);
+        }
         getLocationPermission();
         return mView;
     }
@@ -70,14 +72,11 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mMapView =  mView.findViewById(R.id.map);
-        if(mMapView != null){
-            mMapView.onCreate(null);
-            mMapView.onResume();
-            mMapView.getMapAsync(this);
-        }
+
     }
 
+
+    @AfterPermissionGranted(LOCATION_PERMISSION_REQUEST)
     private void getLocationPermission() {
         /*
          * Request location permission, so that we can get the location of the
@@ -86,53 +85,22 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
          */
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION};
-
-        //get if authorization are granted
-        if(ContextCompat.checkSelfPermission(requireContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-            // if course location accepted
-            if(ContextCompat.checkSelfPermission(requireContext(), COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-                mLocationPermissionGranted = true;
-                // init the map here
-            }
-            // request permission
-            else {
-                ActivityCompat.requestPermissions(requireActivity(),
-                        permissions,
-                        LOCATION_PERMISSION_REQUEST);
-            }
-        } // request permission
-        else{
-            ActivityCompat.requestPermissions(requireActivity(),
-                    permissions,
-                    LOCATION_PERMISSION_REQUEST);
+        if (EasyPermissions.hasPermissions(requireContext(), permissions)) {
+            mLocationPermissionGranted = 1;
+        } else {
+            EasyPermissions.requestPermissions(this, "Go4Lunch needs location permission", LOCATION_PERMISSION_REQUEST, permissions);
         }
-
     }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Toast.makeText(requireContext(), "Map is ready", Toast.LENGTH_SHORT).show();
-
-        // init the first Map View
         mMap = googleMap;
 
 
-        if (mLocationPermissionGranted) {
+        if (mLocationPermissionGranted == 1) {
             getDeviceLocation();
-
-            if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(),
-                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-                return;
-            }
-
-
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMyLocationButtonEnabled(true);
-
         }
-
 
     }
 
@@ -143,27 +111,33 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        mLocationPermissionGranted = false;
+        mLocationPermissionGranted = 0;
 
         switch (requestCode) {
             case LOCATION_PERMISSION_REQUEST: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mLocationPermissionGranted = true;
-                    Toast.makeText(requireContext(), "Permission accordée", Toast.LENGTH_SHORT).show();
+                    mLocationPermissionGranted = 1;
+                    Toast.makeText(requireContext(), "Permission granted", Toast.LENGTH_SHORT).show();
+                    getDeviceLocation();
                     return;
-
+                }
+                else
+                {
+                    Toast.makeText(requireContext(), "Permission refused", Toast.LENGTH_SHORT).show();
+                    EasyPermissions.requestPermissions(this, "Go4Lunch needs location permission", LOCATION_PERMISSION_REQUEST, permissions);
                 }
             }
         }
-        updateLocationUI();
     }
 
     private void getDeviceLocation(){
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext());
         try {
-            if (mLocationPermissionGranted) {
+            if (mLocationPermissionGranted == 1) {
+                mMap.setMyLocationEnabled(true);
+                mMap.getUiSettings().setMyLocationButtonEnabled(true);
                 Task locationResult = mFusedLocationProviderClient.getLastLocation();
                 locationResult.addOnCompleteListener((Activity) requireContext(), new OnCompleteListener() {
                     @Override
@@ -186,27 +160,4 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     }
 
 
-    private void moveCamera(LatLng latLng, float zoom){
-        Log.d("TAG", "move Camera to: lat" + latLng.latitude + ",lng:" + latLng.longitude);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
-    }
-
-    private void updateLocationUI() {
-        if (mMap == null) {
-            return;
-        }
-        try {
-            if (mLocationPermissionGranted) {
-                mMap.setMyLocationEnabled(true);
-                mMap.getUiSettings().setMyLocationButtonEnabled(true);
-            } else {
-                mMap.setMyLocationEnabled(false);
-                mMap.getUiSettings().setMyLocationButtonEnabled(false);
-                mLastKnownLocation = null;
-                getLocationPermission();
-            }
-        } catch (SecurityException e)  {
-            Log.e("Exception: %s", e.getMessage());
-        }
-    }
 }
