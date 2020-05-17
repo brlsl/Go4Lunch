@@ -26,8 +26,6 @@ import java.util.List;
 public abstract class BaseActivity extends AppCompatActivity
 {
 
-
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +44,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int AUTOCOMPLETE_REQUEST_CODE = 1;
+        final int AUTOCOMPLETE_REQUEST_CODE = 1;
 
         switch (item.getItemId()) {
             case R.id.restaurant_search_item:
@@ -65,7 +63,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
                 // Start the autocomplete intent.
                 Intent intent = new Autocomplete.IntentBuilder(
-                        AutocompleteActivityMode.FULLSCREEN, fields)
+                        AutocompleteActivityMode.OVERLAY, fields)
                         .build(this);
                 startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
                 return true;

@@ -155,6 +155,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private void configureBottomView(){
         this.mBottomNavigationView = findViewById(R.id.bottom_navigation_view);
 
+        final Fragment fragment1 = new MapFragment();
+        final Fragment fragment2 = new RestaurantListFragment();
+        final Fragment fragment3 = new WorkmatesFragment();
+
         // open navigation Fragment by default
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MapFragment()).commit();
 
@@ -174,8 +178,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                         selectedFragment = new WorkmatesFragment();
                         break;
 
-                    default:
-                        break;
                 }
                 //display and replace the fragment container with our selected fragment
                 if (selectedFragment != null) {
