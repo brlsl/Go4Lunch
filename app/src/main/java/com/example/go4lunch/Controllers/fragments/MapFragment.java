@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,19 +14,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.go4lunch.R;
-import com.example.go4lunch.models.MyPlaces;
-import com.example.go4lunch.models.Results;
-import com.example.go4lunch.remote.Common;
-import com.example.go4lunch.remote.IGoogleApiInterface;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.internal.ConnectionCallbacks;
+import com.example.go4lunch.models.apiGooglePlace.MyPlaces;
+import com.example.go4lunch.models.apiGooglePlace.Result;
+import com.example.go4lunch.utils.GooglePlaceStreams;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -35,32 +26,28 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 
-public class MapFragment extends androidx.fragment.app.Fragment implements OnMapReadyCallback {
+
+public class MapFragment extends androidx.fragment.app.Fragment implements OnMapReadyCallback, LocationListener {
 
     private static final int LOCATION_PERMISSION_REQUEST = 1234;
     private static final String TAG = "MAP FRAGMENT";
     private static final float DEFAULT_ZOOM = 15f;
 
-    private static final String PLACE_API_KEY= "AIzaSyAK366wqKIdy-Td7snXrjIRaI9MkXb2VZE";
+    private static final String PLACE_API_KEY = "AIzaSyAK366wqKIdy-Td7snXrjIRaI9MkXb2VZE";
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
@@ -69,10 +56,11 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     private GoogleMap mMap;
     private Location mLastKnownLocation;
 
-    private double latitude, longitude;
-    private Marker mMarker;
 
-    private IGoogleApiInterface mService;
+
+
+    private Disposable mDisposable;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -85,16 +73,16 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate layout for this fragment
         View mView = inflater.inflate(R.layout.map_fragment, container, false);
-        MapView mMapView =  mView.findViewById(R.id.map);
-        if(mMapView != null){
+        MapView mMapView = mView.findViewById(R.id.map);
+        if (mMapView != null) {
             mMapView.onCreate(null);
             mMapView.onResume();
             mMapView.getMapAsync(this);
         }
-        mService = Common.getGoogleApiService();
         getLocationPermission();
         return mView;
     }
+
 
 
     @Override
@@ -103,6 +91,17 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.disposeWhenDestroy();
+    }
+
+    private void disposeWhenDestroy() {
+        if (this.mDisposable != null && !this.mDisposable.isDisposed())
+            this.mDisposable.dispose();
+
+    }
 
     @AfterPermissionGranted(LOCATION_PERMISSION_REQUEST)
     private void getLocationPermission() {
@@ -127,6 +126,9 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
         if (mLocationPermissionGranted == 1) {
             getDeviceLocation();
+//            latitude = mLastKnownLocation.getLatitude();
+  //          longitude = mLastKnownLocation.getLongitude();
+            //executeHttpRequestWithRetrofit();
         }
 
     }
@@ -147,9 +149,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                     Toast.makeText(requireContext(), "Permission granted", Toast.LENGTH_SHORT).show();
                     getDeviceLocation();
                     return;
-                }
-                else
-                {
+                } else {
                     Toast.makeText(requireContext(), "Permission refused", Toast.LENGTH_SHORT).show();
                     EasyPermissions.requestPermissions(this, "Go4Lunch needs location permission", LOCATION_PERMISSION_REQUEST, permissions);
                 }
@@ -157,8 +157,10 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
         }
     }
 
-    private void getDeviceLocation(){
+    private void getDeviceLocation() {
+
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext());
+
         try {
             if (mLocationPermissionGranted == 1) {
                 mMap.setMyLocationEnabled(true);
@@ -174,10 +176,8 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                                     new LatLng(mLastKnownLocation.getLatitude(),
                                             mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
 
-                            latitude = mLastKnownLocation.getLatitude();
-                            longitude = mLastKnownLocation.getLongitude();
 
-                            showRestaurantsNearby();
+                            executeHttpRequestNearbySearchWithRetrofit();
 
                         } else {
                             Toast.makeText(requireContext(), "Unable to get current location", Toast.LENGTH_SHORT).show();
@@ -185,62 +185,64 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                     }
                 });
             }
-        } catch(SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
 
-    private void showRestaurantsNearby() {
-        Toast.makeText(requireContext(), "Restaurant show nearby", Toast.LENGTH_SHORT).show();
-        mMap.clear();
-
-        String url = getUrl(latitude,longitude);
-
-        mService.getNearbyPlaces(url)
-                .enqueue(new Callback<MyPlaces>() {
+    // TODO: transformer la location en String pour le mDisposable
+    private void executeHttpRequestNearbySearchWithRetrofit() {
+        this.mDisposable = GooglePlaceStreams.streamFetchNearbySearch("48.82, 2.28",500,"restaurant", PLACE_API_KEY)
+                .subscribeWith(new DisposableObserver<MyPlaces>() {
             @Override
-            public void onResponse(Call<MyPlaces> call, Response<MyPlaces> response) {
-                if (response.isSuccessful()){
+            public void onNext(MyPlaces myPlaces) {
+                for (int i = 0; i < myPlaces.getResults().size(); i++) {
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    Result googlePlace = myPlaces.getResults().get(i);
+                    double lat = googlePlace.getGeometry().getLocation().getLat();
+                    double lng = googlePlace.getGeometry().getLocation().getLng();
+                    String placeName = googlePlace.getName();
+                    LatLng latLng = new LatLng(lat, lng);
+                    markerOptions.position(latLng);
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
+                    markerOptions.title(placeName);
 
-                    for (int i = 0; i < response.body().getResults().length; i++) {
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        Results googlePlace = response.body().getResults()[i];
-                        double lat = googlePlace.getGeometry().getLocation().getLatitude();
-                        double lng = googlePlace.getGeometry().getLocation().getLongitude();
-                        String placeName = googlePlace.getName();
-                        String vinicity = googlePlace.getVicinity();
-                        LatLng latLng = new LatLng(lat, lng);
-                        markerOptions.position(latLng);
-                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
-                        markerOptions.title(placeName);
-
-                        mMap.addMarker(markerOptions);
-                        //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                        //mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
-
+                    mMap.addMarker(markerOptions);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
                     }
-
-                }
             }
 
             @Override
-            public void onFailure(Call<MyPlaces> call, Throwable t) {
-                Log.d(TAG, "Callback failure");
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
             }
         });
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        executeHttpRequestNearbySearchWithRetrofit();
 
     }
 
-    private String getUrl(double latitude, double longitude) {
-        StringBuilder googlePlaceUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
-        googlePlaceUrl.append("location="+latitude+","+longitude);
-        googlePlaceUrl.append("&radius="+5000);
-        googlePlaceUrl.append("&type=restaurant");
-        googlePlaceUrl.append("&key="+PLACE_API_KEY);
-        Log.d("getUrl", googlePlaceUrl.toString());
-        return googlePlaceUrl.toString();
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        // deprecated
     }
 
+    @Override
+    public void onProviderEnabled(String provider) {
 
+    }
 
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
 }

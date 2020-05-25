@@ -14,6 +14,8 @@ android {
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+
     }
 
     buildTypes {
@@ -77,6 +79,12 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
 
+    // Retrofit adapter Rx Java
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+
+    // Rx Java
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
 
 }
 
