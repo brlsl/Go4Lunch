@@ -25,7 +25,6 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -35,9 +34,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+
 
 
 import io.reactivex.disposables.Disposable;
@@ -47,10 +44,10 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 
 
-public class MapFragment extends androidx.fragment.app.Fragment implements OnMapReadyCallback, LocationListener {
+public class MapFragment extends androidx.fragment.app.Fragment implements OnMapReadyCallback {
 
     private static final int LOCATION_PERMISSION_REQUEST = 1234;
-    private static final String TAG = "MAP FRAGMENT";
+
     private static final float DEFAULT_ZOOM = 15f;
 
     private static final String PLACE_API_KEY = "AIzaSyAK366wqKIdy-Td7snXrjIRaI9MkXb2VZE";
@@ -104,7 +101,6 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     }
 
 
-
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -138,7 +134,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
     }
 
-    @AfterPermissionGranted(LOCATION_PERMISSION_REQUEST)
+    @AfterPermissionGranted(LOCATION_PERMISSION_REQUEST) // made with Easy Permission
     private void getLocationPermission() {
         /*
          * Request location permission, so that we can get the location of the
@@ -154,7 +150,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
         }
     }
 
-    // traiter la demande d'autorisation
+    // ask User permission with a dialog
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
@@ -169,7 +165,6 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                     mLocationPermissionGranted = 1;
                     Toast.makeText(requireContext(), "Permission granted", Toast.LENGTH_SHORT).show();
                     getDeviceLocation();
-                    return;
                 } else {
                     Toast.makeText(requireContext(), "Permission refused", Toast.LENGTH_SHORT).show();
                     EasyPermissions.requestPermissions(this, "Go4Lunch needs location permission", LOCATION_PERMISSION_REQUEST, permissions);
@@ -181,20 +176,14 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         if (mLocationPermissionGranted == 1) {
             getDeviceLocation();
-                // latitude = mLastKnownLocation.getLatitude();
-                // longitude = mLastKnownLocation.getLongitude();
-                //executeHttpRequestWithRetrofit();
         }
-
     }
 
 
 
     void getDeviceLocation() {
-
         mFusedLocationProviderClient.getLastLocation()
                 .addOnSuccessListener(requireActivity(), location -> {
                     // Got last known location. In some rare situations this can be null.
@@ -215,7 +204,6 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                         executeHttpRequestNearbySearchWithRetrofit(stringLatitude,stringLongitude);
                     }
                 });
-
     }
 
 
@@ -225,8 +213,8 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                 .subscribeWith(new DisposableObserver<MyPlaces>() {
             @Override
             public void onNext(MyPlaces myPlaces) {
+                mMap.clear();
                 for (int i = 0; i < myPlaces.getResults().size(); i++) {
-
                     MarkerOptions markerOptions = new MarkerOptions();
                     Result googlePlace = myPlaces.getResults().get(i);
                     double lat = googlePlace.getGeometry().getLocation().getLat();
@@ -238,41 +226,17 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                     markerOptions.title(placeName);
 
                     mMap.addMarker(markerOptions);
-                    //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                    //mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+
                     }
             }
 
             @Override
             public void onError(Throwable e) {
-
             }
 
             @Override
             public void onComplete() {
-
             }
         });
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        //executeHttpRequestNearbySearchWithRetrofit();
-
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        // deprecated
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
     }
 }
