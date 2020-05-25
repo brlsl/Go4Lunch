@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +21,11 @@ import com.example.go4lunch.models.apiGooglePlace.MyPlaces;
 import com.example.go4lunch.models.apiGooglePlace.Result;
 import com.example.go4lunch.utils.GooglePlaceStreams;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -31,6 +36,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 
@@ -54,8 +60,8 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     private int mLocationPermissionGranted = 0; // refused by default
 
     private GoogleMap mMap;
-    private Location mLastKnownLocation;
 
+    private LocationCallback locationCallback;
 
 
 
@@ -65,6 +71,20 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext());
+
+        locationCallback = new LocationCallback(){
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null)
+                    return;
+                for(Location location: locationResult.getLocations()){
+                    String stringLatitude = String.valueOf(location.getLatitude());
+                    String stringLongitude = String.valueOf(location.getLongitude());
+                    executeHttpRequestNearbySearchWithRetrofit(stringLatitude,stringLongitude);
+                }
+            }
+        };
     }
 
 
@@ -89,6 +109,21 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        startLocationUpdate();
+
+    }
+
+    private void startLocationUpdate() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mFusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.getMainLooper());
     }
 
     @Override
@@ -119,20 +154,6 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
         }
     }
 
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-
-        if (mLocationPermissionGranted == 1) {
-            getDeviceLocation();
-//            latitude = mLastKnownLocation.getLatitude();
-  //          longitude = mLastKnownLocation.getLongitude();
-            //executeHttpRequestWithRetrofit();
-        }
-
-    }
-
     // traiter la demande d'autorisation
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -157,46 +178,55 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
         }
     }
 
-    private void getDeviceLocation() {
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
 
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext());
-
-        try {
-            if (mLocationPermissionGranted == 1) {
-                mMap.setMyLocationEnabled(true);
-                mMap.getUiSettings().setMyLocationButtonEnabled(true);
-                Task locationResult = mFusedLocationProviderClient.getLastLocation();
-                locationResult.addOnCompleteListener((Activity) requireContext(), new OnCompleteListener() {
-                    @Override
-                    public void onComplete(@NonNull Task task) { // callback
-                        if (task.isSuccessful()) {
-                            // Set the map's camera position to the current location of the device.
-                            mLastKnownLocation = (Location) task.getResult();
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(mLastKnownLocation.getLatitude(),
-                                            mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-
-
-                            executeHttpRequestNearbySearchWithRetrofit();
-
-                        } else {
-                            Toast.makeText(requireContext(), "Unable to get current location", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            }
-        } catch (SecurityException e) {
-            Log.e("Exception: %s", e.getMessage());
+        if (mLocationPermissionGranted == 1) {
+            getDeviceLocation();
+                // latitude = mLastKnownLocation.getLatitude();
+                // longitude = mLastKnownLocation.getLongitude();
+                //executeHttpRequestWithRetrofit();
         }
+
     }
 
-    // TODO: transformer la location en String pour le mDisposable
-    private void executeHttpRequestNearbySearchWithRetrofit() {
-        this.mDisposable = GooglePlaceStreams.streamFetchNearbySearch("48.82, 2.28",500,"restaurant", PLACE_API_KEY)
+
+
+    void getDeviceLocation() {
+
+        mFusedLocationProviderClient.getLastLocation()
+                .addOnSuccessListener(requireActivity(), location -> {
+                    // Got last known location. In some rare situations this can be null.
+                    if (location != null) {
+                        // Logic to handle location object
+                        mMap.setMyLocationEnabled(true);
+                        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+
+                        Location mLastKnownLocation = location;
+                        Double test = mLastKnownLocation.getLatitude();
+                        String stringLatitude = String.valueOf(mLastKnownLocation.getLatitude());
+                        String stringLongitude = String.valueOf(mLastKnownLocation.getLongitude());
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                new LatLng(mLastKnownLocation.getLatitude(),
+                                        mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+
+                        executeHttpRequestNearbySearchWithRetrofit(stringLatitude,stringLongitude);
+                    }
+                });
+
+    }
+
+
+
+    private void executeHttpRequestNearbySearchWithRetrofit(String latitude, String longitude) {
+        this.mDisposable = GooglePlaceStreams.streamFetchNearbySearch(latitude+","+longitude,500,"restaurant", PLACE_API_KEY)
                 .subscribeWith(new DisposableObserver<MyPlaces>() {
             @Override
             public void onNext(MyPlaces myPlaces) {
                 for (int i = 0; i < myPlaces.getResults().size(); i++) {
+
                     MarkerOptions markerOptions = new MarkerOptions();
                     Result googlePlace = myPlaces.getResults().get(i);
                     double lat = googlePlace.getGeometry().getLocation().getLat();
@@ -208,8 +238,8 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                     markerOptions.title(placeName);
 
                     mMap.addMarker(markerOptions);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+                    //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                    //mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
                     }
             }
 
@@ -227,7 +257,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
     @Override
     public void onLocationChanged(Location location) {
-        executeHttpRequestNearbySearchWithRetrofit();
+        //executeHttpRequestNearbySearchWithRetrofit();
 
     }
 
