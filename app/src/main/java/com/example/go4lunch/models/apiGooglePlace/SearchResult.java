@@ -1,10 +1,24 @@
 package com.example.go4lunch.models.apiGooglePlace;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Result {
+public class SearchResult {
+
+    @SerializedName("html_attributions")
+    @Expose
+    private List<Object> htmlAttributions = null;
+    @SerializedName("results")
+    @Expose
+    private List<SearchResult> results = null;
+
+    @SerializedName("status")
+    @Expose
+    private String status;
 
     @SerializedName("business_status")
     @Expose
@@ -57,6 +71,7 @@ public class Result {
     @SerializedName("permanently_closed")
     @Expose
     private Boolean permanentlyClosed;
+
 
     public String getBusinessStatus() {
         return businessStatus;
@@ -193,5 +208,30 @@ public class Result {
     public void setPermanentlyClosed(Boolean permanentlyClosed) {
         this.permanentlyClosed = permanentlyClosed;
     }
+
+    public List<Object> getHtmlAttributions() {
+        return htmlAttributions;
+    }
+
+    public void setHtmlAttributions(List<Object> htmlAttributions) {
+        this.htmlAttributions = htmlAttributions;
+    }
+
+    public List<SearchResult> getResults() {
+        return results;
+    }
+
+    public void setResults(List<SearchResult> results) {
+        this.results = results;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
 
 }

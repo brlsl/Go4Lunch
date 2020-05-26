@@ -1,13 +1,14 @@
 package com.example.go4lunch.controllers.fragments;
 
 import android.Manifest;
-import android.app.Activity;
+
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
+
 import android.os.Bundle;
 import android.os.Looper;
-import android.util.Log;
+
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +17,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+
 import com.example.go4lunch.R;
-import com.example.go4lunch.models.apiGooglePlace.MyPlaces;
-import com.example.go4lunch.models.apiGooglePlace.Result;
+import com.example.go4lunch.controllers.activities.MainActivity;
+import com.example.go4lunch.models.apiGooglePlace.SearchResult;
 import com.example.go4lunch.utils.GooglePlaceStreams;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -36,6 +38,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
+import java.util.ArrayList;
+import java.util.Objects;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
@@ -116,8 +120,8 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
     private void startLocationUpdate() {
         LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
+        locationRequest.setInterval(12000);
+        locationRequest.setFastestInterval(8000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mFusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.getMainLooper());
     }
@@ -183,7 +187,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
 
 
-    void getDeviceLocation() {
+    private void getDeviceLocation() {
         mFusedLocationProviderClient.getLastLocation()
                 .addOnSuccessListener(requireActivity(), location -> {
                     // Got last known location. In some rare situations this can be null.
@@ -193,13 +197,11 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                         mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
 
-                        Location mLastKnownLocation = location;
-                        Double test = mLastKnownLocation.getLatitude();
-                        String stringLatitude = String.valueOf(mLastKnownLocation.getLatitude());
-                        String stringLongitude = String.valueOf(mLastKnownLocation.getLongitude());
+                        String stringLatitude = String.valueOf(location.getLatitude());
+                        String stringLongitude = String.valueOf(location.getLongitude());
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                new LatLng(mLastKnownLocation.getLatitude(),
-                                        mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                                new LatLng(location.getLatitude(),
+                                        location.getLongitude()), DEFAULT_ZOOM));
 
                         executeHttpRequestNearbySearchWithRetrofit(stringLatitude,stringLongitude);
                     }
@@ -208,15 +210,21 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
 
 
-    private void executeHttpRequestNearbySearchWithRetrofit(String latitude, String longitude) {
+    public void executeHttpRequestNearbySearchWithRetrofit(String latitude, String longitude) {
         this.mDisposable = GooglePlaceStreams.streamFetchNearbySearch(latitude+","+longitude,500,"restaurant", PLACE_API_KEY)
-                .subscribeWith(new DisposableObserver<MyPlaces>() {
+                .subscribeWith(new DisposableObserver<SearchResult>() {
             @Override
-            public void onNext(MyPlaces myPlaces) {
+            public void onNext(SearchResult result) {
                 mMap.clear();
-                for (int i = 0; i < myPlaces.getResults().size(); i++) {
+
+                // pass data to restaurant fragment
+                RestaurantListFragment restaurantListFragment = ((MainActivity) requireActivity()).getmRestaurantListFragment();
+                restaurantListFragment.setResultList(result.getResults());
+
+
+                for (int i = 0; i < result.getResults().size(); i++) {
                     MarkerOptions markerOptions = new MarkerOptions();
-                    Result googlePlace = myPlaces.getResults().get(i);
+                    SearchResult googlePlace = result.getResults().get(i);
                     double lat = googlePlace.getGeometry().getLocation().getLat();
                     double lng = googlePlace.getGeometry().getLocation().getLng();
                     String placeName = googlePlace.getName();

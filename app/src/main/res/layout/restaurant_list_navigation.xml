@@ -7,5 +7,4 @@
     android:id="@+id/list_restaurant"
     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
     tools:listitem="@layout/item_restaurant"
-
     />

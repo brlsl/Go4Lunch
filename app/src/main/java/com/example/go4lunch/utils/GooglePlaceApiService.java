@@ -1,6 +1,6 @@
 package com.example.go4lunch.utils;
 
-import com.example.go4lunch.models.apiGooglePlace.MyPlaces;
+import com.example.go4lunch.models.apiGooglePlace.SearchResult;
 
 import io.reactivex.Observable;
 
@@ -9,7 +9,6 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import retrofit2.http.Url;
 
 public interface GooglePlaceApiService {
     Retrofit retrofit = new Retrofit.Builder()
@@ -19,7 +18,12 @@ public interface GooglePlaceApiService {
             .build();
 
     @GET("nearbysearch/json?")
-    Observable<MyPlaces> getNearbyPlaces (@Query("location")String location, @Query("radius") int radius,
-                                          @Query("type") String type, @Query("key") String apiKey);
+    Observable<SearchResult> getNearbyPlaces (@Query("location")String location, @Query("radius") int radius,
+                                              @Query("type") String type, @Query("key") String apiKey);
+/*
+    @GET("autocomplete/output?parameters")
+    Observable<SearchResult> getAutoCompletePlaceRequest(@Query("input") String input, @Query() @Query("radius") int radius,
+                                                         @Query("type")String type, @Query("key")String apiKey);
 
+ */
 }
