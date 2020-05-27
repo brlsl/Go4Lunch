@@ -23,13 +23,13 @@ public class RestaurantListFragment extends androidx.fragment.app.Fragment {
     private RecyclerView mRecyclerView;
     private RestaurantAdapter adapter;
 
-    private List<SearchResult> resultList;
+    //private List<SearchResult> resultList;
 
     public void setResultList(List<SearchResult> resultList) {
 
-        this.resultList = resultList;
-        this.adapter = new RestaurantAdapter(resultList);
+        //this.resultList = resultList;
 
+        this.adapter = new RestaurantAdapter(resultList);
         this.mRecyclerView.setAdapter(this.adapter);
 
     }
@@ -39,7 +39,8 @@ public class RestaurantListFragment extends androidx.fragment.app.Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.restaurant_list_navigation, container, false);
 
-        this.resultList = new ArrayList<>();
+        //this.resultList = new ArrayList<>(); // avoid resultList null value
+        //this.resultList.size();
         this.mRecyclerView = (RecyclerView) view;
         this.mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         this.mRecyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));

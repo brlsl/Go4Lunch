@@ -39,9 +39,17 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     //private ActivityMainBinding activityMainBinding;
 
+    public Fragment getmMapFragment() {
+        return mMapFragment;
+    }
+
+    public RestaurantListFragment getmRestaurantListFragment() {
+        return mRestaurantListFragment;
+    }
+
     // bottom navigation View fragments configuration
     final Fragment mMapFragment = new MapFragment();
-    final Fragment mRestaurantListFragment = new RestaurantListFragment();
+    final RestaurantListFragment mRestaurantListFragment = new RestaurantListFragment();
     final Fragment mWorkmatesListFragment = new WorkmatesFragment();
     final FragmentManager fm = getSupportFragmentManager();
     Fragment active = mMapFragment; // first fragment active when app opens

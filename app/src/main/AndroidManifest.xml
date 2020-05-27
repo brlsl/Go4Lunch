@@ -4,9 +4,9 @@
     package="com.example.go4lunch">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -15,24 +15,32 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAuoABTy9XWos-Dgtli_OV9ctmhanrmhx0"/> <!-- Google Maps Api Key-->
-
+            android:value="AIzaSyAuoABTy9XWos-Dgtli_OV9ctmhanrmhx0" /> <!-- Google Maps Api Key -->
+        <!-- activity connection -->
         <activity
             android:name=".controllers.activities.ConnectActivity"
             android:theme="@style/AppTheme_LoginTheme"
-            tools:node="replace"
-            >
+            tools:node="replace">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".controllers.activities.MainActivity"
+        <!-- main activity of the app with its fragments-->
+        <activity
+            android:name=".controllers.activities.MainActivity"
             android:theme="@style/AppTheme_NoTitle">
+
         </activity>
 
+        <!-- child of main activity-->
+        <activity
+            android:name=".controllers.activities.RestaurantDetailActivity">
+
+        </activity>
     </application>
 
 </manifest>

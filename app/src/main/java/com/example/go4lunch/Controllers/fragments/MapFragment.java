@@ -2,6 +2,7 @@ package com.example.go4lunch.controllers.fragments;
 
 import android.Manifest;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 
@@ -19,6 +20,7 @@ import androidx.annotation.Nullable;
 
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.controllers.activities.RestaurantDetailActivity;
 import com.example.go4lunch.controllers.activities.MainActivity;
 import com.example.go4lunch.models.apiGooglePlace.SearchResult;
 import com.example.go4lunch.utils.GooglePlaceStreams;
@@ -35,11 +37,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-
-import java.util.ArrayList;
-import java.util.Objects;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
@@ -114,14 +114,14 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     @Override
     public void onResume() {
         super.onResume();
-        startLocationUpdate();
+        //startLocationUpdate();
 
     }
 
     private void startLocationUpdate() {
         LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(12000);
-        locationRequest.setFastestInterval(8000);
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mFusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.getMainLooper());
     }
@@ -182,6 +182,26 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
         mMap = googleMap;
         if (mLocationPermissionGranted == 1) {
             getDeviceLocation();
+
+
+            mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+                @Override
+                public boolean onMyLocationButtonClick() {
+                    Toast.makeText(requireContext(), "clic sur bouton localisation", Toast.LENGTH_SHORT).show();
+                    getDeviceLocation();
+                    return false;
+                }
+            });
+
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    Toast.makeText(requireContext(), "on ouvre les détails", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(requireContext(), RestaurantDetailActivity.class);
+                    startActivity(intent);
+                    return false;
+                }
+            });
         }
     }
 
@@ -204,8 +224,11 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                                         location.getLongitude()), DEFAULT_ZOOM));
 
                         executeHttpRequestNearbySearchWithRetrofit(stringLatitude,stringLongitude);
+
                     }
+
                 });
+
     }
 
 
@@ -214,17 +237,17 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
         this.mDisposable = GooglePlaceStreams.streamFetchNearbySearch(latitude+","+longitude,500,"restaurant", PLACE_API_KEY)
                 .subscribeWith(new DisposableObserver<SearchResult>() {
             @Override
-            public void onNext(SearchResult result) {
+            public void onNext(SearchResult searchResult) {
                 mMap.clear();
 
                 // pass data to restaurant fragment
                 RestaurantListFragment restaurantListFragment = ((MainActivity) requireActivity()).getmRestaurantListFragment();
-                restaurantListFragment.setResultList(result.getResults());
+                restaurantListFragment.setResultList(searchResult.getResults());
 
 
-                for (int i = 0; i < result.getResults().size(); i++) {
+                for (int i = 0; i < searchResult.getResults().size(); i++) {
                     MarkerOptions markerOptions = new MarkerOptions();
-                    SearchResult googlePlace = result.getResults().get(i);
+                    SearchResult googlePlace = searchResult.getResults().get(i);
                     double lat = googlePlace.getGeometry().getLocation().getLat();
                     double lng = googlePlace.getGeometry().getLocation().getLng();
                     String placeName = googlePlace.getName();
@@ -244,6 +267,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
             @Override
             public void onComplete() {
+                Toast.makeText(requireContext(), "les données sont rafraichies", Toast.LENGTH_SHORT).show();
             }
         });
     }
