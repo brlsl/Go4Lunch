@@ -39,9 +39,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     //private ActivityMainBinding activityMainBinding;
 
-    public Fragment getmMapFragment() {
-        return mMapFragment;
-    }
 
     public RestaurantListFragment getmRestaurantListFragment() {
         return mRestaurantListFragment;

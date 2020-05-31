@@ -1,5 +1,6 @@
 package com.example.go4lunch.controllers.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,11 +14,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
 
-import com.example.go4lunch.models.apiGooglePlace.SearchResult;
+import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.ResultSearchNearby;
 import com.example.go4lunch.views.RestaurantAdapter;
+import com.google.android.gms.maps.model.LatLng;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class RestaurantListFragment extends androidx.fragment.app.Fragment {
     private RecyclerView mRecyclerView;
@@ -25,11 +28,11 @@ public class RestaurantListFragment extends androidx.fragment.app.Fragment {
 
     //private List<SearchResult> resultList;
 
-    public void setResultList(List<SearchResult> resultList) {
+    public void setResultList(List<ResultSearchNearby> resultList, HashMap<LatLng,String> myDictionary) {
 
         //this.resultList = resultList;
 
-        this.adapter = new RestaurantAdapter(resultList);
+        this.adapter = new RestaurantAdapter(resultList, myDictionary);
         this.mRecyclerView.setAdapter(this.adapter);
 
     }
@@ -47,6 +50,8 @@ public class RestaurantListFragment extends androidx.fragment.app.Fragment {
 
         return view;
     }
+
+
 
 
 }

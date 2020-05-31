@@ -1,6 +1,7 @@
 package com.example.go4lunch.utils;
 
-import com.example.go4lunch.models.apiGooglePlace.SearchResult;
+import com.example.go4lunch.models.apiGooglePlace.placeDetails.PlaceDetail;
+import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.SearchNearby;
 
 import io.reactivex.Observable;
 
@@ -18,12 +19,17 @@ public interface GooglePlaceApiService {
             .build();
 
     @GET("nearbysearch/json?")
-    Observable<SearchResult> getNearbyPlaces (@Query("location")String location, @Query("radius") int radius,
+    Observable<SearchNearby> getNearbyPlaces (@Query("location")String location, @Query("radius") int radius,
                                               @Query("type") String type, @Query("key") String apiKey);
-/*
+
+    @GET("details/json?")
+    Observable<PlaceDetail> getPlaceDetails (@Query("place_id") String placeID, @Query("key") String apiKey,
+                                            @Query("fields") String searchFields);
+
+    /*
     @GET("autocomplete/output?parameters")
     Observable<SearchResult> getAutoCompletePlaceRequest(@Query("input") String input, @Query() @Query("radius") int radius,
                                                          @Query("type")String type, @Query("key")String apiKey);
 
- */
+    */
 }

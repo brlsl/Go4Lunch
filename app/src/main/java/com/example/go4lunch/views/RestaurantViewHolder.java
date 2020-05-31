@@ -19,10 +19,10 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
 
     public RestaurantViewHolder(@NonNull View itemView) {
         super(itemView);
-        mRestaurantName = itemView.findViewById(R.id.restaurant_name);
-        mRestaurantAddress = itemView.findViewById(R.id.restaurant_address);
-        mRestaurantOpeningHours = itemView.findViewById(R.id.opening_hours);
-        mRestaurantDistance = itemView.findViewById(R.id.restaurant_distance_from_current_position);
+        mRestaurantName = itemView.findViewById(R.id.rv_item_restaurant_name);
+        mRestaurantAddress = itemView.findViewById(R.id.rv_item_restaurant_address);
+        mRestaurantOpeningHours = itemView.findViewById(R.id.rv_item_opening_hours);
+        mRestaurantDistance = itemView.findViewById(R.id.rv_item_restaurant_distance_from_current_position);
         //mRestaurantPhoto = itemView.findViewById(R.id.restaurant_photo);
 
     }
