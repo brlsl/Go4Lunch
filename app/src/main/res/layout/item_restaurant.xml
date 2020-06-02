@@ -21,12 +21,14 @@
 
     <TextView
         android:id="@+id/rv_item_restaurant_name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="24dp"
         android:text="Restaurant Name"
         android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/rv_item_restaurant_distance_from_current_position"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -44,14 +46,16 @@
 
     <TextView
         android:id="@+id/rv_item_opening_hours"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
         android:text="restaurant opening hours"
         android:textStyle="italic"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/rv_star_1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rv_item_restaurant_address" />
 
@@ -70,6 +74,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/rv_star_2"
         app:layout_constraintEnd_toStartOf="@+id/rv_number_of_workmates_interested"
         app:layout_constraintTop_toBottomOf="@+id/rv_item_restaurant_distance_from_current_position"
         app:srcCompat="@drawable/ic_person_black_24dp" />
@@ -108,7 +113,7 @@
         android:id="@+id/rv_star_3"
         android:layout_width="15dp"
         android:layout_height="15dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginEnd="8dp"
         app:layout_constraintBottom_toBottomOf="@+id/rv_star_2"
         app:layout_constraintEnd_toStartOf="@+id/rv_item_restaurant_photo"
         app:layout_constraintTop_toTopOf="@+id/rv_star_2"

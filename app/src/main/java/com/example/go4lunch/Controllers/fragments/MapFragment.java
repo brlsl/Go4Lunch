@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.os.Looper;
 
 
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -192,8 +191,6 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
         mMap = googleMap;
         if (mLocationPermissionGranted == 1) {
             getDeviceLocation();
-
-
             mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
                 @Override
                 public boolean onMyLocationButtonClick() {
@@ -231,28 +228,6 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                 });
 
     }
-/*
-    public void executeHttpRequestPlaceDetailWithRetrofit(String restaurantID){
-        this.mDisposable = GooglePlaceStreams.streamFetchPlaceDetails(restaurantID, PLACE_API_KEY, DETAIL_FIELDS).subscribeWith(new DisposableObserver<PlaceDetail>() {
-            @Override
-            public void onNext(PlaceDetail placeDetail) {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        });
-    }
-
- */
-
 
     public void executeHttpRequestNearbySearchWithRetrofit(String latitude, String longitude) {
         this.mDisposable = GooglePlaceStreams.streamFetchNearbySearch(latitude+","+longitude,500,"restaurant", PLACE_API_KEY)
@@ -262,12 +237,6 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                 mMap.clear();
                 HashMap<LatLng,String> myDictionary = new HashMap<>();
                 //myDictionary.clear();
-
-
-
-
-                // declaration dictionary
-
 
                 for (int i = 0; i < searchNearby.getResults().size(); i++) {
 
@@ -289,15 +258,9 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
                     }
 
-                // inutile normalement
-                Intent i = new Intent(requireContext(),RestaurantListFragment.class);
-                i.putExtra("test", myDictionary);
-                System.out.println("MapFragment valeur dictionnary envoyé a RestaurantListFragment:" + myDictionary);
-
-
                 // pass data to restaurant fragment
                 RestaurantListFragment restaurantListFragment = ((MainActivity) requireActivity()).getmRestaurantListFragment();
-                restaurantListFragment.setResultList(searchNearby.getResults(), myDictionary);
+                restaurantListFragment.setResultList(searchNearby.getResults(), myDictionary, requireActivity());
 
                 mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
@@ -308,13 +271,6 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                             intent.putExtra("POSITION_KEY", marker.getPosition());// envoie la position du marker
                             System.out.println("MapFragment valeur de position latlng vers RestaurantDetailActivity:" +marker.getPosition());
                             System.out.println("MapFragment valeur dictionnary vers RestaurantDetailActivity:" + myDictionary);
-
-                            // envoie les données à l'adapter pour qu'elle puisse lancer detail activity (essai en cours)
-                            Intent intent2 = new Intent(requireContext(), RestaurantAdapter.class);
-                            intent2.putExtra("DICTIONARY_KEY2", myDictionary);
-                            intent2.putExtra("POSITION_KEY2", marker.getPosition());
-                            System.out.println("MapFragment valeur de position latlng:" +marker.getPosition());
-                            System.out.println("MapFragment valeur dictionnary 2:" + myDictionary);
 
                             startActivity(intent);
 

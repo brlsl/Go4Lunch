@@ -1,5 +1,6 @@
 package com.example.go4lunch.controllers.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -26,17 +27,6 @@ public class RestaurantListFragment extends androidx.fragment.app.Fragment {
     private RecyclerView mRecyclerView;
     private RestaurantAdapter adapter;
 
-    //private List<SearchResult> resultList;
-
-    public void setResultList(List<ResultSearchNearby> resultList, HashMap<LatLng,String> myDictionary) {
-
-        //this.resultList = resultList;
-
-        this.adapter = new RestaurantAdapter(resultList, myDictionary);
-        this.mRecyclerView.setAdapter(this.adapter);
-
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -49,6 +39,13 @@ public class RestaurantListFragment extends androidx.fragment.app.Fragment {
         this.mRecyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
 
         return view;
+    }
+    public void setResultList(List<ResultSearchNearby> resultList, HashMap<LatLng,String> myDictionary, Context context) {
+
+        //this.resultList = resultList;
+        this.adapter = new RestaurantAdapter(resultList, myDictionary,context);
+        this.mRecyclerView.setAdapter(this.adapter);
+
     }
 
 

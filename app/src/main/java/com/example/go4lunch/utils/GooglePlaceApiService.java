@@ -26,6 +26,7 @@ public interface GooglePlaceApiService {
     Observable<PlaceDetail> getPlaceDetails (@Query("place_id") String placeID, @Query("key") String apiKey,
                                             @Query("fields") String searchFields);
 
+
     /*
     @GET("autocomplete/output?parameters")
     Observable<SearchResult> getAutoCompletePlaceRequest(@Query("input") String input, @Query() @Query("radius") int radius,

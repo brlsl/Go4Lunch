@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:allowBackup="true"
@@ -15,9 +16,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".controllers.activities.SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -32,11 +30,23 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- main activity of the app with its fragments -->
+        </activity>
+        <!-- main activity of the app with its fragments -->
         <activity
             android:name=".controllers.activities.MainActivity"
-            android:theme="@style/AppTheme_NoTitle"></activity> <!-- child of main activity -->
-        <activity android:name=".controllers.activities.RestaurantDetailActivity"></activity>
+            android:theme="@style/AppTheme_NoTitle">
+
+        </activity>
+        <!-- Restaurant Detail Activity:child of main activity -->
+        <activity android:name=".controllers.activities.RestaurantDetailActivity">
+
+        </activity>
+        <!-- Setting Activity: child of Main Activity-->
+        <activity
+            android:name=".controllers.activities.SettingsActivity"
+            android:label="@string/title_activity_settings">
+
+        </activity>
     </application>
 
 </manifest>

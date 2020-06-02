@@ -26,6 +26,8 @@ import java.util.List;
 public abstract class BaseActivity extends AppCompatActivity
 {
 
+    public static final String PLACE_API_KEY_ = "AIzaSyAK366wqKIdy-Td7snXrjIRaI9MkXb2VZE";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +51,7 @@ public abstract class BaseActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.restaurant_search_item:
                 // Initialize Places.
-                Places.initialize(getApplicationContext(), "AIzaSyAK366wqKIdy-Td7snXrjIRaI9MkXb2VZE");
+                Places.initialize(getApplicationContext(), PLACE_API_KEY_);
 
                 // Create a new Places client instance.
                 PlacesClient placesClient = Places.createClient(this);

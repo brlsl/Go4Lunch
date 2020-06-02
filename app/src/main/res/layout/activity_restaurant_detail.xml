@@ -8,7 +8,7 @@
     android:background="@color/orangeAppColor">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/restaurant_detail_activity_restaurant_photo"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
@@ -24,9 +24,9 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
         android:clickable="true"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView"
+        app:layout_constraintBottom_toBottomOf="@+id/restaurant_detail_activity_restaurant_photo"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/restaurant_detail_activity_restaurant_photo"
         app:srcCompat="@drawable/ic_person_black_24dp" />
 
     <TextView
@@ -40,7 +40,7 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/restaurant_detail_activity_restaurant_photo" />
 
     <TextView
         android:id="@+id/restaurant_detail_activity_restaurant_address"
@@ -48,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="Restaurant adress"
+        android:text="Restaurant address"
         android:textColor="#FFFFFF"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/restaurant_detail_activity_restaurant_name" />

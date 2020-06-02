@@ -67,6 +67,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             case R.id.activity_main_drawer_settings:
                 // TODO: ouvrir les paramètres
                 Toast.makeText(this, "Les paramètres de l'application", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 break;
             case R.id.activity_main_drawer_logout:
                 this.signOutUserFromFirebase();
