@@ -1,5 +1,7 @@
 package com.example.go4lunch.controllers.activities;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.appcompat.app.ActionBar;
@@ -30,4 +32,6 @@ public class SettingsActivity extends AppCompatActivity {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
         }
     }
+
+
 }

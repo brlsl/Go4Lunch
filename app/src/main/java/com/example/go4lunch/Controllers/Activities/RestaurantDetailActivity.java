@@ -36,7 +36,7 @@ public class RestaurantDetailActivity extends AppCompatActivity {
     private static final String BASE_GOOGLE_PHOTO_URL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=1600&photoreference=";
 
 
-    Disposable mDisposable;
+    private Disposable mDisposable;
 
 
     @Override

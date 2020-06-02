@@ -214,7 +214,6 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                         mMap.setMyLocationEnabled(true);
                         mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
-
                         String stringLatitude = String.valueOf(location.getLatitude());
                         String stringLongitude = String.valueOf(location.getLongitude());
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
@@ -229,6 +228,8 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
     }
 
+
+
     public void executeHttpRequestNearbySearchWithRetrofit(String latitude, String longitude) {
         this.mDisposable = GooglePlaceStreams.streamFetchNearbySearch(latitude+","+longitude,500,"restaurant", PLACE_API_KEY)
                 .subscribeWith(new DisposableObserver<SearchNearby>() {
@@ -239,17 +240,13 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                 //myDictionary.clear();
 
                 for (int i = 0; i < searchNearby.getResults().size(); i++) {
-
-                    //SearchResult googlePlace = searchResult.getResults().get(i);
                     double lat = searchNearby.getResults().get(i).getGeometry().getLocation().getLat();
                     double lng = searchNearby.getResults().get(i).getGeometry().getLocation().getLng();
-                    //String placeName = googlePlace.getName();
                     LatLng markerLatLng = new LatLng(lat, lng);
 
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(markerLatLng);
                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
-                    //markerOptions.title(placeName);
 
                     mMap.addMarker(markerOptions);
 
@@ -258,20 +255,22 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
                     }
 
-                // pass data to restaurant fragment
+                // pass data to restaurant fragment (results, dictionary and context)
                 RestaurantListFragment restaurantListFragment = ((MainActivity) requireActivity()).getmRestaurantListFragment();
                 restaurantListFragment.setResultList(searchNearby.getResults(), myDictionary, requireActivity());
 
                 mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
-                            Toast.makeText(requireContext(), "on ouvre les détails", Toast.LENGTH_SHORT).show();
+
                             Intent intent = new Intent(requireContext(), RestaurantDetailActivity.class);
                             intent.putExtra("DICTIONARY_KEY", myDictionary);
                             intent.putExtra("POSITION_KEY", marker.getPosition());// envoie la position du marker
+                        /*
+                            Toast.makeText(requireContext(), "on ouvre les détails", Toast.LENGTH_SHORT).show();
                             System.out.println("MapFragment valeur de position latlng vers RestaurantDetailActivity:" +marker.getPosition());
                             System.out.println("MapFragment valeur dictionnary vers RestaurantDetailActivity:" + myDictionary);
-
+                        */
                             startActivity(intent);
 
 

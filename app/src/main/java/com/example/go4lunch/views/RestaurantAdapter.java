@@ -62,7 +62,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
 
 
         if(resultsNearby.getOpeningHours() != null){
-            if(resultsNearby.getOpeningHours().getOpenNow() == true)
+            if(resultsNearby.getOpeningHours().getOpenNow())
                 holder.mRestaurantOpeningHours.setText("Open");
             else
                 holder.mRestaurantOpeningHours.setText("Closed");
@@ -86,15 +86,25 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
                 .into(holder.mRestaurantPhoto);
     }
 
-        if (resultsNearby.getRating() == null || resultsNearby.getRating() <= 2.3){
-            holder.mStar3.setVisibility(View.GONE);
-            holder.mStar2.setVisibility(View.GONE);
+        if (resultsNearby.getRating() != null ) {
+            if (resultsNearby.getRating() > 2.3F && resultsNearby.getRating() <= 3.3F) {
+                holder.mStar1.setVisibility(View.VISIBLE);
+                holder.mStar2.setVisibility(View.GONE);
+                holder.mStar3.setVisibility(View.GONE);
+            }
+            else if (resultsNearby.getRating() > 3.3F && resultsNearby.getRating() < 4.3F){
+                holder.mStar1.setVisibility(View.VISIBLE);
+                holder.mStar2.setVisibility(View.VISIBLE);
+                holder.mStar3.setVisibility(View.GONE);
+            }
+            else if(resultsNearby.getRating() >= 4.3F) {
+                holder.mStar1.setVisibility(View.VISIBLE);
+                holder.mStar2.setVisibility(View.VISIBLE);
+                holder.mStar3.setVisibility(View.VISIBLE);
+            }
+        } else {
             holder.mStar1.setVisibility(View.GONE);
-        } else if (resultsNearby.getRating() > 2.3 && resultsNearby.getRating() <= 3.3){
-            holder.mStar3.setVisibility(View.GONE);
             holder.mStar2.setVisibility(View.GONE);
-        }
-        else if (resultsNearby.getRating() > 3.3 && resultsNearby.getRating() <= 4.3 ){
             holder.mStar3.setVisibility(View.GONE);
         }
 
