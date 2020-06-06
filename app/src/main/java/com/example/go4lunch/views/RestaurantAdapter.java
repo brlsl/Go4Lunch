@@ -2,6 +2,8 @@ package com.example.go4lunch.views;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,12 +29,13 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
     private List<ResultSearchNearby> mRestaurantList;
     private HashMap<LatLng, String> mDictionary;
     private Context mContext;
+    private  Location mDeviceLocation;
 
-
-    public RestaurantAdapter(List<ResultSearchNearby> items, HashMap<LatLng, String> myDictionaryTest, Context context){
-        mRestaurantList = items;
-        mDictionary = myDictionaryTest;
+    public RestaurantAdapter(List<ResultSearchNearby> items, HashMap<LatLng, String> dictionary, Context context, Location deviceLocation){
+        this.mRestaurantList = items;
+        this.mDictionary = dictionary;
         this.mContext = context;
+        this.mDeviceLocation = deviceLocation;
     }
 
     @NonNull
@@ -55,7 +58,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
         // for opening restaurant detail activity
         double lat = resultsNearby.getGeometry().getLocation().getLat();
         double lng = resultsNearby.getGeometry().getLocation().getLng();
-        LatLng latLng = new LatLng(lat, lng);
+        LatLng restaurantLatLng = new LatLng(lat, lng);
 
         holder.mRestaurantName.setText(resultsNearby.getName());
         holder.mRestaurantAddress.setText(resultsNearby.getVicinity());
@@ -86,7 +89,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
                 .into(holder.mRestaurantPhoto);
     }
 
-        if (resultsNearby.getRating() != null ) {
+        if (resultsNearby.getRating() != null) {
             if (resultsNearby.getRating() > 2.3F && resultsNearby.getRating() <= 3.3F) {
                 holder.mStar1.setVisibility(View.VISIBLE);
                 holder.mStar2.setVisibility(View.GONE);
@@ -108,6 +111,12 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
             holder.mStar3.setVisibility(View.GONE);
         }
 
+        // initialize location and set latitude/longitude
+        Location restaurantLocation = new Location(LocationManager.NETWORK_PROVIDER);
+        restaurantLocation.setLatitude(resultsNearby.getGeometry().getLocation().getLat());
+        restaurantLocation.setLongitude(resultsNearby.getGeometry().getLocation().getLng());
+
+        holder.mRestaurantDistance.setText((int) mDeviceLocation.distanceTo(restaurantLocation) +" meters");
 
         // click on item
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -115,7 +124,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
             public void onClick(View v) {
                 // on ouvre les détails
                 Intent intent = new Intent(v.getContext(), RestaurantDetailActivity.class);
-                intent.putExtra("POSITION_KEY",latLng);
+                intent.putExtra("POSITION_KEY",restaurantLatLng);
                 intent.putExtra("DICTIONARY_KEY", mDictionary);
 
                 //System.out.println("RestaurantAdapter valeur de position latlng: " +latLng);
@@ -124,6 +133,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
                 v.getContext().startActivity(intent);
             }
         });
+
     }
 
     @Override

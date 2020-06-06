@@ -2,6 +2,7 @@ package com.example.go4lunch.controllers.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,15 +41,11 @@ public class RestaurantListFragment extends androidx.fragment.app.Fragment {
 
         return view;
     }
-    public void setResultList(List<ResultSearchNearby> resultList, HashMap<LatLng,String> myDictionary, Context context) {
 
+    public void setResultList(List<ResultSearchNearby> resultList, HashMap<LatLng,String> myDictionary, Context context, Location deviceLocation) {
         //this.resultList = resultList;
-        this.adapter = new RestaurantAdapter(resultList, myDictionary,context);
+        this.adapter = new RestaurantAdapter(resultList, myDictionary,context, deviceLocation);
         this.mRecyclerView.setAdapter(this.adapter);
-
     }
-
-
-
 
 }

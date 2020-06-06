@@ -52,6 +52,17 @@ public class RestaurantDetailActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        disposeWhenDestroy();
+    }
+    private void disposeWhenDestroy() {
+        if (this.mDisposable != null && !this.mDisposable.isDisposed())
+            this.mDisposable.dispose();
+
+    }
+
     private void executeHttpRequestPlaceDetailsWithRetrofit(String placeID){
         this.mDisposable = GooglePlaceStreams.streamFetchPlaceDetails(placeID, API_KEY, DETAIL_FIELDS).subscribeWith(new DisposableObserver<PlaceDetail>() {
             @Override
@@ -115,7 +126,6 @@ public class RestaurantDetailActivity extends AppCompatActivity {
 
             @Override
             public void onComplete() {
-
             }
         });
 

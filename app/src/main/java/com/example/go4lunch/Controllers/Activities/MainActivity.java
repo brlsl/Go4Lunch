@@ -3,8 +3,13 @@ package com.example.go4lunch.controllers.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -12,10 +17,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
@@ -23,8 +30,15 @@ import com.example.go4lunch.controllers.fragments.MapFragment;
 import com.example.go4lunch.controllers.fragments.RestaurantListFragment;
 import com.example.go4lunch.controllers.fragments.WorkmatesFragment;
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -40,17 +54,88 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     //private ActivityMainBinding activityMainBinding;
 
 
-    public RestaurantListFragment getmRestaurantListFragment() {
-        return mRestaurantListFragment;
-    }
 
     // bottom navigation View fragments configuration
-    final Fragment mMapFragment = new MapFragment();
+    final MapFragment mMapFragment = new MapFragment();
     final RestaurantListFragment mRestaurantListFragment = new RestaurantListFragment();
     final Fragment mWorkmatesListFragment = new WorkmatesFragment();
     final FragmentManager fm = getSupportFragmentManager();
     Fragment active = mMapFragment; // first fragment active when app opens
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        super.onCreate(savedInstanceState, persistentState);
+
+    }
+
+    private void testAutocomplete(String input){
+        // Initialize Places.
+        Places.initialize(getApplicationContext(), PLACE_API_KEY_);
+        // Create new Places Client Instance
+        PlacesClient placesClient = Places.createClient(this);
+
+        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
+        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
+                .setTypeFilter(TypeFilter.ESTABLISHMENT)
+                .setSessionToken(token)
+                .setQuery(input)
+                .build();
+
+
+        placesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
+            for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
+                Log.i("MainActivity", prediction.getPlaceId());
+                Log.i("MainActivity", prediction.getPrimaryText(null).toString());
+
+            }
+        }).addOnFailureListener((exception) -> {
+            if (exception instanceof ApiException) {
+                ApiException apiException = (ApiException) exception;
+                Log.e("MainActivity", "Place not found: " + apiException.getStatusCode());
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.search_restaurant_menu, menu);
+
+        SearchView searchView = (SearchView) menu.findItem(R.id.restaurant_action_search).getActionView();
+
+        searchView.setQueryHint("Search a restaurant");
+
+        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if (query.trim().length() > 2) {
+                    mMapFragment.executeHttpRequestAutoCompleteWithRetrofit(query);
+                }
+                return false;
+
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+
+
+    public RestaurantListFragment getRestaurantListFragment() {
+        return mRestaurantListFragment;
+    }
+
+    public Fragment getMapFragment() {
+        return mMapFragment;
+    }
 
     @Override
     public int getFragmentLayout() {
@@ -185,15 +270,15 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.bottom_navigation_map:
-                        fm.beginTransaction().hide(active).show(mMapFragment).commit();
+                        fm.beginTransaction().hide(active).show(mMapFragment).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).commit();
                         active = mMapFragment;
                         return true;
                     case R.id.bottom_navigation_restaurant_list:
-                        fm.beginTransaction().hide(active).show(mRestaurantListFragment).commit();
+                        fm.beginTransaction().hide(active).show(mRestaurantListFragment).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).commit();
                         active = mRestaurantListFragment;
                         return true;
                     case R.id.bottom_navigation_workmates_list:
-                        fm.beginTransaction().hide(active).show(mWorkmatesListFragment).commit();
+                        fm.beginTransaction().hide(active).show(mWorkmatesListFragment).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).commit();
                         active = mWorkmatesListFragment;
                         return true;
                 }

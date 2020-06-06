@@ -20,7 +20,7 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAuoABTy9XWos-Dgtli_OV9ctmhanrmhx0" /> <!-- Google Maps Api Key -->
-        <!-- activity connection -->
+        <!-- connect Activity -->
         <activity
             android:name=".controllers.activities.ConnectActivity"
             android:theme="@style/AppTheme_LoginTheme"
