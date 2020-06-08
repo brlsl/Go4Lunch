@@ -11,10 +11,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
 
 public class WorkmatesFragment extends androidx.fragment.app.Fragment {
+
+    private RecyclerView mRecyclerView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -25,9 +30,17 @@ public class WorkmatesFragment extends androidx.fragment.app.Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.workmates_list_navigation, container, false);
+        View view = inflater.inflate(R.layout.workmates_list_navigation, container, false);
+
+        this.mRecyclerView = (RecyclerView) view;
+        this.mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        this.mRecyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
+
+        return view;
     }
 
+
+/*
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         menu.clear();
@@ -44,4 +57,6 @@ public class WorkmatesFragment extends androidx.fragment.app.Fragment {
         }
         return super.onOptionsItemSelected(item);
     }
+
+ */
 }

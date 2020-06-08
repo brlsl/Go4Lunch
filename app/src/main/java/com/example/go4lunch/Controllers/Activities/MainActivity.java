@@ -110,9 +110,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if (query.trim().length() > 2) {
+
+                if (query.trim().length() > 2 && mMapFragment.getLocation() != null) {
                     mMapFragment.executeHttpRequestAutoCompleteWithRetrofit(query);
+                    //mRestaurantListFragment.configureAdapter(0);
+                    // TODO: configurer adapter de la RV avec liste de Predictions
                 }
+
+
                 return false;
 
             }
@@ -133,9 +138,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         return mRestaurantListFragment;
     }
 
-    public Fragment getMapFragment() {
-        return mMapFragment;
-    }
 
     @Override
     public int getFragmentLayout() {

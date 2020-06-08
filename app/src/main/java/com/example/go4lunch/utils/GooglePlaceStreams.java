@@ -4,10 +4,12 @@ import com.example.go4lunch.models.apiGooglePlace.placeAutoComplete.AutoComplete
 import com.example.go4lunch.models.apiGooglePlace.placeDetails.PlaceDetail;
 import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.SearchNearby;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 public class GooglePlaceStreams {
@@ -36,4 +38,19 @@ public class GooglePlaceStreams {
                 .observeOn(AndroidSchedulers.mainThread())
                 .timeout(10, TimeUnit.SECONDS);
     }
+/*
+    public static Observable<SearchNearby> streamFetchNearbyAndAutoComplete(String input, String type, int radius, String location, String key){
+        GooglePlaceApiService mService = GooglePlaceApiService.retrofit.create(GooglePlaceApiService.class);
+        return streamFetchNearbySearch(input,radius, type,key)
+                .map(new Function<List<SearchNearby>, AutoComplete>(){
+                    @Override
+                    public AutoComplete apply(List<SearchNearby> searchNearbies) throws Exception {
+                        return null;
+                    }
+                });
+
+
+    }
+*/
+
 }

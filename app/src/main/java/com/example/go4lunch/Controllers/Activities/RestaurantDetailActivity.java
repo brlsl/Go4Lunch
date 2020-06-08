@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
+import com.example.go4lunch.api.UserHelper;
 import com.example.go4lunch.models.apiGooglePlace.placeDetails.PlaceDetail;
 import com.example.go4lunch.utils.GooglePlaceApiService;
 import com.example.go4lunch.utils.GooglePlaceStreams;
@@ -28,7 +29,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 
-public class RestaurantDetailActivity extends AppCompatActivity {
+public class RestaurantDetailActivity extends BaseActivity {
 
     private static final String API_KEY = "AIzaSyAK366wqKIdy-Td7snXrjIRaI9MkXb2VZE" ;
 
@@ -42,7 +43,6 @@ public class RestaurantDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_restaurant_detail);
 
         Intent intent = getIntent();
         HashMap<LatLng,String> hashMap = (HashMap<LatLng, String>)intent.getSerializableExtra("DICTIONARY_KEY"); // récupère dictionnaire
@@ -50,6 +50,11 @@ public class RestaurantDetailActivity extends AppCompatActivity {
 
         executeHttpRequestPlaceDetailsWithRetrofit(hashMap.get(latLng));
 
+    }
+
+    @Override
+    public int getFragmentLayout() {
+        return R.layout.activity_restaurant_detail;
     }
 
     @Override
@@ -72,6 +77,7 @@ public class RestaurantDetailActivity extends AppCompatActivity {
                 Button mRestaurantButtonPhoneCall = findViewById(R.id.restaurant_activity_detail_call_button);
                 Button mRestaurantButtonWebsiteURL  = findViewById(R.id.restaurant_activity_detail_website_button);
                 ImageView mRestaurantPhoto = findViewById(R.id.restaurant_detail_activity_restaurant_photo);
+                Button mRestaurantLikeButton = findViewById(R.id.restaurant_activity_detail_like_button);
 
                 mRestaurantName.setText(placeDetail.getResult().getName());
                 mRestaurantAddress.setText(placeDetail.getResult().getVicinity());
@@ -116,6 +122,15 @@ public class RestaurantDetailActivity extends AppCompatActivity {
                         }
                     }
                 });
+
+                mRestaurantLikeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (getCurrentUser() != null)
+                                UserHelper.updateIsInterested(getCurrentUser().getUid(), false);
+                    }
+                });
+
 
             }
 
