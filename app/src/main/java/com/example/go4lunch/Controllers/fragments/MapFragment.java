@@ -9,7 +9,6 @@ import android.location.Location;
 import android.os.Bundle;
 
 
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,12 +23,12 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.controllers.activities.RestaurantDetailActivity;
 import com.example.go4lunch.controllers.activities.MainActivity;
 import com.example.go4lunch.models.apiGooglePlace.placeAutoComplete.AutoComplete;
+import com.example.go4lunch.models.apiGooglePlace.placeAutoComplete.Prediction;
+import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.ResultSearchNearby;
 import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.SearchNearby;
 import com.example.go4lunch.utils.GooglePlaceStreams;
-import com.example.go4lunch.views.RestaurantAdapter;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -46,7 +45,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -79,9 +80,9 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     private Disposable mDisposable;
 
 
-    private HashMap<LatLng,String> myDictionary = new HashMap<>();
+    private HashMap<LatLng, ResultSearchNearby> myDictionary = new HashMap<>();
 
-    private boolean requestingLocationUpdates;
+    private ResultSearchNearby resultSearchNearby;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -251,7 +252,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
             @Override
             public void onNext(SearchNearby searchNearby) {
                 mMap.clear();
-                HashMap<LatLng,String> myDictionary = new HashMap<>();
+                HashMap<LatLng,ResultSearchNearby> myDictionary = new HashMap<>();
 
                 for (int i = 0; i < searchNearby.getResults().size(); i++) {
                     double lat = searchNearby.getResults().get(i).getGeometry().getLocation().getLat();
@@ -264,22 +265,26 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                     restaurantMarker.isVisible();
 
                     // put restaurant position & place id in dictionary
-                    myDictionary.put(markerLatLng, searchNearby.getResults().get(i).getPlaceId());
+                    myDictionary.put(markerLatLng, searchNearby.getResults().get(i));
 
                 }
 
-                //setMyDictionary(myDictionary);
+                // set dictionary for autoComplete
+                setMyDictionary(myDictionary);
 
                 // pass data to restaurant fragment (results, dictionary, context and device location)
                 RestaurantListFragment restaurantListFragment = ((MainActivity) requireActivity()).getRestaurantListFragment();
-                restaurantListFragment.setRestaurantAdapterNearby(searchNearby.getResults(), myDictionary, requireActivity(), deviceLocation);
+                restaurantListFragment.setRestaurantAdapterNearby(searchNearby.getResults(), requireActivity(), deviceLocation);
+
+
 
                 mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
                         Intent intent = new Intent(requireContext(), RestaurantDetailActivity.class);
-                        intent.putExtra("DICTIONARY_KEY", myDictionary); // send dictionary position(key) and place id (value)
-                        intent.putExtra("POSITION_KEY", marker.getPosition());// send marker position
+                        //intent.putExtra("DICTIONARY_KEY", myDictionary); // send dictionary position(key) and place id (value)
+                       // intent.putExtra("POSITION_KEY", marker.getPosition());// send marker position
+                        intent.putExtra("ID_KEY", myDictionary.get(marker.getPosition()).getPlaceId());
 
                         startActivity(intent);
                         return false;
@@ -297,9 +302,8 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
         });
     }
 
-
     public void executeHttpRequestAutoCompleteWithRetrofit(String input){
-        HashMap<LatLng,String> myDictionary = getMyDictionary();
+        HashMap<LatLng,ResultSearchNearby> myDictionary = getMyDictionary();
         Location deviceLocation = getLocation();
         String deviceLocationStr = deviceLocation.getLatitude()+","+deviceLocation.getLongitude();
 
@@ -309,27 +313,34 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                     @Override
                     public void onNext(AutoComplete autoComplete) {
                         mMap.clear();
-                        for (int i = 0; i < autoComplete.getPredictions().size(); i++) {
-                            if (myDictionary.containsValue(autoComplete.getPredictions().get(i).getPlaceId())){
-                                //TODO: récupérer la position et mettre le marqueur assosié
-                                LatLng latLng = getKeyByValue(myDictionary, autoComplete.getPredictions().get(i).getPlaceId());
 
-                                MarkerOptions markerOptions = new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory
+                        for (int i = 0; i < autoComplete.getPredictions().size(); i++) {
+                            String restaurantId = autoComplete.getPredictions().get(i).getPlaceId();
+                            LatLng restaurantLatLng = getPredictionKeyByValue(myDictionary,restaurantId);
+                            if (myDictionary.containsKey(restaurantLatLng)){
+                                // get position (key) associated to value (place id) and add marker
+                                //LatLng latLng = getPredictionKeyByValue(myDictionary, autoComplete.getPredictions().get(i).getPlaceId());
+
+                                MarkerOptions markerOptions = new MarkerOptions().position(restaurantLatLng).icon(BitmapDescriptorFactory
                                         .defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                                 Marker restaurantMarker = mMap.addMarker(markerOptions);
                                 restaurantMarker.isVisible();
 
                             }
+
                         }
+                        List<ResultSearchNearby> resultsSearch =  getResultSearchNearbyFromPrediction(autoComplete.getPredictions());
+
                         RestaurantListFragment restaurantListFragment = ((MainActivity) requireActivity()).getRestaurantListFragment();
-                        restaurantListFragment.setResultListPrediction(autoComplete.getPredictions());
+                        restaurantListFragment.setRestaurantAdapterNearby(resultsSearch, requireContext(), deviceLocation );
 
                         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                             @Override
                             public boolean onMarkerClick(Marker marker) {
                                 Intent intent = new Intent(requireContext(), RestaurantDetailActivity.class);
-                                intent.putExtra("DICTIONARY_KEY", myDictionary); // send dictionary position(key) and place id (value)
-                                intent.putExtra("POSITION_KEY", marker.getPosition());// send marker position
+                                //intent.putExtra("DICTIONARY_KEY", myDictionary); // send dictionary position(key) and place id (value)
+                                //intent.putExtra("POSITION_KEY", marker.getPosition());// send marker position
+                                intent.putExtra("ID_KEY", myDictionary.get(marker.getPosition()).getPlaceId());
 
                                 startActivity(intent);
                                 return false;
@@ -349,13 +360,27 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                 });
     }
 
-    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
-        for (Map.Entry<T, E> entry : map.entrySet()) {
-            if (Objects.equals(value, entry.getValue())) {
+    public static LatLng getPredictionKeyByValue(Map<LatLng,ResultSearchNearby > map, String id) {
+        for (Map.Entry<LatLng,ResultSearchNearby > entry : map.entrySet()) {
+            if (Objects.equals(id, entry.getValue().getPlaceId())) {
                 return entry.getKey();
             }
         }
         return null;
+    }
+
+    public List<ResultSearchNearby> getResultSearchNearbyFromPrediction(List<Prediction> listPredictions){
+        List<ResultSearchNearby> resultSearchNearbies = new ArrayList<>();
+        for (Prediction prediction: listPredictions) {
+            for(Map.Entry<LatLng,ResultSearchNearby > resultSearchNearby: myDictionary.entrySet()){
+                if (resultSearchNearby.getValue().getPlaceId().equals(prediction.getPlaceId())){
+                    resultSearchNearbies.add(resultSearchNearby.getValue());
+                }
+
+            }
+
+        }
+        return resultSearchNearbies;
     }
 
     // -------------------
@@ -370,11 +395,11 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
         this.location = location;
     }
 
-    public HashMap<LatLng, String> getMyDictionary() {
+    public HashMap<LatLng, ResultSearchNearby> getMyDictionary() {
         return myDictionary;
     }
 
-    public void setMyDictionary(HashMap<LatLng, String> myDictionary) {
+    public void setMyDictionary(HashMap<LatLng, ResultSearchNearby> myDictionary) {
         this.myDictionary = myDictionary;
     }
 

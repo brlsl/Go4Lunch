@@ -26,6 +26,7 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
 
     public TextView mRestaurantName, mRestaurantAddress, mRestaurantOpeningHours, mRestaurantDistance;
     public ImageView mRestaurantPhoto, mStar1, mStar2, mStar3;
+    String idRestaurant;
    // private HashMap<LatLng, String> mDictionary;
     //private Context mContext;
     //private  Location mDeviceLocation;
@@ -43,12 +44,13 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
         mStar3 = itemView.findViewById(R.id.rv_star_3);
     }
 
-    public void displayData(List<ResultSearchNearby> mRestaurantList, HashMap<LatLng, String> mDictionary,
+    public void displayData(List<ResultSearchNearby> mRestaurantList,
                             Context mContext, Location mDeviceLocation, int position){
 
-        System.out.println("Valeur de mon dictionnaire de RestaurantListFragment dans RestaurantAdapter:" + mDictionary);
+        System.out.println("Valeur de mon dictionnaire de RestaurantListFragment dans RestaurantAdapter:" + idRestaurant);
 
         ResultSearchNearby resultsNearby = mRestaurantList.get(position);
+        idRestaurant = resultsNearby.getPlaceId();
 
         // for opening restaurant detail activity
         double lat = resultsNearby.getGeometry().getLocation().getLat();
@@ -59,6 +61,8 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
         mRestaurantAddress.setText(resultsNearby.getVicinity());
 
 
+        //TODO: récupérer détail des heures avec placeDetail et place_id
+        resultsNearby.getPlaceId();
         if(resultsNearby.getOpeningHours() != null){
             if(resultsNearby.getOpeningHours().getOpenNow())
                 mRestaurantOpeningHours.setText("Open");
@@ -119,11 +123,11 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
             public void onClick(View v) {
                 // on ouvre les détails
                 Intent intent = new Intent(v.getContext(), RestaurantDetailActivity.class);
-                intent.putExtra("POSITION_KEY",restaurantLatLng);
-                intent.putExtra("DICTIONARY_KEY", mDictionary);
+                //intent.putExtra("POSITION_KEY",restaurantLatLng);
+                intent.putExtra("ID_KEY", idRestaurant);
 
                 //System.out.println("RestaurantAdapter valeur de position latlng: " +latLng);
-                System.out.println("RestaurantAdapter valeur de position dictionnaire: " + mDictionary);
+                System.out.println("RestaurantAdapter valeur de position dictionnaire: " + idRestaurant);
 
                 v.getContext().startActivity(intent);
             }

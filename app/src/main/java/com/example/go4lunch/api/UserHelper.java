@@ -32,9 +32,9 @@ public class UserHelper {
 
     // --- UPDATE ---
 
-    public static Task<Void> updateIsInterested(String uid, Boolean isInterested) {
-        return UserHelper.getUsersCollection().document(uid).update("isInterested", isInterested);
-    }
+    //public static Task<Void> updateIsInterested(String uid, Boolean isInterested) {
+      //  return UserHelper.getUsersCollection().document(uid).update("isInterested", isInterested);
+    //}
 
     // --- DELETE ---
 

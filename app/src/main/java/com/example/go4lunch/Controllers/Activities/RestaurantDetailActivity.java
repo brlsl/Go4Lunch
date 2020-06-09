@@ -45,10 +45,12 @@ public class RestaurantDetailActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        HashMap<LatLng,String> hashMap = (HashMap<LatLng, String>)intent.getSerializableExtra("DICTIONARY_KEY"); // récupère dictionnaire
-        LatLng latLng = Objects.requireNonNull(intent.getExtras()).getParcelable("POSITION_KEY"); // recupere la position
+        //HashMap<LatLng,String> hashMap = (HashMap<LatLng, String>)intent.getSerializableExtra("DICTIONARY_KEY"); // récupère dictionnaire
+        //LatLng latLng = Objects.requireNonNull(intent.getExtras()).getParcelable("POSITION_KEY"); // recupere la position
 
-        executeHttpRequestPlaceDetailsWithRetrofit(hashMap.get(latLng));
+        String id = Objects.requireNonNull(intent.getStringExtra("ID_KEY")); // recupere id
+
+        executeHttpRequestPlaceDetailsWithRetrofit(id);
 
     }
 
@@ -126,8 +128,9 @@ public class RestaurantDetailActivity extends BaseActivity {
                 mRestaurantLikeButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (getCurrentUser() != null)
-                                UserHelper.updateIsInterested(getCurrentUser().getUid(), false);
+                        if (getCurrentUser() != null){
+                            //placeDetail.getResult().getOpeningHours().getPeriods();
+                        }
                     }
                 });
 

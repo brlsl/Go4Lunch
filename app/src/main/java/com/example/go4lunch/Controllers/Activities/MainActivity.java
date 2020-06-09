@@ -113,7 +113,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
                 if (query.trim().length() > 2 && mMapFragment.getLocation() != null) {
                     mMapFragment.executeHttpRequestAutoCompleteWithRetrofit(query);
-                    //mRestaurantListFragment.configureAdapter(0);
+
                     // TODO: configurer adapter de la RV avec liste de Predictions
                 }
 

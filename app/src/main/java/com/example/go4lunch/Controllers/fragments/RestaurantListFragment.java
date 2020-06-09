@@ -42,22 +42,13 @@ public class RestaurantListFragment extends androidx.fragment.app.Fragment {
         this.mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         this.mRecyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
 
-        this.mRecyclerView.setAdapter(this.mAdapter);
         return view;
     }
 
 
-    public void setRestaurantAdapterNearby(List<ResultSearchNearby> resultListSearchNearby, HashMap<LatLng,String> myDictionary, Context context, Location deviceLocation) {
-        this.mAdapter = new RestaurantAdapter(resultListSearchNearby, myDictionary,context,deviceLocation);
-        mRecyclerView.setAdapter(mAdapter);
-    }
-
-    public void setResultListPrediction(List<Prediction> resultListPrediction){
-        mResultListPrediction = resultListPrediction;
-        this.mAdapter = new RestaurantAdapter(resultListPrediction);
-        mRecyclerView.setAdapter(mAdapter);
-        //mAdapter = new RestaurantAdapter(resultListPrediction);
-        //mRecyclerView.setAdapter(this.mAdapter);
+    public void setRestaurantAdapterNearby(List<ResultSearchNearby> resultListSearchNearby, Context context, Location deviceLocation) {
+        this.mAdapter = new RestaurantAdapter(resultListSearchNearby,context,deviceLocation);
+        this.mRecyclerView.setAdapter(mAdapter);
     }
 
 
