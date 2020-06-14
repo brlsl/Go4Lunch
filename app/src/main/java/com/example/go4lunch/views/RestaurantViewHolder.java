@@ -15,18 +15,16 @@ import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
 import com.example.go4lunch.controllers.activities.RestaurantDetailActivity;
 import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.ResultSearchNearby;
-import com.google.android.gms.maps.model.LatLng;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class RestaurantViewHolder extends RecyclerView.ViewHolder {
     private static final String BASE_GOOGLE_PHOTO_URL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=300&photoreference=" ;
     private static final String API_KEY = "AIzaSyAK366wqKIdy-Td7snXrjIRaI9MkXb2VZE";
 
-    public TextView mRestaurantName, mRestaurantAddress, mRestaurantOpeningHours, mRestaurantDistance;
-    public ImageView mRestaurantPhoto, mStar1, mStar2, mStar3;
-    String idRestaurant;
+    private TextView mRestaurantName, mRestaurantAddress, mRestaurantOpeningHours, mRestaurantDistance;
+    private ImageView mRestaurantPhoto, mStar1, mStar2, mStar3;
+    private String restaurantId;
    // private HashMap<LatLng, String> mDictionary;
     //private Context mContext;
     //private  Location mDeviceLocation;
@@ -38,7 +36,7 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
         mRestaurantAddress = itemView.findViewById(R.id.rv_item_restaurant_address);
         mRestaurantOpeningHours = itemView.findViewById(R.id.rv_item_opening_hours);
         mRestaurantDistance = itemView.findViewById(R.id.rv_item_restaurant_distance_from_current_position);
-        mRestaurantPhoto = itemView.findViewById(R.id.rv_item_workmate_avatar);
+        mRestaurantPhoto = itemView.findViewById(R.id.rv_item_restaurant_photo);
         mStar1 = itemView.findViewById(R.id.rv_star_1);
         mStar2 = itemView.findViewById(R.id.rv_star_2);
         mStar3 = itemView.findViewById(R.id.rv_star_3);
@@ -47,33 +45,33 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
     public void displayData(List<ResultSearchNearby> mRestaurantList,
                             Context mContext, Location mDeviceLocation, int position){
 
-        System.out.println("Valeur de mon dictionnaire de RestaurantListFragment dans RestaurantAdapter:" + idRestaurant);
+        System.out.println("Valeur de mon dictionnaire de RestaurantListFragment dans RestaurantAdapter:" + restaurantId);
 
         ResultSearchNearby resultsNearby = mRestaurantList.get(position);
-        idRestaurant = resultsNearby.getPlaceId();
-
+        restaurantId = resultsNearby.getPlaceId();
+/*
         // for opening restaurant detail activity
         double lat = resultsNearby.getGeometry().getLocation().getLat();
         double lng = resultsNearby.getGeometry().getLocation().getLng();
         LatLng restaurantLatLng = new LatLng(lat, lng);
-
+*/
         mRestaurantName.setText(resultsNearby.getName());
         mRestaurantAddress.setText(resultsNearby.getVicinity());
 
 
         //TODO: récupérer détail des heures avec placeDetail et place_id
-        resultsNearby.getPlaceId();
         if(resultsNearby.getOpeningHours() != null){
             if(resultsNearby.getOpeningHours().getOpenNow())
-                mRestaurantOpeningHours.setText("Open");
+                mRestaurantOpeningHours.setText(R.string.open);
             else
-                mRestaurantOpeningHours.setText("Closed");
+                mRestaurantOpeningHours.setText(R.string.closed);
 
         }
         else  {
-            mRestaurantOpeningHours.setText("Opening hours not available");
+            mRestaurantOpeningHours.setText(R.string.opening_hours_not_available);
         }
 
+        //default picture if no photo of restaurant
         if(resultsNearby.getPhotos() == null) {
             Glide.with(mContext)
                     .load(R.drawable.connect_activity_food)
@@ -115,19 +113,15 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
         restaurantLocation.setLatitude(resultsNearby.getGeometry().getLocation().getLat());
         restaurantLocation.setLongitude(resultsNearby.getGeometry().getLocation().getLng());
 
-        mRestaurantDistance.setText((int) mDeviceLocation.distanceTo(restaurantLocation) +" meters");
+        mRestaurantDistance.setText((int) mDeviceLocation.distanceTo(restaurantLocation) + " meters");
 
         // click on item
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // on ouvre les détails
+                // open restaurant details
                 Intent intent = new Intent(v.getContext(), RestaurantDetailActivity.class);
-                //intent.putExtra("POSITION_KEY",restaurantLatLng);
-                intent.putExtra("ID_KEY", idRestaurant);
-
-                //System.out.println("RestaurantAdapter valeur de position latlng: " +latLng);
-                System.out.println("RestaurantAdapter valeur de position dictionnaire: " + idRestaurant);
+                intent.putExtra("PLACE_ID_KEY", restaurantId);
 
                 v.getContext().startActivity(intent);
             }

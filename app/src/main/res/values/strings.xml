@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Go4Lunch</string>
 
+    <!--Google Place api key -->
+    <string name="google_place_api_key" translatable="false">AIzaSyAK366wqKIdy-Td7snXrjIRaI9MkXb2VZE</string>
+
     <!--Facebook configuration -->
     <string name="facebook_application_id" translatable="false">239273297312721</string>
     <string name="facebook_login_protocol_scheme" translatable="false">fb239273297312721</string>
@@ -27,6 +30,27 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    <!--Restaurant view holder-->
+    <string name="open">Open</string>
+    <string name="closed">Closed</string>
+    <string name="opening_hours_not_available">Opening hours not available</string>
+    <string name="distance"> meters</string>
+
+
+    <!--Restaurant detail activity-->
+    <string name="no_website_available">Restaurant has no website :(</string>
+    <string name="no_phone_number_available">Restaurant has no phone number :(</string>
+
+    <!--Map fragment -->
+    <string name="ask_for_permission">Go4Lunch needs location permission</string>
+    <string name="permission_granted">Permission granted</string>
+    <string name="permission_refused">Permission refused</string>
+    <string name="unknown_location">Device location unknown</string>
+
+    <!--WorkMate List Layout-->
+    <string name="user_is_eating_at_restaurant_name">User is eating at Restaurant Name</string>
+
 
 
 </resources>

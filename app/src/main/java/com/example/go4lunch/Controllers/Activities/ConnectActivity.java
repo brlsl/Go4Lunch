@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.widget.Toast;
 
 import com.example.go4lunch.R;
+
 import com.example.go4lunch.api.UserHelper;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
@@ -77,10 +78,13 @@ public class ConnectActivity extends BaseActivity {
         if (this.getCurrentUser() != null){
 
             String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
+            if (urlPicture != null){
+                urlPicture = urlPicture+"?height=250"; // for better resolution of profile picture
+            }
             String username = this.getCurrentUser().getDisplayName();
             String uid = this.getCurrentUser().getUid();
 
-            UserHelper.createUser(uid, username, urlPicture).addOnFailureListener(this.onFailureListener());
+            UserHelper.createUser(uid,username,urlPicture, null).addOnFailureListener(this.onFailureListener());
         }
     }
 

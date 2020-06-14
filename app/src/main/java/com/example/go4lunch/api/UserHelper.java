@@ -2,10 +2,16 @@ package com.example.go4lunch.api;
 
 
 import com.example.go4lunch.models.User;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserHelper {
 
@@ -19,8 +25,8 @@ public class UserHelper {
 
     // --- CREATE ---
 
-    public static Task<Void> createUser(String uid, String username, String urlPicture) {
-        User userToCreate = new User(uid, username, urlPicture);
+    public static Task<Void> createUser(String uid, String username, String urlPicture, String restaurantChoiceId) {
+        User userToCreate = new User(uid, username, urlPicture, restaurantChoiceId);
         return UserHelper.getUsersCollection().document(uid).set(userToCreate);
     }
 
@@ -30,11 +36,27 @@ public class UserHelper {
         return UserHelper.getUsersCollection().document(uid).get();
     }
 
+    /*
+    public static Task<DocumentSnapshot> getUserRestaurantChoice(String uid, String restaurantChoiceId){
+        return UserHelper.getUsersCollection().document(uid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+            }
+        });
+    }
+    */
+
+    public static Task<QuerySnapshot> getUserRestaurantChoice(String userRestaurantChoice){
+        return UserHelper.getUsersCollection().whereEqualTo("userRestaurantChoice",userRestaurantChoice).get();
+    }
+
     // --- UPDATE ---
 
-    //public static Task<Void> updateIsInterested(String uid, Boolean isInterested) {
-      //  return UserHelper.getUsersCollection().document(uid).update("isInterested", isInterested);
-    //}
+    public static Task<Void> updateUserRestaurantChoice(String uid, String userRestaurantChoiceId) {
+        return UserHelper.getUsersCollection().document(uid).update("userRestaurantChoiceId", userRestaurantChoiceId);
+    }
+
 
     // --- DELETE ---
 

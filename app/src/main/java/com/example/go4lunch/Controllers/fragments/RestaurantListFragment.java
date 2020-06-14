@@ -28,10 +28,6 @@ public class RestaurantListFragment extends androidx.fragment.app.Fragment {
     private RestaurantAdapter mAdapter;
 
 
-    private List<Prediction> mResultListPrediction;
-
-
-
 
     @Nullable
     @Override
@@ -44,7 +40,6 @@ public class RestaurantListFragment extends androidx.fragment.app.Fragment {
 
         return view;
     }
-
 
     public void setRestaurantAdapterNearby(List<ResultSearchNearby> resultListSearchNearby, Context context, Location deviceLocation) {
         this.mAdapter = new RestaurantAdapter(resultListSearchNearby,context,deviceLocation);

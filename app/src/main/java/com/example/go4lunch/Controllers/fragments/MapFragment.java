@@ -50,6 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
@@ -63,7 +64,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
     private static final float DEFAULT_ZOOM = 15f;
 
-    private static final String PLACE_API_KEY = "AIzaSyAK366wqKIdy-Td7snXrjIRaI9MkXb2VZE";
+    private static String PLACE_API_KEY = "AIzaSyAK366wqKIdy-Td7snXrjIRaI9MkXb2VZE";
 
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -82,7 +83,9 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
     private HashMap<LatLng, ResultSearchNearby> myDictionary = new HashMap<>();
 
-    private ResultSearchNearby resultSearchNearby;
+    private UUID uuid = UUID.randomUUID(); // Universally Unique Identifier
+    private String mSessionToken = uuid.toString();
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -170,7 +173,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
         if (EasyPermissions.hasPermissions(requireContext(), permissions)) {
             mLocationPermissionGranted = 1;
         } else {
-            EasyPermissions.requestPermissions(this, "Go4Lunch needs location permission", LOCATION_PERMISSION_REQUEST, permissions);
+            EasyPermissions.requestPermissions(this, getString(R.string.ask_for_permission), LOCATION_PERMISSION_REQUEST, permissions);
         }
     }
 
@@ -187,11 +190,11 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = 1;
-                    Toast.makeText(requireContext(), "Permission granted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.permission_granted, Toast.LENGTH_SHORT).show();
                     getDeviceLocation();
                 } else {
-                    Toast.makeText(requireContext(), "Permission refused", Toast.LENGTH_SHORT).show();
-                    EasyPermissions.requestPermissions(this, "Go4Lunch needs location permission", LOCATION_PERMISSION_REQUEST, permissions);
+                    Toast.makeText(requireContext(), R.string.permission_refused, Toast.LENGTH_SHORT).show();
+                    EasyPermissions.requestPermissions(this, getString(R.string.ask_for_permission), LOCATION_PERMISSION_REQUEST, permissions);
                 }
             }
         }
@@ -221,7 +224,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                             setLocation(deviceLocation);
                             handleDeviceLocation(deviceLocation);
                         } else {
-                            Toast.makeText(requireContext(), "Device location unknown", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), R.string.unknown_location, Toast.LENGTH_SHORT).show();
                             Log.d("MapFragment","Device location unknown");
                             //startLocationUpdate();
                         }
@@ -241,7 +244,6 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                 new LatLng(deviceLocation.getLatitude(),
                         deviceLocation.getLongitude()), DEFAULT_ZOOM));
         executeHttpRequestNearbySearchWithRetrofit();
-        //executeHttpRequestAutoCompleteWithRetrofit();
     }
 
     public void executeHttpRequestNearbySearchWithRetrofit() {
@@ -277,14 +279,11 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                 restaurantListFragment.setRestaurantAdapterNearby(searchNearby.getResults(), requireActivity(), deviceLocation);
 
 
-
                 mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
                         Intent intent = new Intent(requireContext(), RestaurantDetailActivity.class);
-                        //intent.putExtra("DICTIONARY_KEY", myDictionary); // send dictionary position(key) and place id (value)
-                       // intent.putExtra("POSITION_KEY", marker.getPosition());// send marker position
-                        intent.putExtra("ID_KEY", myDictionary.get(marker.getPosition()).getPlaceId());
+                        intent.putExtra("PLACE_ID_KEY", myDictionary.get(marker.getPosition()).getPlaceId());
 
                         startActivity(intent);
                         return false;
@@ -308,7 +307,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
         String deviceLocationStr = deviceLocation.getLatitude()+","+deviceLocation.getLongitude();
 
         this.mDisposable = GooglePlaceStreams.streamFetchAutoComplete(input,"establishment",deviceLocationStr,
-                500,"" ,"token", PLACE_API_KEY)
+                500,"" , mSessionToken, PLACE_API_KEY)
                 .subscribeWith(new DisposableObserver<AutoComplete>() {
                     @Override
                     public void onNext(AutoComplete autoComplete) {
@@ -338,10 +337,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                             @Override
                             public boolean onMarkerClick(Marker marker) {
                                 Intent intent = new Intent(requireContext(), RestaurantDetailActivity.class);
-                                //intent.putExtra("DICTIONARY_KEY", myDictionary); // send dictionary position(key) and place id (value)
-                                //intent.putExtra("POSITION_KEY", marker.getPosition());// send marker position
-                                intent.putExtra("ID_KEY", myDictionary.get(marker.getPosition()).getPlaceId());
-
+                                intent.putExtra("ID_KEY", Objects.requireNonNull(myDictionary.get(marker.getPosition())).getPlaceId());
                                 startActivity(intent);
                                 return false;
                             }
@@ -402,5 +398,4 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     public void setMyDictionary(HashMap<LatLng, ResultSearchNearby> myDictionary) {
         this.myDictionary = myDictionary;
     }
-
 }

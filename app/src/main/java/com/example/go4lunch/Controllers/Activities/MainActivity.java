@@ -28,7 +28,7 @@ import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
 import com.example.go4lunch.controllers.fragments.MapFragment;
 import com.example.go4lunch.controllers.fragments.RestaurantListFragment;
-import com.example.go4lunch.controllers.fragments.WorkmatesFragment;
+import com.example.go4lunch.controllers.fragments.WorkmatesListFragment;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -58,7 +58,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     // bottom navigation View fragments configuration
     final MapFragment mMapFragment = new MapFragment();
     final RestaurantListFragment mRestaurantListFragment = new RestaurantListFragment();
-    final Fragment mWorkmatesListFragment = new WorkmatesFragment();
+    final Fragment mWorkmatesListFragment = new WorkmatesListFragment();
     final FragmentManager fm = getSupportFragmentManager();
     Fragment active = mMapFragment; // first fragment active when app opens
 
@@ -70,7 +70,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private void testAutocomplete(String input){
         // Initialize Places.
-        Places.initialize(getApplicationContext(), PLACE_API_KEY_);
+        Places.initialize(getApplicationContext(), PLACE_API_KEY);
         // Create new Places Client Instance
         PlacesClient placesClient = Places.createClient(this);
 
