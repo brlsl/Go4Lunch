@@ -1,4 +1,4 @@
-package com.example.go4lunch.views;
+package com.example.go4lunch.views.restaurant_list_fragment_rv;
 
 import android.content.Context;
 import android.content.Intent;

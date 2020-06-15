@@ -74,8 +74,7 @@ public class ConnectActivity extends BaseActivity {
 
 
     public void createUserInFirestore(){
-
-        if (this.getCurrentUser() != null){
+        if (this.getCurrentUser() != null ){
 
             String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
             if (urlPicture != null){
@@ -84,7 +83,7 @@ public class ConnectActivity extends BaseActivity {
             String username = this.getCurrentUser().getDisplayName();
             String uid = this.getCurrentUser().getUid();
 
-            UserHelper.createUser(uid,username,urlPicture, null).addOnFailureListener(this.onFailureListener());
+            UserHelper.createUser(uid,username,urlPicture).addOnFailureListener(this.onFailureListener());
         }
     }
 

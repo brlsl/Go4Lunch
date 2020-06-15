@@ -1,12 +1,10 @@
-package com.example.go4lunch.views;
+package com.example.go4lunch.views.restaurant_list_fragment_rv;
 
 import android.content.Context;
 import android.location.Location;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,18 +12,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.apiGooglePlace.placeAutoComplete.Prediction;
 import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.ResultSearchNearby;
-import com.google.android.gms.maps.model.LatLng;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder> {
 
 
     private List<ResultSearchNearby> resultSearchNearbyList;
-    private List<ResultSearchNearby> resultSearchNearbyListFiltered;
-
     private Context mContext;
     private  Location mDeviceLocation;
 
@@ -35,7 +28,6 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
         this.resultSearchNearbyList = items;
         this.mContext = context;
         this.mDeviceLocation = deviceLocation;
-        resultSearchNearbyListFiltered = new ArrayList<>(items);
     }
 
 
@@ -43,7 +35,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
     @Override
     public RestaurantViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_restaurant,parent,false);
+                .inflate(R.layout.item_restaurant_fragment_restaurant_list,parent,false);
 
         return new RestaurantViewHolder(view);
     }

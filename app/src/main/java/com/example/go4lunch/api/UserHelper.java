@@ -1,17 +1,11 @@
 package com.example.go4lunch.api;
 
-
 import com.example.go4lunch.models.User;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class UserHelper {
 
@@ -25,8 +19,8 @@ public class UserHelper {
 
     // --- CREATE ---
 
-    public static Task<Void> createUser(String uid, String username, String urlPicture, String restaurantChoiceId) {
-        User userToCreate = new User(uid, username, urlPicture, restaurantChoiceId);
+    public static Task<Void> createUser(String uid, String username, String urlPicture) {
+        User userToCreate = new User(uid, username, urlPicture, null, null);
         return UserHelper.getUsersCollection().document(uid).set(userToCreate);
     }
 
@@ -47,16 +41,16 @@ public class UserHelper {
     }
     */
 
-    public static Task<QuerySnapshot> getUserRestaurantChoice(String userRestaurantChoice){
-        return UserHelper.getUsersCollection().whereEqualTo("userRestaurantChoice",userRestaurantChoice).get();
-    }
 
     // --- UPDATE ---
 
-    public static Task<Void> updateUserRestaurantChoice(String uid, String userRestaurantChoiceId) {
-        return UserHelper.getUsersCollection().document(uid).update("userRestaurantChoiceId", userRestaurantChoiceId);
+    public static Task<Void> updateUserRestaurantChoiceId(String uid, String userRestaurantChoiceId) {
+        return UserHelper.getUsersCollection().document(uid).update("restaurantChoiceId", userRestaurantChoiceId);
     }
 
+    public static Task<Void> updateUserRestaurantChoiceName(String uid, String userRestaurantChoiceName){
+        return UserHelper.getUsersCollection().document(uid).update("restaurantChoiceName",userRestaurantChoiceName);
+    }
 
     // --- DELETE ---
 

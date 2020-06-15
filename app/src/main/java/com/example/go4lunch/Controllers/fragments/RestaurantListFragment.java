@@ -15,12 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
 
-import com.example.go4lunch.models.apiGooglePlace.placeAutoComplete.Prediction;
 import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.ResultSearchNearby;
-import com.example.go4lunch.views.RestaurantAdapter;
-import com.google.android.gms.maps.model.LatLng;
+import com.example.go4lunch.views.restaurant_list_fragment_rv.RestaurantAdapter;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class RestaurantListFragment extends androidx.fragment.app.Fragment {
