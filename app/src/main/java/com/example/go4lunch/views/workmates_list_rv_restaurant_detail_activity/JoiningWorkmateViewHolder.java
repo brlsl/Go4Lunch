@@ -26,19 +26,26 @@ public class JoiningWorkmateViewHolder extends RecyclerView.ViewHolder {
         mTextViewIsJoining = itemView.findViewById(R.id.user_is_joining_text_view_restaurant_detail_activity);
     }
 
-    public void displayData(User userDatabase) {
-        UserHelper.getUser(userDatabase.getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+    public void displayData(User model, String mRestaurantId, Context context) {
+        UserHelper.getAllUser(model.getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                User currentUser = documentSnapshot.toObject(User.class);
-/*
-                // configure avatar
-                Glide
-                        .with(context)
-                        .load(userDatabase.getUrlPicture())
-                        .circleCrop()
-                        .into(mUserAvatar);*/
-                //Todo: si l'id et le nom du restaurant choisi correspondent à ceux du restaurant en détail, on rajoute l'utilisateur dans des joinings
+                User databaseUser = documentSnapshot.toObject(User.class);
+
+                if(!databaseUser.getRestaurantChoiceId().equals(mRestaurantId)){
+                    //itemView.setVisibility(View.GONE);
+                    //itemView.setLayoutParams(new RecyclerView.LayoutParams(0,0));
+                }else {
+                    // configure avatar
+                    Glide
+                            .with(context)
+                            .load(model.getUrlPicture())
+                            .circleCrop()
+                            .into(mUserAvatar);
+
+                    //configure text
+                    mTextViewIsJoining.setText(databaseUser.getUsername()+ " is joining!");
+                }
             }
         });
     }

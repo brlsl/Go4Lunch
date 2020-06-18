@@ -47,7 +47,7 @@ public class WorkmatesListFragment extends androidx.fragment.app.Fragment {
 
     private void configureRecyclerView() {
         // 1 Query
-        Query query = UserHelper.getUsersCollection();
+        Query query = UserHelper.getUsersCollection().orderBy("username", Query.Direction.ASCENDING);
 
         // 2 FirestoreRecyclerOptions
         FirestoreRecyclerOptions<User> options = new FirestoreRecyclerOptions.Builder<User>()

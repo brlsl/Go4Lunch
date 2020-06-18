@@ -14,11 +14,13 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
 public class JoiningWorkmateAdapter extends FirestoreRecyclerAdapter<User,JoiningWorkmateViewHolder> {
 
-    //private Context mContext;
+    private Context mContext;
+    private String mRestaurantId;
 
-    public JoiningWorkmateAdapter(@NonNull FirestoreRecyclerOptions<User> options) {
+    public JoiningWorkmateAdapter(@NonNull FirestoreRecyclerOptions<User> options, String restaurantId, Context context) {
         super(options);
-        //mContext = context;
+        mContext = context;
+        mRestaurantId = restaurantId;
     }
 
 
@@ -33,6 +35,6 @@ public class JoiningWorkmateAdapter extends FirestoreRecyclerAdapter<User,Joinin
 
     @Override
     protected void onBindViewHolder(@NonNull JoiningWorkmateViewHolder holder, int position, @NonNull User model) {
-        holder.displayData(model);
+        holder.displayData(model, mRestaurantId, mContext);
     }
 }

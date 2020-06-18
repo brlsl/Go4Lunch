@@ -26,9 +26,11 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
+import com.example.go4lunch.api.UserHelper;
 import com.example.go4lunch.controllers.fragments.MapFragment;
 import com.example.go4lunch.controllers.fragments.RestaurantListFragment;
 import com.example.go4lunch.controllers.fragments.WorkmatesListFragment;
+import com.example.go4lunch.models.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -114,7 +116,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 if (query.trim().length() > 2 && mMapFragment.getLocation() != null) {
                     mMapFragment.executeHttpRequestAutoCompleteWithRetrofit(query);
 
-                    // TODO: configurer adapter de la RV avec liste de Predictions
                 }
 
 
@@ -148,8 +149,17 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.activity_main_your_meal:
-                //TODO: montrer le restaurant choisi
-                Toast.makeText(this, "Mon repas", Toast.LENGTH_SHORT).show();
+                UserHelper.getAllUser(getCurrentUser().getUid()).addOnSuccessListener(documentSnapshot -> {
+                    String userRestaurantChoiceId = documentSnapshot.toObject(User.class).getRestaurantChoiceId();
+                    if (userRestaurantChoiceId != null) {
+                        Intent intent = new Intent(getApplicationContext(), RestaurantDetailActivity.class);
+                        intent.putExtra("PLACE_ID_KEY", userRestaurantChoiceId);
+                        startActivity(intent);
+                        Toast.makeText(this, "Your lunch", Toast.LENGTH_SHORT).show();
+                    } else
+                        Toast.makeText(this, "You haven't choose any restaurant yet!", Toast.LENGTH_SHORT).show();
+                });
+
                 break;
             case R.id.activity_main_drawer_settings:
                 // TODO: ouvrir les paramètres

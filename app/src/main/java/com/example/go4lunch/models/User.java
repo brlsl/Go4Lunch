@@ -6,22 +6,16 @@ public class User {
     private String username;
     private String urlPicture;
     private String restaurantChoiceName;
-
-
-
-
-
     private String restaurantChoiceId;
+    private Boolean restaurantIsLiked;
 
     public User(){} // Empty constructor required for Firestore's automatic data mapping.
 
 
-    public User(String uid, String username, String urlPicture, String restaurantChoiceName, String restaurantChoiceId) {
+    public User(String uid, String username, String urlPicture) {
         this.uid = uid;
         this.username = username;
         this.urlPicture = urlPicture;
-        this.restaurantChoiceName = restaurantChoiceName;
-        this.restaurantChoiceId = restaurantChoiceId;
     }
 
     // --- GETTERS ---
@@ -30,6 +24,8 @@ public class User {
     public String getUrlPicture() { return urlPicture; }
     public String getRestaurantChoiceName() { return restaurantChoiceName;}
     public String getRestaurantChoiceId() {return restaurantChoiceId;}
+    public Boolean getRestaurantIsLiked() {return restaurantIsLiked;}
+
 
 
 
@@ -39,4 +35,5 @@ public class User {
     public void setUrlPicture(String urlPicture) { this.urlPicture = urlPicture; }
     public void setRestaurantChoiceName(String restaurantChoiceName) { this.restaurantChoiceName = restaurantChoiceName;}
     public void setRestaurantChoiceId(String restaurantChoiceId) {this.restaurantChoiceId = restaurantChoiceId;}
+    public void setRestaurantIsLiked(Boolean restaurantIsLiked) {this.restaurantIsLiked = restaurantIsLiked;}
 }

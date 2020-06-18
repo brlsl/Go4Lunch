@@ -27,6 +27,7 @@ import com.example.go4lunch.models.apiGooglePlace.placeAutoComplete.Prediction;
 import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.ResultSearchNearby;
 import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.SearchNearby;
 import com.example.go4lunch.utils.GooglePlaceStreams;
+import com.example.go4lunch.views.workmates_list_rv_restaurant_detail_activity.JoiningWorkmateAdapter;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
@@ -43,6 +44,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 
 import java.util.ArrayList;
@@ -85,6 +87,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
     private UUID uuid = UUID.randomUUID(); // Universally Unique Identifier
     private String mSessionToken = uuid.toString();
+    private FloatingActionButton mGetDeviceLocationFab;
 
 
     @Override
@@ -108,7 +111,6 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
         };
     }
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -124,6 +126,12 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
         return mView;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+            mGetDeviceLocationFab = getView().findViewById(R.id.getLocationFab);
+
+    }
 
     @Override
     public void onPause() {
@@ -192,8 +200,20 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                     mLocationPermissionGranted = 1;
                     Toast.makeText(requireContext(), R.string.permission_granted, Toast.LENGTH_SHORT).show();
                     getDeviceLocation();
+                    mGetDeviceLocationFab.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            getDeviceLocation();
+                        }
+                    });
                 } else {
                     Toast.makeText(requireContext(), R.string.permission_refused, Toast.LENGTH_SHORT).show();
+                    mGetDeviceLocationFab.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(requireContext(), "Please give location permission first", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                     EasyPermissions.requestPermissions(this, getString(R.string.ask_for_permission), LOCATION_PERMISSION_REQUEST, permissions);
                 }
             }
@@ -204,6 +224,12 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         if (mLocationPermissionGranted == 1) {
+            mGetDeviceLocationFab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getDeviceLocation();
+                }
+            });
             getDeviceLocation();
             mMap.setOnMyLocationButtonClickListener(() -> {
                 getDeviceLocation();
@@ -230,9 +256,9 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                         }
                     }
                 }).addOnFailureListener(requireActivity(), new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("Map Fragment","get Device Location on Failure Listener:" , e);
             }
         });
 
@@ -261,6 +287,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                     double lng = searchNearby.getResults().get(i).getGeometry().getLocation().getLng();
                     LatLng markerLatLng = new LatLng(lat, lng);
 
+
                     MarkerOptions markerOptions = new MarkerOptions().position(markerLatLng).icon(BitmapDescriptorFactory
                             .defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
                     Marker restaurantMarker = mMap.addMarker(markerOptions);
@@ -282,10 +309,11 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                 mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
-                        Intent intent = new Intent(requireContext(), RestaurantDetailActivity.class);
-                        intent.putExtra("PLACE_ID_KEY", myDictionary.get(marker.getPosition()).getPlaceId());
-
-                        startActivity(intent);
+                        Intent intentDetail = new Intent(requireContext(), RestaurantDetailActivity.class);
+                        //Intent intentList = new Intent(requireContext(), JoiningWorkmateAdapter.class);
+                        intentDetail.putExtra("PLACE_ID_KEY", myDictionary.get(marker.getPosition()).getPlaceId());
+                        //intentList.putExtra("PLACE_ID_KEY", myDictionary.get(marker.getPosition()).getPlaceId());
+                        startActivity(intentDetail);
                         return false;
                     }
                 });
@@ -337,7 +365,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                             @Override
                             public boolean onMarkerClick(Marker marker) {
                                 Intent intent = new Intent(requireContext(), RestaurantDetailActivity.class);
-                                intent.putExtra("ID_KEY", Objects.requireNonNull(myDictionary.get(marker.getPosition())).getPlaceId());
+                                intent.putExtra("PLACE_ID_KEY", Objects.requireNonNull(myDictionary.get(marker.getPosition())).getPlaceId());
                                 startActivity(intent);
                                 return false;
                             }

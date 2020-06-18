@@ -83,6 +83,7 @@ public class ConnectActivity extends BaseActivity {
             String username = this.getCurrentUser().getDisplayName();
             String uid = this.getCurrentUser().getUid();
 
+         //   if (UserHelper.getExistingUser(getCurrentUser().getUid())) { }
             UserHelper.createUser(uid,username,urlPicture).addOnFailureListener(this.onFailureListener());
         }
     }

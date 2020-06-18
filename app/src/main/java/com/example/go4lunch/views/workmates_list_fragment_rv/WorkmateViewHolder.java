@@ -31,40 +31,33 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
         mUserAvatar = itemView.findViewById(R.id.rv_item_workmate_avatar);
     }
 
-    public void displayData(User userDatabase, Context context) {
+    public void displayData(User model, Context context) {
 
-        // prevent to print our connected user in recycler view
-        String connectedUserId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-        if (userDatabase.getUid().equals(connectedUserId)) {
-            itemView.setVisibility(View.INVISIBLE);
-            itemView.setLayoutParams(new RecyclerView.LayoutParams(0,0));
-        }
-
-        UserHelper.getUser(userDatabase.getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        UserHelper.getAllUser(model.getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                User currentUser = documentSnapshot.toObject(User.class);
+                User databaseUser = documentSnapshot.toObject(User.class);
 
                 // configure avatar
                 Glide
                         .with(context)
-                        .load(userDatabase.getUrlPicture())
+                        .load(model.getUrlPicture())
                         .circleCrop()
                         .into(mUserAvatar);
 
                 // configure choice text
-                if (currentUser.getRestaurantChoiceId() == null || currentUser.getRestaurantChoiceName() == null) {
-                    mUserChoice.setText(userDatabase.getUsername() + " has not chosen yet");
+                if (databaseUser.getRestaurantChoiceId() == null ) {
+                    mUserChoice.setText(model.getUsername() + " has not chosen yet");
                 } else
-                    mUserChoice.setText(userDatabase.getUsername() + " is eating at " +  userDatabase.getRestaurantChoiceName());
+                    mUserChoice.setText(model.getUsername() + " is eating at " +  model.getRestaurantChoiceName());
 
                 // open restaurant details on item click
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (currentUser.getRestaurantChoiceId() != null && currentUser.getRestaurantChoiceName() != null){
+                        if (databaseUser.getRestaurantChoiceId() != null){
                             Intent intent = new Intent(context, RestaurantDetailActivity.class);
-                            intent.putExtra("PLACE_ID_KEY", userDatabase.getRestaurantChoiceId());
+                            intent.putExtra("PLACE_ID_KEY", model.getRestaurantChoiceId());
                             context.startActivity(intent);
                         }
                     }
