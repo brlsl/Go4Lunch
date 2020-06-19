@@ -149,7 +149,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.activity_main_your_meal:
-                UserHelper.getAllUser(getCurrentUser().getUid()).addOnSuccessListener(documentSnapshot -> {
+                UserHelper.getCurrentUser(getCurrentUser().getUid()).addOnSuccessListener(documentSnapshot -> {
                     String userRestaurantChoiceId = documentSnapshot.toObject(User.class).getRestaurantChoiceId();
                     if (userRestaurantChoiceId != null) {
                         Intent intent = new Intent(getApplicationContext(), RestaurantDetailActivity.class);

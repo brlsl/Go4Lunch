@@ -29,18 +29,10 @@ import com.example.go4lunch.models.apiGooglePlace.placeDetails.PlaceDetail;
 import com.example.go4lunch.utils.GooglePlaceStreams;
 import com.example.go4lunch.views.workmates_list_rv_restaurant_detail_activity.JoiningWorkmateAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Objects;
 
@@ -88,7 +80,9 @@ public class RestaurantDetailActivity extends BaseActivity {
         setContentView(R.layout.activity_restaurant_detail);
         mRecyclerView = findViewById(R.id.workmates_joining_list_rv_restaurant_detail_activity);
 
-        Query query = UserHelper.getAllJoiningWorkmate(restaurantId).orderBy("username", Query.Direction.ASCENDING);
+        Query query = UserHelper.getUsersCollection()
+                .whereEqualTo("restaurantChoiceId",restaurantId)
+                .orderBy("username", Query.Direction.ASCENDING);
 
         FirestoreRecyclerOptions<User> options = new FirestoreRecyclerOptions.Builder<User>()
                 .setQuery(query, User.class)
@@ -184,7 +178,7 @@ public class RestaurantDetailActivity extends BaseActivity {
 
 
                     // manage view and user restaurant choice  in firestore
-                    UserHelper.getAllUser(getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    UserHelper.getCurrentUser(getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                         @Override
                         public void onSuccess(DocumentSnapshot userDocumentSnapshot) {
                             User databaseUser = userDocumentSnapshot.toObject(User.class);
@@ -229,33 +223,27 @@ public class RestaurantDetailActivity extends BaseActivity {
                             });
 */
                     // Manage like button view and data in firestore
-                    UserHelper.getLikedRestaurant(getCurrentUser().getUid(), placeID).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            Restaurant restaurantDb = documentSnapshot.toObject(Restaurant.class);
+                    UserHelper.getUserLikeRestaurant(getCurrentUser().getUid(), placeID).addOnSuccessListener(documentSnapshot -> {
+                        Restaurant restaurantDb = documentSnapshot.toObject(Restaurant.class);
 
-                            if(restaurantDb != null && restaurantDb.getRestaurantIsLiked()){
-                                mRestaurantLikeButton.setBackgroundColor(Color.GRAY);
-                                isLiked = true;
-                            }
-                            mRestaurantLikeButton.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if (isLiked == null || !isLiked){
-                                        UserHelper.createUserLikeRestaurant(getCurrentUser().getUid(),placeID,true);
-                                        isLiked = true;
-                                        v.setBackgroundColor(Color.GRAY);
-                                        Toast.makeText(getApplicationContext(), "You like this restaurant", Toast.LENGTH_SHORT).show();
-                                    }
-                                    else {
-                                        UserHelper.deleteLikeRestaurant(getCurrentUser().getUid(),placeID);
-                                        isLiked = false;
-                                        mRestaurantLikeButton.setBackgroundColor(Color.WHITE);
-                                        Toast.makeText(getApplicationContext(), "You dislike this restaurant", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
+                        if(restaurantDb != null && restaurantDb.getRestaurantIsLiked()){
+                            mRestaurantLikeButton.setBackgroundColor(Color.GRAY);
+                            isLiked = true;
                         }
+                        mRestaurantLikeButton.setOnClickListener(v -> {
+                            if (isLiked == null || !isLiked){
+                                UserHelper.createRestaurantLikedByUser(getCurrentUser().getUid(),placeID,true);
+                                isLiked = true;
+                                v.setBackgroundColor(Color.GRAY);
+                                Toast.makeText(getApplicationContext(), "You like this restaurant", Toast.LENGTH_SHORT).show();
+                            }
+                            else {
+                                UserHelper.deleteRestaurantLikedByUser(getCurrentUser().getUid(),placeID);
+                                isLiked = false;
+                                mRestaurantLikeButton.setBackgroundColor(Color.WHITE);
+                                Toast.makeText(getApplicationContext(), "You dislike this restaurant", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     });
 
 
@@ -274,6 +262,8 @@ public class RestaurantDetailActivity extends BaseActivity {
             }
 
         });
+
+
 
     }
 }

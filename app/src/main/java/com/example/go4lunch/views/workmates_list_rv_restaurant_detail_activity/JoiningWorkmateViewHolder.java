@@ -27,7 +27,7 @@ public class JoiningWorkmateViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void displayData(User model, String mRestaurantId, Context context) {
-        UserHelper.getAllUser(model.getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        UserHelper.getCurrentUser(model.getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 User databaseUser = documentSnapshot.toObject(User.class);

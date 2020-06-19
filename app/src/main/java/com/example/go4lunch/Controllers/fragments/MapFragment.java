@@ -20,14 +20,15 @@ import androidx.annotation.Nullable;
 
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.api.UserHelper;
 import com.example.go4lunch.controllers.activities.RestaurantDetailActivity;
 import com.example.go4lunch.controllers.activities.MainActivity;
+import com.example.go4lunch.models.User;
 import com.example.go4lunch.models.apiGooglePlace.placeAutoComplete.AutoComplete;
 import com.example.go4lunch.models.apiGooglePlace.placeAutoComplete.Prediction;
 import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.ResultSearchNearby;
 import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.SearchNearby;
 import com.example.go4lunch.utils.GooglePlaceStreams;
-import com.example.go4lunch.views.workmates_list_rv_restaurant_detail_activity.JoiningWorkmateAdapter;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
@@ -45,6 +46,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 
 import java.util.ArrayList;
@@ -310,9 +313,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                     @Override
                     public boolean onMarkerClick(Marker marker) {
                         Intent intentDetail = new Intent(requireContext(), RestaurantDetailActivity.class);
-                        //Intent intentList = new Intent(requireContext(), JoiningWorkmateAdapter.class);
                         intentDetail.putExtra("PLACE_ID_KEY", myDictionary.get(marker.getPosition()).getPlaceId());
-                        //intentList.putExtra("PLACE_ID_KEY", myDictionary.get(marker.getPosition()).getPlaceId());
                         startActivity(intentDetail);
                         return false;
                     }
@@ -325,6 +326,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
             @Override
             public void onComplete() {
+                 handleMarkerWorkmateGoingToRestaurant(getMyDictionary());
             }
         });
     }
@@ -343,7 +345,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
                         for (int i = 0; i < autoComplete.getPredictions().size(); i++) {
                             String restaurantId = autoComplete.getPredictions().get(i).getPlaceId();
-                            LatLng restaurantLatLng = getPredictionKeyByValue(myDictionary,restaurantId);
+                            LatLng restaurantLatLng = getLatLngKeyByRestaurantIdValue(myDictionary,restaurantId);
                             if (myDictionary.containsKey(restaurantLatLng)){
                                 // get position (key) associated to value (place id) and add marker
                                 //LatLng latLng = getPredictionKeyByValue(myDictionary, autoComplete.getPredictions().get(i).getPlaceId());
@@ -379,13 +381,35 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
                     @Override
                     public void onComplete() {
-
                     }
                 });
     }
 
-    public static LatLng getPredictionKeyByValue(Map<LatLng,ResultSearchNearby > map, String id) {
-        for (Map.Entry<LatLng,ResultSearchNearby > entry : map.entrySet()) {
+    // --- UI ---
+
+    private void handleMarkerWorkmateGoingToRestaurant(HashMap<LatLng,ResultSearchNearby> myDictionary){
+        for (Map.Entry<LatLng,ResultSearchNearby> entry : myDictionary.entrySet()) {
+            UserHelper.getUsersCollection()
+                    .whereEqualTo("restaurantChoiceId", entry.getValue().getPlaceId()).get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots){
+                            User user = documentSnapshot.toObject(User.class);
+                            LatLng userRestaurantChoiceLatLng = getLatLngKeyByRestaurantIdValue(myDictionary,user.getRestaurantChoiceId());
+                            assert userRestaurantChoiceLatLng != null;
+                            MarkerOptions markerOptions = new MarkerOptions().position(userRestaurantChoiceLatLng).icon(BitmapDescriptorFactory
+                                    .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+                            Marker restaurantMarker = mMap.addMarker(markerOptions);
+                            restaurantMarker.isVisible();
+                        }
+
+                    });
+        }
+    }
+
+    // --- UTILS ---
+
+    public static LatLng getLatLngKeyByRestaurantIdValue(Map<LatLng,ResultSearchNearby> map, String id) {
+        for (Map.Entry<LatLng,ResultSearchNearby> entry : map.entrySet()) {
             if (Objects.equals(id, entry.getValue().getPlaceId())) {
                 return entry.getKey();
             }
@@ -396,11 +420,10 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     public List<ResultSearchNearby> getResultSearchNearbyFromPrediction(List<Prediction> listPredictions){
         List<ResultSearchNearby> resultSearchNearbies = new ArrayList<>();
         for (Prediction prediction: listPredictions) {
-            for(Map.Entry<LatLng,ResultSearchNearby > resultSearchNearby: myDictionary.entrySet()){
+            for(Map.Entry<LatLng,ResultSearchNearby> resultSearchNearby: myDictionary.entrySet()){
                 if (resultSearchNearby.getValue().getPlaceId().equals(prediction.getPlaceId())){
                     resultSearchNearbies.add(resultSearchNearby.getValue());
                 }
-
             }
 
         }

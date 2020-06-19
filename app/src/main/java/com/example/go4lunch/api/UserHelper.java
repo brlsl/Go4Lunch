@@ -4,7 +4,6 @@ import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.models.User;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -33,9 +32,9 @@ public class UserHelper {
         return UserHelper.getUsersCollection().document(uid).set(userToCreate, SetOptions.merge());
     }
 
-    public static Task<Void> createUserLikeRestaurant(String uid, String restaurantId, Boolean isLiked){
+    public static void createRestaurantLikedByUser(String uid, String restaurantId, Boolean isLiked){
         Restaurant restaurantLiked = new Restaurant(restaurantId, isLiked);
-        return UserHelper.getUsersCollection().document(uid)
+        UserHelper.getUsersCollection().document(uid)
                 .collection(COLLECTION_RESTAURANTS_LIKED).document(restaurantId).set(restaurantLiked);
     }
 
@@ -45,18 +44,15 @@ public class UserHelper {
         return UserHelper.getUsersCollection().whereEqualTo("uid", uid);
     }
 
-    public static Task<DocumentSnapshot> getAllUser(String uid){
+    public static Task<DocumentSnapshot> getCurrentUser(String uid){
         return UserHelper.getUsersCollection().document(uid).get();
     }
 
-    public static Task<DocumentSnapshot> getLikedRestaurant(String uid,String restaurantId){
+    public static Task<DocumentSnapshot> getUserLikeRestaurant(String uid, String restaurantId){
         return UserHelper.getUsersCollection().document(uid)
                 .collection(COLLECTION_RESTAURANTS_LIKED).document(restaurantId).get();
     }
 
-    public static Query getAllJoiningWorkmate(String placeId){
-        return UserHelper.getUsersCollection().whereEqualTo("restaurantChoiceId",placeId);
-    }
 
     // --- UPDATE ---
 
@@ -74,8 +70,8 @@ public class UserHelper {
         return UserHelper.getUsersCollection().document(uid).delete();
     }
 
-    public static Task<Void> deleteLikeRestaurant(String uid, String restaurantId){
-        return UserHelper.getUsersCollection().document(uid)
+    public static void deleteRestaurantLikedByUser(String uid, String restaurantId){
+        UserHelper.getUsersCollection().document(uid)
                 .collection(COLLECTION_RESTAURANTS_LIKED).document(restaurantId).delete();
     }
 
