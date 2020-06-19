@@ -10,24 +10,33 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
+import com.example.go4lunch.api.UserHelper;
 import com.example.go4lunch.controllers.activities.RestaurantDetailActivity;
+import com.example.go4lunch.models.User;
 import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.ResultSearchNearby;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RestaurantViewHolder extends RecyclerView.ViewHolder {
     private static final String BASE_GOOGLE_PHOTO_URL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=300&photoreference=" ;
     private static final String API_KEY = "AIzaSyAK366wqKIdy-Td7snXrjIRaI9MkXb2VZE";
 
-    private TextView mRestaurantName, mRestaurantAddress, mRestaurantOpeningHours, mRestaurantDistance;
+    private TextView mRestaurantName, mRestaurantAddress, mRestaurantOpeningHours,
+            mRestaurantDistance, mNumberOfInterested;
     private ImageView mRestaurantPhoto, mStar1, mStar2, mStar3;
     private String restaurantId;
-   // private HashMap<LatLng, String> mDictionary;
+    // private HashMap<LatLng, String> mDictionary;
     //private Context mContext;
     //private  Location mDeviceLocation;
+
 
 
     public RestaurantViewHolder(@NonNull View itemView) {
@@ -37,17 +46,17 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
         mRestaurantOpeningHours = itemView.findViewById(R.id.rv_item_opening_hours);
         mRestaurantDistance = itemView.findViewById(R.id.rv_item_restaurant_distance_from_current_position);
         mRestaurantPhoto = itemView.findViewById(R.id.rv_item_restaurant_photo);
+        mNumberOfInterested = itemView.findViewById(R.id.rv_number_of_workmates_interested);
+
         mStar1 = itemView.findViewById(R.id.rv_star_1);
         mStar2 = itemView.findViewById(R.id.rv_star_2);
         mStar3 = itemView.findViewById(R.id.rv_star_3);
     }
 
-    public void displayData(List<ResultSearchNearby> mRestaurantList,
+    public void displayData(List<ResultSearchNearby> mRestaurantResultNearbyList,
                             Context mContext, Location mDeviceLocation, int position){
 
-        System.out.println("Valeur de mon dictionnaire de RestaurantListFragment dans RestaurantAdapter:" + restaurantId);
-
-        ResultSearchNearby resultsNearby = mRestaurantList.get(position);
+        ResultSearchNearby resultsNearby = mRestaurantResultNearbyList.get(position);
         restaurantId = resultsNearby.getPlaceId();
 /*
         // for opening restaurant detail activity
@@ -81,7 +90,8 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
         }
         else {
             Glide.with(mContext)
-                    .load(BASE_GOOGLE_PHOTO_URL + resultsNearby.getPhotos().get(0).getPhotoReference() + "&key=" + API_KEY)
+                    .load(BASE_GOOGLE_PHOTO_URL + resultsNearby.getPhotos().get(0)
+                            .getPhotoReference() + "&key=" + API_KEY)
                     .centerCrop()
                     .into(mRestaurantPhoto);
         }
@@ -112,8 +122,24 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
         Location restaurantLocation = new Location(LocationManager.NETWORK_PROVIDER);
         restaurantLocation.setLatitude(resultsNearby.getGeometry().getLocation().getLat());
         restaurantLocation.setLongitude(resultsNearby.getGeometry().getLocation().getLng());
-
         mRestaurantDistance.setText((int) mDeviceLocation.distanceTo(restaurantLocation) + " meters");
+
+        // number of workmates joining
+        UserHelper.getUsersCollection()
+                .whereEqualTo("restaurantChoiceId",restaurantId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                List<User> userList = new ArrayList<>();
+
+                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots){
+                    User user = documentSnapshot.toObject(User.class);
+                    userList.add(user);
+                }
+                String number = String.valueOf(userList.size());
+                mNumberOfInterested.setText(number);
+
+            }
+        });
 
         // click on item
         itemView.setOnClickListener(new View.OnClickListener() {
@@ -122,7 +148,6 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
                 // open restaurant details
                 Intent intent = new Intent(v.getContext(), RestaurantDetailActivity.class);
                 intent.putExtra("PLACE_ID_KEY", restaurantId);
-
                 v.getContext().startActivity(intent);
             }
         });

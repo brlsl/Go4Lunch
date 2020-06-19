@@ -20,9 +20,8 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
 
     private List<ResultSearchNearby> resultSearchNearbyList;
     private Context mContext;
-    private  Location mDeviceLocation;
+    private Location mDeviceLocation;
 
-    private List<Prediction> mRestaurantListPrediction;
 
     public RestaurantAdapter(List<ResultSearchNearby> items, Context context, Location deviceLocation){
         this.resultSearchNearbyList = items;

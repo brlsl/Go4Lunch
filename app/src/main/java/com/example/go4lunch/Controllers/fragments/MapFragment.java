@@ -132,7 +132,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-            mGetDeviceLocationFab = getView().findViewById(R.id.getLocationFab);
+            mGetDeviceLocationFab = requireView().findViewById(R.id.getLocationFab);
 
     }
 
@@ -198,8 +198,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
         switch (requestCode) {
             case LOCATION_PERMISSION_REQUEST: {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = 1;
                     Toast.makeText(requireContext(), R.string.permission_granted, Toast.LENGTH_SHORT).show();
                     getDeviceLocation();
@@ -304,20 +303,12 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                 // set dictionary for autoComplete
                 setMyDictionary(myDictionary);
 
-                // pass data to restaurant fragment (results, dictionary, context and device location)
+                // pass data to restaurant fragment (results, context and device location)
                 RestaurantListFragment restaurantListFragment = ((MainActivity) requireActivity()).getRestaurantListFragment();
                 restaurantListFragment.setRestaurantAdapterNearby(searchNearby.getResults(), requireActivity(), deviceLocation);
 
 
-                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                    @Override
-                    public boolean onMarkerClick(Marker marker) {
-                        Intent intentDetail = new Intent(requireContext(), RestaurantDetailActivity.class);
-                        intentDetail.putExtra("PLACE_ID_KEY", myDictionary.get(marker.getPosition()).getPlaceId());
-                        startActivity(intentDetail);
-                        return false;
-                    }
-                });
+                onMarkerClick();
             }
 
             @Override
@@ -360,18 +351,11 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                         }
                         List<ResultSearchNearby> resultsSearch =  getResultSearchNearbyFromPrediction(autoComplete.getPredictions());
 
+                        // pass data to restaurant Fragment (search result, context and device location)
                         RestaurantListFragment restaurantListFragment = ((MainActivity) requireActivity()).getRestaurantListFragment();
-                        restaurantListFragment.setRestaurantAdapterNearby(resultsSearch, requireContext(), deviceLocation );
+                        restaurantListFragment.setRestaurantAdapterNearby(resultsSearch, requireContext(), deviceLocation);
 
-                        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                            @Override
-                            public boolean onMarkerClick(Marker marker) {
-                                Intent intent = new Intent(requireContext(), RestaurantDetailActivity.class);
-                                intent.putExtra("PLACE_ID_KEY", Objects.requireNonNull(myDictionary.get(marker.getPosition())).getPlaceId());
-                                startActivity(intent);
-                                return false;
-                            }
-                        });
+                        onMarkerClick();
 
                     }
 
@@ -383,6 +367,17 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                     public void onComplete() {
                     }
                 });
+    }
+
+    // ---
+
+    private void onMarkerClick(){
+        mMap.setOnMarkerClickListener(marker -> {
+            Intent intentDetail = new Intent(requireContext(), RestaurantDetailActivity.class);
+            intentDetail.putExtra("PLACE_ID_KEY", myDictionary.get(marker.getPosition()).getPlaceId());
+            startActivity(intentDetail);
+            return false;
+        });
     }
 
     // --- UI ---

@@ -3,6 +3,9 @@ package com.example.go4lunch.controllers.activities;
 import androidx.annotation.Nullable;
 
 import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.go4lunch.R;
@@ -17,10 +20,17 @@ import java.util.Arrays;
 
 public class ConnectActivity extends BaseActivity {
     private static final int RC_SIGN_IN = 123;
+    private Button mConnectButton;
 
     @Override
     public int getFragmentLayout() {
-        return R.layout.connect_layout_transition;
+        return R.layout.first_layout_connect;
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mConnectButton = findViewById(R.id.connect_button);
     }
 
     @Override
@@ -30,7 +40,7 @@ public class ConnectActivity extends BaseActivity {
         if (this.isCurrentUserLogged()){
             this.startMainActivity();
         } else {
-            this.startSignInActivity();
+            mConnectButton.setOnClickListener(v -> startSignInActivity());
         }
 
     }
@@ -39,11 +49,6 @@ public class ConnectActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         handleResponseAfterSignIn(requestCode,resultCode, data);
-    }
-
-    @Override
-    public void onBackPressed() {
-        finish();
     }
 
     AuthMethodPickerLayout customLayout = new AuthMethodPickerLayout
@@ -108,6 +113,7 @@ public class ConnectActivity extends BaseActivity {
             }
         }
     }
+
 
 }
 

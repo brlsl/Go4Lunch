@@ -23,8 +23,7 @@
         <!-- connect Activity -->
         <activity
             android:name=".controllers.activities.ConnectActivity"
-            android:theme="@style/AppTheme_LoginTheme"
-            tools:node="replace">
+            android:theme="@style/AppTheme_LoginTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

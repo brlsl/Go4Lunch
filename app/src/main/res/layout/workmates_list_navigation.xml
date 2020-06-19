@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/list_workmate"
+    android:id="@+id/recycler_view_restaurants"
     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
     tools:listitem="@layout/item_workmate_fragment_workmate_list"
     />

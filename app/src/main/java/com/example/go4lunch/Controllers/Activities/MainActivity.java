@@ -70,34 +70,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     }
 
-    private void testAutocomplete(String input){
-        // Initialize Places.
-        Places.initialize(getApplicationContext(), PLACE_API_KEY);
-        // Create new Places Client Instance
-        PlacesClient placesClient = Places.createClient(this);
-
-        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
-        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
-                .setTypeFilter(TypeFilter.ESTABLISHMENT)
-                .setSessionToken(token)
-                .setQuery(input)
-                .build();
-
-
-        placesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
-            for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
-                Log.i("MainActivity", prediction.getPlaceId());
-                Log.i("MainActivity", prediction.getPrimaryText(null).toString());
-
-            }
-        }).addOnFailureListener((exception) -> {
-            if (exception instanceof ApiException) {
-                ApiException apiException = (ApiException) exception;
-                Log.e("MainActivity", "Place not found: " + apiException.getStatusCode());
-            }
-        });
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -115,10 +87,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
                 if (query.trim().length() > 2 && mMapFragment.getLocation() != null) {
                     mMapFragment.executeHttpRequestAutoCompleteWithRetrofit(query);
-
                 }
-
-
                 return false;
 
             }
@@ -130,13 +99,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         });
 
         return super.onCreateOptionsMenu(menu);
-    }
-
-
-
-
-    public RestaurantListFragment getRestaurantListFragment() {
-        return mRestaurantListFragment;
     }
 
 
@@ -311,6 +273,18 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                         finish();
                     }
                 });
+    }
+
+
+
+    // --- GETTERS ---
+
+    public MapFragment getMapFragment(){
+        return mMapFragment;
+    }
+
+    public RestaurantListFragment getRestaurantListFragment() {
+        return mRestaurantListFragment;
     }
 
 }
