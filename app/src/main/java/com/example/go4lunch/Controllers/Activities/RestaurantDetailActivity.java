@@ -49,7 +49,8 @@ public class RestaurantDetailActivity extends BaseActivity {
     private JoiningWorkmateAdapter mAdapter;
     private Context mContext;
 
-    private Boolean isLiked;
+    private Boolean mRestaurantIsLiked;
+    private Boolean mUserRestaurantIsChosen;
 
 
     @Override
@@ -66,7 +67,6 @@ public class RestaurantDetailActivity extends BaseActivity {
 
         executeHttpRequestPlaceDetailsWithRetrofit(restaurantId);
         configureRecyclerView(restaurantId);
-
     }
 
     @Nullable
@@ -77,7 +77,6 @@ public class RestaurantDetailActivity extends BaseActivity {
     }
 
     private void configureRecyclerView(String restaurantId) {
-        setContentView(R.layout.activity_restaurant_detail);
         mRecyclerView = findViewById(R.id.workmates_joining_list_rv_restaurant_detail_activity);
 
         Query query = UserHelper.getUsersCollection()
@@ -89,9 +88,11 @@ public class RestaurantDetailActivity extends BaseActivity {
                 .build();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL,false));
-        mAdapter = new JoiningWorkmateAdapter(options,restaurantId, mContext);
+        mAdapter = new JoiningWorkmateAdapter(options, mContext);
         mRecyclerView.setAdapter(mAdapter);
     }
+
+
 
     @Override
     public void onStart() {
@@ -121,7 +122,7 @@ public class RestaurantDetailActivity extends BaseActivity {
     }
 
     public void executeHttpRequestPlaceDetailsWithRetrofit(String placeID){
-        this.mDisposable = GooglePlaceStreams.streamFetchPlaceDetails(placeID, PLACE_API_KEY, DETAIL_FIELDS).subscribeWith(new DisposableObserver<PlaceDetail>() {
+        this.mDisposable = GooglePlaceStreams.streamFetchPlaceDetails(placeID, PLACE_API_KEY).subscribeWith(new DisposableObserver<PlaceDetail>() {
             @Override
             public void onNext(PlaceDetail placeDetail) {
                 TextView mRestaurantName = findViewById(R.id.restaurant_detail_activity_restaurant_name);
@@ -184,62 +185,48 @@ public class RestaurantDetailActivity extends BaseActivity {
                             User databaseUser = userDocumentSnapshot.toObject(User.class);
                             if (databaseUser.getRestaurantChoiceId() != null && databaseUser.getRestaurantChoiceId().equals(placeID) ){
                                 mFabUserRestaurantChoice.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_circle_green_24dp));
-                                mFabUserRestaurantChoice.setClickable(false);
+                                mUserRestaurantIsChosen = true;
                             }
                             mFabUserRestaurantChoice.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    UserHelper.updateUserRestaurantChoiceId(getCurrentUser().getUid(), placeID);
-                                    UserHelper.updateUserRestaurantChoiceName(getCurrentUser().getUid(), placeDetail.getResult().getName());
-                                    mFabUserRestaurantChoice.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_circle_green_24dp));
+                                    if (mUserRestaurantIsChosen == null || !mUserRestaurantIsChosen ) {
+                                        mUserRestaurantIsChosen = true;
+                                        UserHelper.updateUserRestaurantChoiceId(getCurrentUser().getUid(), placeID);
+                                        UserHelper.updateUserRestaurantChoiceName(getCurrentUser().getUid(), placeDetail.getResult().getName());
+                                        mFabUserRestaurantChoice.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_circle_green_24dp));
+
+                                    }
+                                    else{
+                                        mUserRestaurantIsChosen = false;
+                                        UserHelper.updateUserRestaurantChoiceId(getCurrentUser().getUid(), null);
+                                        UserHelper.updateUserRestaurantChoiceName(getCurrentUser().getUid(), null);
+                                        mFabUserRestaurantChoice.setImageDrawable(getResources().getDrawable(R.drawable.ic_person_black_24dp));
+                                    }
                                 }
                             });
 
                         }
                     });
-/*
-                    UserHelper.getRestaurantCollection(getCurrentUser().getUid())
-                            .whereEqualTo("restaurantId", placeID)
-                            .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                @Override
-                                public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-                                    if (e != null){
-                                        Log.w("Restaurant Detail", "listen:error", e);
-                                    }
-                                    for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                                        switch (dc.getType()) {
-                                            case ADDED:
-                                                Log.d("Restaurant Detail", "New city: " + dc.getDocument().getData());
-                                                break;
-                                            case MODIFIED:
-                                                Log.d("Restaurant Detail", "Modified city: " + dc.getDocument().getData());
-                                                break;
-                                            case REMOVED:
-                                                Log.d("Restaurant Detail", "Removed city: " + dc.getDocument().getData());
-                                                break;
-                                        }
-                                    }
-                                }
-                            });
-*/
+
                     // Manage like button view and data in firestore
                     UserHelper.getUserLikeRestaurant(getCurrentUser().getUid(), placeID).addOnSuccessListener(documentSnapshot -> {
                         Restaurant restaurantDb = documentSnapshot.toObject(Restaurant.class);
 
                         if(restaurantDb != null && restaurantDb.getRestaurantIsLiked()){
                             mRestaurantLikeButton.setBackgroundColor(Color.GRAY);
-                            isLiked = true;
+                            mRestaurantIsLiked = true;
                         }
                         mRestaurantLikeButton.setOnClickListener(v -> {
-                            if (isLiked == null || !isLiked){
+                            if (mRestaurantIsLiked == null || !mRestaurantIsLiked){
                                 UserHelper.createRestaurantLikedByUser(getCurrentUser().getUid(),placeID,true);
-                                isLiked = true;
+                                mRestaurantIsLiked = true;
                                 v.setBackgroundColor(Color.GRAY);
                                 Toast.makeText(getApplicationContext(), "You like this restaurant", Toast.LENGTH_SHORT).show();
                             }
                             else {
                                 UserHelper.deleteRestaurantLikedByUser(getCurrentUser().getUid(),placeID);
-                                isLiked = false;
+                                mRestaurantIsLiked = false;
                                 mRestaurantLikeButton.setBackgroundColor(Color.WHITE);
                                 Toast.makeText(getApplicationContext(), "You dislike this restaurant", Toast.LENGTH_SHORT).show();
                             }

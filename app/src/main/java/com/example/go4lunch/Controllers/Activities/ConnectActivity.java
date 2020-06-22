@@ -3,6 +3,7 @@ package com.example.go4lunch.controllers.activities;
 import androidx.annotation.Nullable;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -51,6 +52,11 @@ public class ConnectActivity extends BaseActivity {
         handleResponseAfterSignIn(requestCode,resultCode, data);
     }
 
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
     AuthMethodPickerLayout customLayout = new AuthMethodPickerLayout
             .Builder(R.layout.connect_layout)
             .setGoogleButtonId(R.id.buttonGoogle)
@@ -87,6 +93,8 @@ public class ConnectActivity extends BaseActivity {
             }
             String username = this.getCurrentUser().getDisplayName();
             String uid = this.getCurrentUser().getUid();
+            SharedPreferences pref = getPreferences(MODE_PRIVATE);
+            pref.edit().putString("uid_key",getCurrentUser().getUid()).apply();
 
          //   if (UserHelper.getExistingUser(getCurrentUser().getUid())) { }
             UserHelper.createUser(uid,username,urlPicture).addOnFailureListener(this.onFailureListener());

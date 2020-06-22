@@ -29,36 +29,32 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void displayData(User model, Context context) {
+        UserHelper.getCurrentUser(model.getUid()).addOnSuccessListener(documentSnapshot -> {
+            User databaseUser = documentSnapshot.toObject(User.class);
+            // configure avatar
+            Glide
+                    .with(context)
+                    .load(model.getUrlPicture())
+                    .circleCrop()
+                    .into(mUserAvatar);
 
-        UserHelper.getCurrentUser(model.getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                User databaseUser = documentSnapshot.toObject(User.class);
-                // configure avatar
-                Glide
-                        .with(context)
-                        .load(model.getUrlPicture())
-                        .circleCrop()
-                        .into(mUserAvatar);
+            // configure choice text
+            if (databaseUser.getRestaurantChoiceId() == null ) {
+                mUserChoice.setText(model.getUsername() + " has not chosen yet");
+            } else
+                mUserChoice.setText(model.getUsername() + " is eating at " +  model.getRestaurantChoiceName());
 
-                // configure choice text
-                if (databaseUser.getRestaurantChoiceId() == null ) {
-                    mUserChoice.setText(model.getUsername() + " has not chosen yet");
-                } else
-                    mUserChoice.setText(model.getUsername() + " is eating at " +  model.getRestaurantChoiceName());
-
-                // open restaurant details on item click
-                itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (databaseUser.getRestaurantChoiceId() != null){
-                            Intent intent = new Intent(context, RestaurantDetailActivity.class);
-                            intent.putExtra("PLACE_ID_KEY", model.getRestaurantChoiceId());
-                            context.startActivity(intent);
-                        }
+            // open restaurant details on item click
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (databaseUser.getRestaurantChoiceId() != null){
+                        Intent intent = new Intent(context, RestaurantDetailActivity.class);
+                        intent.putExtra("PLACE_ID_KEY", model.getRestaurantChoiceId());
+                        context.startActivity(intent);
                     }
-                });
-            }
+                }
+            });
         });
     }
 

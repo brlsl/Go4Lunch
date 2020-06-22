@@ -21,7 +21,7 @@ public interface GooglePlaceApiService {
             .build();
 
     @GET("nearbysearch/json?")
-    Observable<SearchNearby> getNearbyPlaces (@Query("location")String location, @Query("radius") int radius,
+    Observable<SearchNearby> getNearbyPlaces (@Query("location")String location, @Query("radius") String radius,
                                               @Query("type") String type, @Query("key") String apiKey);
 
     @GET("details/json?")
@@ -30,7 +30,7 @@ public interface GooglePlaceApiService {
 
     @GET("autocomplete/json?")
     Observable<AutoComplete> getAutoCompletePlaceRequest(@Query("input") String input, @Query("types")String types,
-                                                         @Query("location")String location, @Query("radius") int radius,
+                                                         @Query("location")String location, @Query("radius") String radius,
                                                          @Query("strictbounds")String strictbounds, @Query("sessiontoken")String sessionToken,
                                                          @Query("key")String apiKey);
 

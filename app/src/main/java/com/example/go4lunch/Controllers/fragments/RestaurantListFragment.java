@@ -38,7 +38,6 @@ public class RestaurantListFragment extends androidx.fragment.app.Fragment {
         configureRecyclerView(view);
         configureSwipeRefreshLayout(view);
 
-
         return view;
     }
 

@@ -17,13 +17,19 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.api.UserHelper;
 import com.example.go4lunch.controllers.activities.RestaurantDetailActivity;
 import com.example.go4lunch.models.User;
+import com.example.go4lunch.models.apiGooglePlace.placeDetails.PlaceDetail;
 import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.ResultSearchNearby;
+import com.example.go4lunch.utils.GooglePlaceApiService;
+import com.example.go4lunch.utils.GooglePlaceStreams;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 
 public class RestaurantViewHolder extends RecyclerView.ViewHolder {
     private static final String BASE_GOOGLE_PHOTO_URL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=300&photoreference=" ;
@@ -33,6 +39,7 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
             mRestaurantDistance, mNumberOfInterested;
     private ImageView mRestaurantPhoto, mStar1, mStar2, mStar3;
     private String restaurantId;
+    private Disposable disposable;
     // private HashMap<LatLng, String> mDictionary;
     //private Context mContext;
     //private  Location mDeviceLocation;
@@ -68,8 +75,15 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
         mRestaurantAddress.setText(resultsNearby.getVicinity());
 
 
+
+
+
+
+
         //TODO: récupérer détail des heures avec placeDetail et place_id
         if(resultsNearby.getOpeningHours() != null){
+            //en test
+            executePlaceDetailWithRetrofit(restaurantId);
             if(resultsNearby.getOpeningHours().getOpenNow())
                 mRestaurantOpeningHours.setText(R.string.open);
             else
@@ -152,5 +166,35 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
             }
         });
 
+    }
+
+    private void executePlaceDetailWithRetrofit(String restaurantId){
+        this.disposable = GooglePlaceStreams.streamFetchPlaceDetails(restaurantId, API_KEY)
+                .subscribeWith(new DisposableObserver<PlaceDetail>() {
+                    @Override
+                    public void onNext(PlaceDetail placeDetail) {
+                        //mRestaurantOpeningHours.setText();
+                        System.out.println("Horaires de la semaine: " +placeDetail.getResult().getOpeningHours().getWeekdayText().get(6));
+
+                        //0 lundi
+                        //1 mardi
+                        //2 mercredi
+                        //3 jeudi
+                        //4 vendredi
+                        //5 samedi
+                        //6 dimanche
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 }
