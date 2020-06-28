@@ -2,13 +2,13 @@ package com.example.go4lunch.controllers.fragments;
 
 import android.Manifest;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 
-import android.location.LocationManager;
 import android.os.Bundle;
 
 
@@ -25,17 +25,14 @@ import androidx.preference.PreferenceManager;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.api.UserHelper;
-import com.example.go4lunch.controllers.activities.RestaurantDetailActivity;
 import com.example.go4lunch.controllers.activities.MainActivity;
+import com.example.go4lunch.controllers.activities.RestaurantDetailActivity;
 import com.example.go4lunch.models.User;
 import com.example.go4lunch.models.apiGooglePlace.placeAutoComplete.AutoComplete;
 import com.example.go4lunch.models.apiGooglePlace.placeAutoComplete.Prediction;
-import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.ResultSearchNearby;
-import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.SearchNearby;
+import com.example.go4lunch.models.apiGooglePlace.placeDetails.ResultDetails;
 import com.example.go4lunch.utils.GooglePlaceStreams;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -47,11 +44,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 
 import java.util.ArrayList;
@@ -60,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
@@ -70,21 +64,20 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class MapFragment extends androidx.fragment.app.Fragment implements OnMapReadyCallback {
 
     // -- FOR DATA
-    private Location location;
+    private Location deviceLocation;
     private int mLocationPermissionGranted = 0; // refused by default
     private Disposable mDisposable;
-    private LocationCallback locationCallback;
-    private UUID uuid = UUID.randomUUID(); // Universally Unique Identifier
-    private String mSessionToken = uuid.toString();
-    private HashMap<LatLng, ResultSearchNearby> myDictionary = new HashMap<>();
+
+    private HashMap<LatLng, ResultDetails> myDictionary = new HashMap<>();
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private static final int LOCATION_PERMISSION_REQUEST = 1234;
     private static String PLACE_API_KEY;
 
+    private String mSessionToken;
+
     // -- FOR UI
     private GoogleMap mMap;
     private static final float DEFAULT_ZOOM = 15f;
-    private FloatingActionButton mGetDeviceLocationFab;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -92,19 +85,9 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
         PLACE_API_KEY = requireActivity().getString(R.string.google_place_api_key);
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext());
 
-        // for location update
-        locationCallback = new LocationCallback(){
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null)
-                    return;
-                for(Location location: locationResult.getLocations()){
-                    String stringLatitude = String.valueOf(location.getLatitude());
-                    String stringLongitude = String.valueOf(location.getLongitude());
-                    //executeHttpRequestNearbySearchWithRetrofit(stringLatitude,stringLongitude);
-                }
-            }
-        };
+        // Universally Unique Identifier
+        UUID uuid = UUID.randomUUID();
+        mSessionToken = uuid.toString();
     }
 
     @Nullable
@@ -123,37 +106,6 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
         return mView;
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-            mGetDeviceLocationFab = requireView().findViewById(R.id.getLocationFab);
-
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        stopLocationUpdates();
-    }
-
-    private void stopLocationUpdates() {
-        mFusedLocationProviderClient.removeLocationUpdates(locationCallback);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        //if (requestingLocation)
-        //startLocationUpdate();
-    }
-/*
-    private void startLocationUpdate() {
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(300000); // in milliseconds = 300 seconds
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mFusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.getMainLooper());
-    }
-*/
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -189,20 +141,14 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                                            @NonNull int[] grantResults) {
         mLocationPermissionGranted = 0;
 
-        switch (requestCode) {
-            case LOCATION_PERMISSION_REQUEST: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mLocationPermissionGranted = 1;
-                    Toast.makeText(requireContext(), R.string.permission_granted, Toast.LENGTH_SHORT).show();
-                    getDeviceLocation();
-                    mGetDeviceLocationFab.setOnClickListener(v -> getDeviceLocation());
-                } else {
-                    Toast.makeText(requireContext(), R.string.permission_refused, Toast.LENGTH_SHORT).show();
-                    mGetDeviceLocationFab.setOnClickListener(v -> Toast.makeText(requireContext(),
-                            "Please give location permission first", Toast.LENGTH_SHORT).show());
-                    EasyPermissions.requestPermissions(this, getString(R.string.ask_for_permission), LOCATION_PERMISSION_REQUEST, permissions);
-                }
+        if (requestCode == LOCATION_PERMISSION_REQUEST) {// If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                mLocationPermissionGranted = 1;
+                Toast.makeText(requireContext(), R.string.permission_granted, Toast.LENGTH_SHORT).show();
+                getLastKnownLocation();
+            } else {
+                Toast.makeText(requireContext(), R.string.permission_refused, Toast.LENGTH_SHORT).show();
+                EasyPermissions.requestPermissions(this, getString(R.string.ask_for_permission), LOCATION_PERMISSION_REQUEST, permissions);
             }
         }
     }
@@ -211,36 +157,37 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         if (mLocationPermissionGranted == 1) {
-            mGetDeviceLocationFab.setOnClickListener(v -> getDeviceLocation());
-            getDeviceLocation();
+            getLastKnownLocation();
             mMap.setOnMyLocationButtonClickListener(() -> {
-                getDeviceLocation();
+                getLastKnownLocation();
                 return false;
             });
 
         }
     }
 
-    public void writeLastKnownLocation(Location deviceLocation){
+    private void writeLastKnownLocation(Location deviceLocation){
         SharedPreferences pref = requireActivity().getPreferences(Context.MODE_PRIVATE);
         deviceLocation.getLongitude();
         pref.edit().putString("device_latitude", String.valueOf(deviceLocation.getLatitude())).apply();
         pref.edit().putString("device_longitude", String.valueOf(deviceLocation.getLongitude())).apply();
     }
-    public void readLastKnownLocation(){
+    private void readLastKnownLocation(){
         String lat = requireActivity().getPreferences(Context.MODE_PRIVATE).getString("device_latitude", "48.8534");
         String lng = requireActivity().getPreferences(Context.MODE_PRIVATE).getString("device_longitude", "2.3488");
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                 new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)), DEFAULT_ZOOM));
 
     }
-    void getDeviceLocation() {
+
+    @SuppressLint("MissingPermission")
+    public void getLastKnownLocation() {
         mFusedLocationProviderClient.getLastLocation()
                 .addOnSuccessListener(requireActivity(), deviceLocation -> {
                     // Got last known location. In some rare situations this can be null.
                     if (deviceLocation != null) {
                         // Logic to handle location object
-                        setLocation(deviceLocation);
+                        setDeviceLocation(deviceLocation);
                         writeLastKnownLocation(deviceLocation);
                         handleDeviceLocation(deviceLocation);
 
@@ -248,66 +195,61 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                         Toast.makeText(requireContext(), R.string.unknown_location, Toast.LENGTH_SHORT).show();
                         Log.d("MapFragment", "Device location unknown");
                         readLastKnownLocation();
-
-                        //startLocationUpdate();
                     }
                 });
 
     }
 
+    @SuppressLint("MissingPermission")
     private void handleDeviceLocation(Location deviceLocation){
         mMap.setMyLocationEnabled(true);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                 new LatLng(deviceLocation.getLatitude(),
                         deviceLocation.getLongitude()), DEFAULT_ZOOM));
-        executeHttpRequestNearbySearchWithRetrofit();
+        executeHttpSearchNearbyAndDetailsWithRetrofit();
     }
 
-    public void executeHttpRequestNearbySearchWithRetrofit() {
-        String deviceLocationStr = getLocation().getLatitude()+","+getLocation().getLongitude();
+
+    public void executeHttpSearchNearbyAndDetailsWithRetrofit(){
+        String deviceLocationStr = getDeviceLocation().getLatitude()+","+ getDeviceLocation().getLongitude();
         String radius_preferences = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getString("radius","500");
 
-        this.mDisposable = GooglePlaceStreams.streamFetchNearbySearch(deviceLocationStr,radius_preferences, PLACE_API_KEY)
-                .subscribeWith(new DisposableObserver<SearchNearby>() {
-            @Override
-            public void onNext(SearchNearby searchNearby) {
-                mMap.clear();
-                HashMap<LatLng,ResultSearchNearby> myDictionary = new HashMap<>();
+        this.mDisposable = GooglePlaceStreams.streamNearbyThenFetchPlaceDetails(deviceLocationStr,radius_preferences,PLACE_API_KEY)
+                .subscribeWith(new DisposableObserver<List<ResultDetails>>() {
+                    @Override
+                    public void onNext(List<ResultDetails> resultDetails) {
+                        mMap.clear();
+                        for (int i = 0; i <resultDetails.size() ; i++) {
+                            double lat = resultDetails.get(i).getResult().getGeometry().getLocation().getLat();
+                            double lng = resultDetails.get(i).getResult().getGeometry().getLocation().getLng();
+                            LatLng markerLatLng = new LatLng(lat, lng);
 
-                for (int i = 0; i < searchNearby.getResults().size(); i++) {
-                    double lat = searchNearby.getResults().get(i).getGeometry().getLocation().getLat();
-                    double lng = searchNearby.getResults().get(i).getGeometry().getLocation().getLng();
-                    LatLng markerLatLng = new LatLng(lat, lng);
+                            handleMarkerRestaurant(markerLatLng);
+                            myDictionary.put(markerLatLng, resultDetails.get(i).getResult());
+                        }
 
-                    handleMarkerRestaurant(markerLatLng);
+                        setMyDictionary(myDictionary);
+                        // pass list of restaurants nearby details, context and device location to recycler view
+                        RestaurantListFragment restaurantListFragment = ((MainActivity) requireActivity()).getRestaurantListFragment();
+                        restaurantListFragment.setRestaurantAdapterNearby(resultDetails, requireActivity(), getDeviceLocation());
+                        handleMarkerWorkmateGoingToRestaurant(getMyDictionary());
+                    }
 
-                    // put restaurant position & place id in dictionary
-                    myDictionary.put(markerLatLng, searchNearby.getResults().get(i));
-                }
-                // set dictionary for autoComplete
-                setMyDictionary(myDictionary);
+                    @Override
+                    public void onError(Throwable e) {
 
-                // pass data to restaurant fragment (results, context and device location)
-                RestaurantListFragment restaurantListFragment = ((MainActivity) requireActivity()).getRestaurantListFragment();
-                restaurantListFragment.setRestaurantAdapterNearby(searchNearby.getResults(), requireActivity(), getLocation());
+                    }
 
+                    @Override
+                    public void onComplete() {
+                        onMarkerClick();
+                    }
+                });
 
-                onMarkerClick();
-            }
-
-            @Override
-            public void onError(Throwable e) {
-            }
-
-            @Override
-            public void onComplete() {
-                 handleMarkerWorkmateGoingToRestaurant(getMyDictionary());
-            }
-        });
     }
 
     public void executeHttpRequestAutoCompleteWithRetrofit(String input){
-        String deviceLocationStr = getLocation().getLatitude()+","+getLocation().getLongitude();
+        String deviceLocationStr = getDeviceLocation().getLatitude()+","+ getDeviceLocation().getLongitude();
         String radius_preferences = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getString("radius","500");
 
         this.mDisposable = GooglePlaceStreams.streamFetchAutoComplete(input,"establishment",
@@ -320,21 +262,18 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
                         for (int i = 0; i < autoComplete.getPredictions().size(); i++) {
                             String restaurantId = autoComplete.getPredictions().get(i).getPlaceId();
                             LatLng restaurantLatLng = getLatLngKeyByRestaurantIdValue(getMyDictionary(),restaurantId);
-                            if (getMyDictionary().containsKey(restaurantLatLng)){
-
+                            if (restaurantLatLng != null && getMyDictionary().containsKey(restaurantLatLng)){
                                 MarkerOptions markerOptions = new MarkerOptions().position(restaurantLatLng).icon(BitmapDescriptorFactory
                                         .defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                                 Marker restaurantMarker = mMap.addMarker(markerOptions);
                                 restaurantMarker.isVisible();
                             }
                         }
-                        List<ResultSearchNearby> resultsSearch =  getResultSearchNearbyFromPrediction(autoComplete.getPredictions());
+                        List<ResultDetails> resultDetails =  getResultDetailsFromPrediction(autoComplete.getPredictions());
 
-                        // pass data to restaurant Fragment (search result, context and device location)
+                        // pass list of restaurants nearby details, context and device location to recycler view
                         RestaurantListFragment restaurantListFragment = ((MainActivity) requireActivity()).getRestaurantListFragment();
-                        restaurantListFragment.setRestaurantAdapterNearby(resultsSearch, requireContext(), getLocation());
-
-                        onMarkerClick();
+                        restaurantListFragment.setRestaurantAdapterNearby(resultDetails, requireContext(), getDeviceLocation());
                     }
 
                     @Override
@@ -343,6 +282,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
                     @Override
                     public void onComplete() {
+                        onMarkerClick();
                     }
                 });
     }
@@ -352,7 +292,7 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
     private void onMarkerClick(){
         mMap.setOnMarkerClickListener(marker -> {
             Intent intentDetail = new Intent(requireContext(), RestaurantDetailActivity.class);
-            intentDetail.putExtra("PLACE_ID_KEY", myDictionary.get(marker.getPosition()).getPlaceId());
+            intentDetail.putExtra("PLACE_ID_KEY", Objects.requireNonNull(myDictionary.get(marker.getPosition())).getPlaceId());
             startActivity(intentDetail);
             return false;
         });
@@ -368,8 +308,8 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
     };
 
-    private void handleMarkerWorkmateGoingToRestaurant(HashMap<LatLng,ResultSearchNearby> myDictionary){
-        for (Map.Entry<LatLng,ResultSearchNearby> entry : myDictionary.entrySet()) {
+    private void handleMarkerWorkmateGoingToRestaurant(HashMap<LatLng, ResultDetails> myDictionary){
+        for (Map.Entry<LatLng, ResultDetails> entry : myDictionary.entrySet()) {
             UserHelper.getUsersCollection()
                     .whereEqualTo("restaurantChoiceId", entry.getValue().getPlaceId()).get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -389,8 +329,8 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
 
     // --- UTILS ---
 
-    public static LatLng getLatLngKeyByRestaurantIdValue(Map<LatLng,ResultSearchNearby> map, String id) {
-        for (Map.Entry<LatLng,ResultSearchNearby> entry : map.entrySet()) {
+    public static LatLng getLatLngKeyByRestaurantIdValue(Map<LatLng,ResultDetails> map, String id) {
+        for (Map.Entry<LatLng,ResultDetails> entry : map.entrySet()) {
             if (Objects.equals(id, entry.getValue().getPlaceId())) {
                 return entry.getKey();
             }
@@ -398,36 +338,38 @@ public class MapFragment extends androidx.fragment.app.Fragment implements OnMap
         return null;
     }
 
-    public List<ResultSearchNearby> getResultSearchNearbyFromPrediction(List<Prediction> listPredictions){
-        List<ResultSearchNearby> resultSearchNearbies = new ArrayList<>();
+    public List<ResultDetails> getResultDetailsFromPrediction(List<Prediction> listPredictions){
+        List<ResultDetails> resultDetails = new ArrayList<>();
         for (Prediction prediction: listPredictions) {
-            for(Map.Entry<LatLng,ResultSearchNearby> resultSearchNearby: myDictionary.entrySet()){
-                if (resultSearchNearby.getValue().getPlaceId().equals(prediction.getPlaceId())){
-                    resultSearchNearbies.add(resultSearchNearby.getValue());
+            for(Map.Entry<LatLng, ResultDetails> resultDetailsEntry: myDictionary.entrySet()){
+                if (resultDetailsEntry.getValue().getPlaceId().equals(prediction.getPlaceId())){
+                    resultDetails.add(resultDetailsEntry.getValue());
                 }
             }
 
         }
-        return resultSearchNearbies;
+        return resultDetails;
     }
 
     // -------------------
     // GETTERS AND SETTERS
     // -------------------
 
-    public Location getLocation() {
-        return location;
+    public Location getDeviceLocation() {
+        return deviceLocation;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setDeviceLocation(Location location) {
+        this.deviceLocation = location;
     }
 
-    public HashMap<LatLng, ResultSearchNearby> getMyDictionary() {
+    public HashMap<LatLng, ResultDetails> getMyDictionary() {
         return myDictionary;
     }
 
-    public void setMyDictionary(HashMap<LatLng, ResultSearchNearby> myDictionary) {
+    public void setMyDictionary(HashMap<LatLng, ResultDetails> myDictionary) {
         this.myDictionary = myDictionary;
     }
+
+
 }

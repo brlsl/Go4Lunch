@@ -107,6 +107,11 @@ public class ConnectActivity extends BaseActivity {
 
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) { // SUCCESS
+                //if( user exists in firebase){
+                // query
+                //  recupere si existe dans firebase
+                //  FirebaseAuth.getInstance().getCurrentUser();}
+                //else {}
                 this.createUserInFirestore();
                 Toast.makeText(this, "Connexion réussie", Toast.LENGTH_SHORT).show();
                 this.startMainActivity();

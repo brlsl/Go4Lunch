@@ -24,10 +24,15 @@
 
 
     <!--Restaurant view holder-->
-    <string name="open">Open</string>
+    <string name="open">Open 24 hours</string>
     <string name="closed">Closed</string>
     <string name="opening_hours_not_available">Opening hours not available</string>
     <string name="distance"> meters</string>
+    <string name="open_at">Open at %1$s</string>
+    <string name="open_from_until">Open from %1$s until %2$s</string>
+    <string name="meters">%1$d meters</string>
+    <string name="closing_soon">Closing soon</string>
+    <string name="close_tomorrow_at">Close tomorrow at %1$s</string>
 
 
     <!--Restaurant detail activity-->

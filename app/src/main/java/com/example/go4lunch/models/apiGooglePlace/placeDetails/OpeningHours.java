@@ -36,8 +36,5 @@ public class OpeningHours {
         return weekdayText;
     }
 
-    public void setWeekdayText(List<String> weekdayText) {
-        this.weekdayText = weekdayText;
-    }
 
 }

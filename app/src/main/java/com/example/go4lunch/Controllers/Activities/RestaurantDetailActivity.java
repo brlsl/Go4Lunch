@@ -23,9 +23,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
 import com.example.go4lunch.api.UserHelper;
+
 import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.models.User;
-import com.example.go4lunch.models.apiGooglePlace.placeDetails.PlaceDetail;
+
+import com.example.go4lunch.models.apiGooglePlace.placeDetails.ResultDetails;
 import com.example.go4lunch.utils.GooglePlaceStreams;
 import com.example.go4lunch.views.workmates_list_rv_restaurant_detail_activity.JoiningWorkmateAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -41,14 +43,15 @@ import io.reactivex.observers.DisposableObserver;
 
 public class RestaurantDetailActivity extends BaseActivity {
 
-    private static final String DETAIL_FIELDS = "name,photos,rating,formatted_phone_number,vicinity,opening_hours,website";
+
+
+    // FOR UI
     private static final String BASE_GOOGLE_PHOTO_URL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=1600&photoreference=";
 
+    // FOR DATA
     private Disposable mDisposable;
-    private RecyclerView mRecyclerView;
     private JoiningWorkmateAdapter mAdapter;
     private Context mContext;
-
     private Boolean mRestaurantIsLiked;
     private Boolean mUserRestaurantIsChosen;
 
@@ -77,7 +80,7 @@ public class RestaurantDetailActivity extends BaseActivity {
     }
 
     private void configureRecyclerView(String restaurantId) {
-        mRecyclerView = findViewById(R.id.workmates_joining_list_rv_restaurant_detail_activity);
+        RecyclerView mRecyclerView = findViewById(R.id.workmates_joining_list_rv_restaurant_detail_activity);
 
         Query query = UserHelper.getUsersCollection()
                 .whereEqualTo("restaurantChoiceId",restaurantId)
@@ -122,9 +125,9 @@ public class RestaurantDetailActivity extends BaseActivity {
     }
 
     public void executeHttpRequestPlaceDetailsWithRetrofit(String placeID){
-        this.mDisposable = GooglePlaceStreams.streamFetchPlaceDetails(placeID, PLACE_API_KEY).subscribeWith(new DisposableObserver<PlaceDetail>() {
+        this.mDisposable = GooglePlaceStreams.streamFetchPlaceDetails(placeID, PLACE_API_KEY).subscribeWith(new DisposableObserver<ResultDetails>() {
             @Override
-            public void onNext(PlaceDetail placeDetail) {
+            public void onNext(ResultDetails resultDetails) {
                 TextView mRestaurantName = findViewById(R.id.restaurant_detail_activity_restaurant_name);
                 TextView mRestaurantAddress = findViewById(R.id.restaurant_detail_activity_restaurant_address);
                 Button mRestaurantButtonPhoneCall = findViewById(R.id.restaurant_activity_detail_call_button);
@@ -135,17 +138,17 @@ public class RestaurantDetailActivity extends BaseActivity {
 
                 if(getCurrentUser() != null) {
 
-                    mRestaurantName.setText(placeDetail.getResult().getName());
-                    mRestaurantAddress.setText(placeDetail.getResult().getVicinity());
+                    mRestaurantName.setText(resultDetails.getResult().getName());
+                    mRestaurantAddress.setText(resultDetails.getResult().getVicinity());
 
-                    if(placeDetail.getResult().getPhotos() == null || placeDetail.getResult().getPhotos().size() < 10) {
+                    if(resultDetails.getResult().getPhotos() == null || resultDetails.getResult().getPhotos().size() < 10) {
                         Glide.with(getApplicationContext())
                                 .load(R.drawable.connect_activity_food)
                                 .into(mRestaurantPhoto);
                     }else{
                         int randomNum = (int) (Math.random() * (10));
                         Glide.with(getApplicationContext())
-                                .load(BASE_GOOGLE_PHOTO_URL + placeDetail.getResult().getPhotos().get(randomNum).getPhotoReference() + "&key=" +PLACE_API_KEY)
+                                .load(BASE_GOOGLE_PHOTO_URL + resultDetails.getResult().getPhotos().get(randomNum).getPhotoReference() + "&key=" +PLACE_API_KEY)
                                 .into(mRestaurantPhoto);
                         System.out.println("Value of random integer:" +randomNum);
                     }
@@ -153,7 +156,7 @@ public class RestaurantDetailActivity extends BaseActivity {
                     mRestaurantButtonPhoneCall.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            String mRestaurantPhoneNumber = placeDetail.getResult().getFormattedPhoneNumber();
+                            String mRestaurantPhoneNumber = resultDetails.getResult().getFormattedPhoneNumber();
                             if (mRestaurantPhoneNumber != null) {
                             Intent callIntent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", mRestaurantPhoneNumber, null));
                             startActivity(callIntent);
@@ -166,7 +169,7 @@ public class RestaurantDetailActivity extends BaseActivity {
                     mRestaurantButtonWebsiteURL.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            String mRestaurantWebsite = placeDetail.getResult().getWebsite();
+                            String mRestaurantWebsite = resultDetails.getResult().getWebsite();
                             if (mRestaurantWebsite != null) {
                                 Intent intentURL = new Intent(Intent.ACTION_VIEW);
                                 intentURL.setData(Uri.parse(mRestaurantWebsite));
@@ -193,7 +196,7 @@ public class RestaurantDetailActivity extends BaseActivity {
                                     if (mUserRestaurantIsChosen == null || !mUserRestaurantIsChosen ) {
                                         mUserRestaurantIsChosen = true;
                                         UserHelper.updateUserRestaurantChoiceId(getCurrentUser().getUid(), placeID);
-                                        UserHelper.updateUserRestaurantChoiceName(getCurrentUser().getUid(), placeDetail.getResult().getName());
+                                        UserHelper.updateUserRestaurantChoiceName(getCurrentUser().getUid(), resultDetails.getResult().getName());
                                         mFabUserRestaurantChoice.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_circle_green_24dp));
 
                                     }
@@ -232,8 +235,6 @@ public class RestaurantDetailActivity extends BaseActivity {
                             }
                         });
                     });
-
-
 
                 }
             }

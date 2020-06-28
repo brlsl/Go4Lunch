@@ -4,7 +4,7 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Result {
+public class ResultDetails {
 
     @SerializedName("formatted_phone_number")
     @Expose
@@ -28,60 +28,68 @@ public class Result {
     @Expose
     private String website;
 
-    public String getFormattedPhoneNumber() {
-        return formattedPhoneNumber;
+    @SerializedName("geometry")
+    @Expose
+    private Geometry geometry;
+
+    @SerializedName("result")
+    @Expose
+    private ResultDetails result;
+
+    @SerializedName("place_id")
+    @Expose
+    private String placeId;
+
+    @SerializedName("weekday_text")
+    @Expose
+    private List<String> weekdayText = null;
+
+
+    public ResultDetails getResult() {
+        return result;
     }
 
-    public void setFormattedPhoneNumber(String formattedPhoneNumber) {
-        this.formattedPhoneNumber = formattedPhoneNumber;
+    public String getFormattedPhoneNumber() {
+        return formattedPhoneNumber;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Geometry getGeometry() {
+        return geometry;
     }
+
 
     public OpeningHours getOpeningHours() {
         return openingHours;
-    }
-
-    public void setOpeningHours(OpeningHours openingHours) {
-        this.openingHours = openingHours;
     }
 
     public List<Photo> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(List<Photo> photos) {
-        this.photos = photos;
-    }
 
     public Double getRating() {
         return rating;
     }
 
-    public void setRating(Double rating) {
-        this.rating = rating;
-    }
 
     public String getVicinity() {
         return vicinity;
     }
 
-    public void setVicinity(String vicinity) {
-        this.vicinity = vicinity;
-    }
 
     public String getWebsite() {
         return website;
     }
 
-    public void setWebsite(String website) {
-        this.website = website;
+    public String getPlaceId() {
+        return placeId;
     }
 
+    public List<String> getWeekdayText() {
+        return weekdayText;
+    }
 }

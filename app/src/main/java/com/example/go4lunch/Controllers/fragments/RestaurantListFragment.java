@@ -18,16 +18,16 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.go4lunch.R;
 
 import com.example.go4lunch.controllers.activities.MainActivity;
-import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.ResultSearchNearby;
+import com.example.go4lunch.models.apiGooglePlace.placeDetails.ResultDetails;
 import com.example.go4lunch.views.restaurant_list_fragment_rv.RestaurantAdapter;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 public class RestaurantListFragment extends androidx.fragment.app.Fragment {
     private RecyclerView mRecyclerView;
     private RestaurantAdapter mAdapter;
-
+    private HashMap<String, List<String>> mRestaurantHourDictionary;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Nullable
@@ -51,18 +51,31 @@ public class RestaurantListFragment extends androidx.fragment.app.Fragment {
         mSwipeRefreshLayout = view.findViewById(R.id.restaurant_list_rv__refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             MapFragment mapFragment =  ((MainActivity) requireActivity()).getMapFragment();
-            mapFragment.getDeviceLocation();
+            mapFragment.getLastKnownLocation();
             Toast.makeText(requireContext(), "Refreshing data", Toast.LENGTH_SHORT).show();
             mSwipeRefreshLayout.setRefreshing(false);
         });
 
     }
 
-    public void setRestaurantAdapterNearby(List<ResultSearchNearby> resultListSearchNearby, Context context, Location deviceLocation) {
-        this.mAdapter = new RestaurantAdapter(resultListSearchNearby,context,deviceLocation);
+    void setRestaurantAdapterNearby(List<ResultDetails> resultDetails, Context context, Location deviceLocation) {
+        this.mAdapter = new RestaurantAdapter(resultDetails,context,deviceLocation);
         this.mRecyclerView.setAdapter(mAdapter);
     }
+/*
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mAdapter.disposeWhenDestroy();
+    }
+*/
+    public void setRestaurantHourDictionary(HashMap<String, List<String>> restaurantHoursDictionary) {
+        mRestaurantHourDictionary = restaurantHoursDictionary;
+    }
+/*
+    public HashMap<String, List<String>> getmRestaurantHourDictionary() {
+        return mRestaurantHourDictionary;
+    }
 
-
-
+ */
 }

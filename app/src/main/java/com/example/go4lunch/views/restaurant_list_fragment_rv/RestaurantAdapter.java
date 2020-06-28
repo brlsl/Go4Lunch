@@ -10,20 +10,22 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.models.apiGooglePlace.placeAutoComplete.Prediction;
-import com.example.go4lunch.models.apiGooglePlace.placeSearchNearby.ResultSearchNearby;
+import com.example.go4lunch.models.apiGooglePlace.placeDetails.ResultDetails;
 
+import java.util.HashMap;
 import java.util.List;
+
 
 public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder> {
 
 
-    private List<ResultSearchNearby> resultSearchNearbyList;
+    private List<ResultDetails> resultSearchNearbyList;
     private Context mContext;
     private Location mDeviceLocation;
+    private HashMap<String, List<String>> mRestaurantHoursDictionary;
 
 
-    public RestaurantAdapter(List<ResultSearchNearby> items, Context context, Location deviceLocation){
+    public RestaurantAdapter(List<ResultDetails> items, Context context, Location deviceLocation){
         this.resultSearchNearbyList = items;
         this.mContext = context;
         this.mDeviceLocation = deviceLocation;
@@ -42,13 +44,11 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
     @Override
     public void onBindViewHolder(@NonNull RestaurantViewHolder holder, int position) {
         holder.displayData(resultSearchNearbyList,mContext,mDeviceLocation, position);
-
     }
 
     @Override
     public int getItemCount() {
         return resultSearchNearbyList.size();
     }
-
 
 }

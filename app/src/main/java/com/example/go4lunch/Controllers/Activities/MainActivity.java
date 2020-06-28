@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,15 +31,8 @@ import com.example.go4lunch.controllers.fragments.RestaurantListFragment;
 import com.example.go4lunch.controllers.fragments.WorkmatesListFragment;
 import com.example.go4lunch.models.User;
 import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.AutocompletePrediction;
-import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
-import com.google.android.libraries.places.api.model.TypeFilter;
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -85,7 +77,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             @Override
             public boolean onQueryTextSubmit(String query) {
 
-                if (query.trim().length() > 2 && mMapFragment.getLocation() != null) {
+                if (query.trim().length() > 2 && mMapFragment.getDeviceLocation() != null) {
                     mMapFragment.executeHttpRequestAutoCompleteWithRetrofit(query);
                 }
                 return false;
