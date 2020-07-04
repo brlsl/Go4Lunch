@@ -37,6 +37,9 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
     public RestaurantViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_restaurant_fragment_restaurant_list,parent,false);
+        switch (viewType){
+
+        }
 
         return new RestaurantViewHolder(view);
     }
@@ -50,5 +53,6 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
     public int getItemCount() {
         return resultSearchNearbyList.size();
     }
+
 
 }

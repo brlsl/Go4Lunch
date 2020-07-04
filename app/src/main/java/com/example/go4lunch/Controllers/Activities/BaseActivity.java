@@ -1,5 +1,6 @@
 package com.example.go4lunch.controllers.activities;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 import android.widget.Toast;
@@ -8,22 +9,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.go4lunch.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public abstract class BaseActivity extends AppCompatActivity
 {
-    public final String PLACE_API_KEY = "AIzaSyAK366wqKIdy-Td7snXrjIRaI9MkXb2VZE";
+    public String PLACE_API_KEY;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(this.getFragmentLayout());
+        PLACE_API_KEY =  getApplicationContext().getString(R.string.google_place_api_key);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // prevent screen orientation change
 
     }
-
 
     public abstract int getFragmentLayout();
 
@@ -33,11 +36,6 @@ public abstract class BaseActivity extends AppCompatActivity
 
     // if there is error during Firestore request
     protected OnFailureListener onFailureListener() {
-        return new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(), "Une erreur inconnue s'est produite", Toast.LENGTH_LONG).show();
-            }
-        };
+        return e -> Toast.makeText(getApplicationContext(), R.string.unknown_error_has_occurred, Toast.LENGTH_LONG).show();
     }
 }

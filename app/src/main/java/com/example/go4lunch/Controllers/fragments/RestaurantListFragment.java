@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,12 +24,20 @@ import com.example.go4lunch.views.restaurant_list_fragment_rv.RestaurantAdapter;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
-public class RestaurantListFragment extends androidx.fragment.app.Fragment {
+public class RestaurantListFragment extends BaseFragment {
     private RecyclerView mRecyclerView;
     private RestaurantAdapter mAdapter;
     private HashMap<String, List<String>> mRestaurantHourDictionary;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true); // show item in menu
+    }
 
     @Nullable
     @Override
@@ -38,7 +47,20 @@ public class RestaurantListFragment extends androidx.fragment.app.Fragment {
         configureRecyclerView(view);
         configureSwipeRefreshLayout(view);
 
+        setHasOptionsMenu(true);
+
         return view;
+    }
+
+    @Override
+    protected int getFragmentLayout() {
+        return 0;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setTitle(R.string.restaurant_list_title);
     }
 
     private void configureRecyclerView(View view){
@@ -62,20 +84,9 @@ public class RestaurantListFragment extends androidx.fragment.app.Fragment {
         this.mAdapter = new RestaurantAdapter(resultDetails,context,deviceLocation);
         this.mRecyclerView.setAdapter(mAdapter);
     }
-/*
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mAdapter.disposeWhenDestroy();
-    }
-*/
+
     public void setRestaurantHourDictionary(HashMap<String, List<String>> restaurantHoursDictionary) {
         mRestaurantHourDictionary = restaurantHoursDictionary;
     }
-/*
-    public HashMap<String, List<String>> getmRestaurantHourDictionary() {
-        return mRestaurantHourDictionary;
-    }
 
- */
 }

@@ -14,8 +14,6 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.api.UserHelper;
 import com.example.go4lunch.controllers.activities.RestaurantDetailActivity;
 import com.example.go4lunch.models.User;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 public class WorkmateViewHolder extends RecyclerView.ViewHolder {
 
@@ -29,7 +27,7 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void displayData(User model, Context context) {
-        UserHelper.getCurrentUser(model.getUid()).addOnSuccessListener(documentSnapshot -> {
+        UserHelper.getUser(model.getUid()).addOnSuccessListener(documentSnapshot -> {
             User databaseUser = documentSnapshot.toObject(User.class);
             // configure avatar
             Glide

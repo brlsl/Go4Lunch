@@ -20,10 +20,6 @@ public class UserHelper {
     public static CollectionReference getUsersCollection(){
         return FirebaseFirestore.getInstance().collection(COLLECTION_USERS);
     }
-    public static CollectionReference getRestaurantCollection(String uid){
-        return FirebaseFirestore.getInstance().collection(COLLECTION_USERS)
-                .document(uid).collection(COLLECTION_RESTAURANTS_LIKED);
-    }
 
     // --- CREATE ---
 
@@ -44,7 +40,7 @@ public class UserHelper {
         return UserHelper.getUsersCollection().whereEqualTo("uid", uid);
     }
 
-    public static Task<DocumentSnapshot> getCurrentUser(String uid){
+    public static Task<DocumentSnapshot> getUser(String uid){
         return UserHelper.getUsersCollection().document(uid).get();
     }
 
@@ -56,12 +52,12 @@ public class UserHelper {
 
     // --- UPDATE ---
 
-    public static Task<Void> updateUserRestaurantChoiceId(String uid, String userRestaurantChoiceId) {
-        return UserHelper.getUsersCollection().document(uid).update("restaurantChoiceId", userRestaurantChoiceId);
+    public static void updateUserRestaurantChoiceId(String uid, String userRestaurantChoiceId) {
+        UserHelper.getUsersCollection().document(uid).update("restaurantChoiceId", userRestaurantChoiceId);
     }
 
-    public static Task<Void> updateUserRestaurantChoiceName(String uid, String userRestaurantChoiceName){
-        return UserHelper.getUsersCollection().document(uid).update("restaurantChoiceName",userRestaurantChoiceName);
+    public static void updateUserRestaurantChoiceName(String uid, String userRestaurantChoiceName){
+        UserHelper.getUsersCollection().document(uid).update("restaurantChoiceName", userRestaurantChoiceName);
     }
 
     // --- DELETE ---

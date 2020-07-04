@@ -15,8 +15,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         >
-
-        <!-- Toolbar -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/activity_main_toolbar"
             android:layout_width="match_parent"
@@ -29,8 +27,9 @@
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/activity_main_toolbar"
-            android:layout_above="@id/bottom_navigation_view"/>
+            android:layout_above="@id/bottom_navigation_view"
+            android:layout_below="@+id/activity_main_toolbar" />
+
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_navigation_view"
@@ -45,8 +44,8 @@
     </RelativeLayout>
 
     <!-- 2 | NavigationView
-    headerLayout -> pour la partie haute du drawer
-    menu -> autre fichier xml-->
+    headerLayout -> high part of drawer
+    menu -> another xml file-->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/activity_main_navigation_view"
         android:layout_width="wrap_content"

@@ -2,6 +2,7 @@ package com.example.go4lunch.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -14,7 +15,14 @@ public class DateUtils {
         return sdf.format(today).toLowerCase();
     }
 
-    public static Integer getTodayDateToInteger(String day){
+    // ok
+    public static String getCurrentHourToStr(){
+        Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa",Locale.ENGLISH);
+        return sdf.format(now);
+    }
+
+    public static Integer getTodayToInteger(String day){
         HashMap<String, Integer> map = new HashMap<>();
         map.put("monday",0);
         map.put("tuesday",1);
@@ -26,28 +34,22 @@ public class DateUtils {
         return map.get(day);
     }
 
-    // ok
-    public static String getCurrentHourToStr(){
-        Date today = new Date();
+    public static long hour1CompareToHour2(String inputHour1, String inputHour2) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa",Locale.ENGLISH);
-        return sdf.format(today);
+        Date hour1 = sdf.parse(inputHour1);
+        Date hour2 = sdf.parse(inputHour2);
+
+        assert hour1 != null;
+        assert hour2 != null;
+        return hour1.getTime() - hour2.getTime();
     }
 
-
-    public static int currentHourCompareToRestaurantHour(String inputHour) throws ParseException {
+    public static long openingHoursCompareToCloseHours(String openHour, String closeHour) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa",Locale.ENGLISH);
-        Date currentHour = sdf.parse(getCurrentHourToStr());
-
-        Date restaurantHour = sdf.parse(inputHour);
-
-        return currentHour.compareTo(restaurantHour);
-    }
-
-    public static int compareOpeningHoursToCloseHours(String openHour, String closeHour) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa",Locale.ENGLISH);
-
         Date open = sdf.parse(openHour);
         Date close = sdf.parse(closeHour);
+        assert open != null;
+        assert close != null;
 
         return openHour.compareTo(closeHour);
     }
@@ -63,7 +65,6 @@ public class DateUtils {
         long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(duration);
 
         if (diffInMinutes >= 0 && diffInMinutes <= 45) {
-            System.out.println("Closing soon");
             return true;
         }
         return false;

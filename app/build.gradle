@@ -58,6 +58,9 @@ dependencies {
     // FirebaseUI for Cloud Firestore
     implementation 'com.firebaseui:firebase-ui-firestore:6.2.1'
 
+    // Firebase Messaging
+    implementation 'com.google.firebase:firebase-messaging:20.2.1'
+
     // Firestore
     implementation 'com.google.firebase:firebase-firestore:21.4.3'
 

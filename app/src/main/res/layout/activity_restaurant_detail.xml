@@ -5,7 +5,7 @@
     android:id="@+id/restaurant_activity_detail"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/orangeAppColor">
+    android:background="@color/colorPrimary">
 
     <ImageView
         android:id="@+id/restaurant_detail_activity_restaurant_photo"
@@ -27,7 +27,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/restaurant_detail_activity_restaurant_photo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/restaurant_detail_activity_restaurant_photo"
-        app:srcCompat="@drawable/ic_person_black_24dp" />
+        app:srcCompat="@drawable/ic_baseline_restaurant_24" />
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -112,7 +112,7 @@
                         android:background="@android:color/transparent"
                         android:drawableTop="@drawable/ic_phone_orange_24dp"
                         android:text="CALL"
-                        android:textColor="@color/orangeAppColor"
+                        android:textColor="@color/colorPrimary"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/restaurant_activity_detail_website_button"
                         app:layout_constraintStart_toStartOf="parent"
@@ -125,7 +125,7 @@
                         android:background="@android:color/transparent"
                         android:drawableTop="@drawable/ic_public_restaurant_website_orange_24dp"
                         android:text="Website"
-                        android:textColor="@color/orangeAppColor"
+                        android:textColor="@color/colorPrimary"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.498"
@@ -139,7 +139,7 @@
                         android:background="@android:color/transparent"
                         android:drawableTop="@drawable/ic_thumb_up_restaurant_like_orange_24dp"
                         android:text="like"
-                        android:textColor="@color/orangeAppColor"
+                        android:textColor="@color/colorPrimary"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/restaurant_activity_detail_website_button"

@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
 
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -16,6 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <uses-library android:name="com.google.android.maps" android:required="false"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -23,10 +25,9 @@
         <!-- connect Activity -->
         <activity
             android:name=".controllers.activities.ConnectActivity"
-            android:theme="@style/AppTheme_LoginTheme">
+            android:theme="@style/AppTheme_NoTitle">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -46,6 +47,14 @@
             android:label="@string/title_activity_settings">
 
         </activity>
+
+        <!-- Notification Service -->
+        <service
+            android:name=".notifications.NotificationsService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

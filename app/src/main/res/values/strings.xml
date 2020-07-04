@@ -9,8 +9,8 @@
     <string name="facebook_login_protocol_scheme" translatable="false">fb239273297312721</string>
 
     <!--Drawer configuration-->
-    <string name="navigation_drawer_open" />
-    <string name="navigation_drawer_close" />
+    <string name="navigation_drawer_open">Open drawer </string>
+    <string name="navigation_drawer_close">Close drawer</string>
     <string name="your_meal">Your meal</string>
     <string name="settings">Settings</string>
     <string name="logout">Logout</string>
@@ -47,7 +47,31 @@
 
     <!--WorkMate List Layout-->
     <string name="user_is_eating_at_restaurant_name">User is eating at Restaurant Name</string>
+    <string name="default_notification_channel_id">fcm_default_channel</string>
 
+    <!--Fragment names -->
+    <string name="map_view_title">I\'m hungry</string>
+    <string name="restaurant_list_title">I\'m hungry</string>
+    <string name="workmates_list_title">Workmates joining</string>
 
+    <!--Sort menu item -->
+    <string name="sort_by_name">Sort by name</string>
+    <string name="Sort_by_proximity">Sort by proximity</string>
+
+    <!-- Navigation Header -->
+    <string name="user_name">user name</string>
+    <string name="user_avatar">user avatar</string>
+    <string name="user_mail">user mail</string>
+
+    <!--Connect Activity -->
+    <string name="authentification_canceled">Authentification canceled</string>
+    <string name="connexion_succeeded">Connexion succeeded</string>
+    <string name="no_internet_connexion">No internet connexion</string>
+    <string name="unknown_error_has_occurred">Unknown error has occurred</string>
+    <string name="connect_activity_background">Connect activity background</string>
+    <string name="logo_connect_activity">Logo connect activity</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="sign_in_with_facebook">Sign in with Facebook</string>
+    <string name="find_a_restaurant_and_invite_your_co_workers">Find a restaurant and invite your co-workers!</string>
 
 </resources>

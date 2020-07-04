@@ -14,7 +14,8 @@
         android:icon="@drawable/ic_settings_white_24dp"/>
     <item
         android:id="@+id/activity_main_drawer_logout"
-        android:title="@string/logout" />
+        android:title="@string/logout"
+        android:icon="@drawable/ic_logout_24dp"/>
 
 
 </menu>

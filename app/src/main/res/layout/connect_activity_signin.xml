@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/connect_activity_food_blurry"
+        android:scaleType="centerCrop"
+        tools:ignore="MissingConstraints" />
+    <ImageView
+        android:id="@+id/logo_app"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="50dp"
+        android:contentDescription="@string/logo_connect_activity"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_meal_24dp"
+        />
+
+    <TextView
+        android:id="@+id/connect_activity_name_app"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textColor="@color/colorAccent"
+        android:shadowColor="#010101"
+        android:shadowDx="12"
+        android:shadowDy="15"
+        android:shadowRadius="1"
+        android:textSize="50sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logo_app" />
+
+    <TextView
+        android:id="@+id/connect_activity_subtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/find_a_restaurant_and_invite_your_co_workers"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:textColor="@color/colorAccent"
+        android:shadowColor="#010101"
+        android:shadowDx="5"
+        android:shadowDy="5"
+        android:shadowRadius="0.1"
+        android:textStyle="italic|bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/connect_activity_name_app" />
+
+    <TextView
+        android:id="@+id/facebook_sign_in"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:background="@color/com_facebook_blue"
+        android:clickable="true"
+        android:drawableStart="@drawable/com_facebook_button_login_logo"
+        android:drawablePadding="20dp"
+        android:focusable="true"
+        android:paddingStart="16dp"
+        android:paddingTop="10dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="10dp"
+        android:text="@string/sign_in_with_facebook"
+        android:textColor="#FFFFFF"
+        android:textSize="16dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/google_sign_in"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:background="#FFFFFFFF"
+        android:clickable="true"
+        android:drawableStart="@drawable/fui_ic_googleg_color_24dp"
+        android:drawablePadding="20dp"
+        android:focusable="true"
+        android:paddingLeft="16dp"
+        android:paddingTop="10dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="10dp"
+        android:text="@string/sign_in_with_google"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/facebook_sign_in"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

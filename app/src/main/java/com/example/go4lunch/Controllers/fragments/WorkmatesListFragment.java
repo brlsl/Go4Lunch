@@ -19,7 +19,7 @@ import com.example.go4lunch.views.workmates_list_fragment_rv.WorkmateAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.Query;
 
-public class WorkmatesListFragment extends androidx.fragment.app.Fragment {
+public class WorkmatesListFragment extends BaseFragment {
 
     private RecyclerView mRecyclerView;
     private WorkmateAdapter mAdapter;
@@ -43,6 +43,11 @@ public class WorkmatesListFragment extends androidx.fragment.app.Fragment {
         configureRecyclerView();
 
         return view;
+    }
+
+    @Override
+    protected int getFragmentLayout() {
+        return 0;
     }
 
     private void configureRecyclerView() {

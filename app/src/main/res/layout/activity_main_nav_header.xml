@@ -1,13 +1,25 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="200dp"
-    android:background="@drawable/connect_activity_food_landscape"
+    android:background="@drawable/food_landscape"
     android:gravity="center"
     android:orientation="vertical"
     android:id="@+id/nav_header">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textColor="@color/colorAccent"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/user_avatar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/user_avatar"
@@ -15,8 +27,8 @@
         android:layout_height="70dp"
         android:layout_marginStart="24dp"
         android:layout_marginBottom="24dp"
-        android:background="@drawable/ic_people_white_24dp"
-        android:contentDescription="user avatar"
+        android:background="@drawable/ic_person_black_24dp"
+        android:contentDescription="@string/user_avatar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
@@ -26,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
-        android:text="user_name"
+        android:text="@string/user_name"
         android:textStyle="bold"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toTopOf="@+id/user_email"
@@ -38,7 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="32dp"
-        android:text="adresse@gmail.com"
+        android:text="@string/user_mail"
         android:textColor="@android:color/white"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
