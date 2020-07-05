@@ -39,6 +39,17 @@
     <!--Restaurant detail activity-->
     <string name="no_website_available">Restaurant has no website :(</string>
     <string name="no_phone_number_available">Restaurant has no phone number :(</string>
+    <string name="you_like_this_restaurant">You like this restaurant</string>
+    <string name="you_dislike_this_restaurant">You dislike this restaurant</string>
+    <string name="restaurant_photo">restaurant_photo</string>
+    <string name="restaurant_name">Restaurant Name</string>
+    <string name="you_eat_at">You eat at %1$s</string>
+    <string name="you_canceled">You canceled your choice!</string>
+    <string name="restaurant_address">Restaurant address</string>
+    <string name="website">Website</string>
+    <string name="like">Like</string>
+    <string name="call">Call</string>
+
 
     <!--Map fragment -->
     <string name="ask_for_permission">Go4Lunch needs location permission</string>
@@ -79,5 +90,20 @@
 
     <!--Base Activity-->
     <string name="search_a_restaurant">Search a restaurant</string>
+
+    <!--Bottom Navigation View -->
+    <string name="mapview">MapView</string>
+    <string name="listview">ListView</string>
+    <string name="workmates">Workmates</string>
+    <string name="delete_account_question">Are you sure to delete your account?</string>
+    <string name="answer_no">No</string>
+
+    <!--Joining Workmates View Holder-->
+    <string name="workmates_is_joining">%1$s is joining!</string>
+
+    <!--Restaurant List Fragment-->
+    <string name="no_restaurant_around">No restaurant around to sort</string>
+
+
 
 </resources>

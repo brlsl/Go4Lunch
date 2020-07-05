@@ -36,7 +36,8 @@ public class JoiningWorkmateViewHolder extends RecyclerView.ViewHolder {
                         .into(mUserAvatar);
 
                 //configure text
-                mTextViewIsJoining.setText(databaseUser.getUsername()+ " is joining!");
+            assert databaseUser != null;
+            mTextViewIsJoining.setText(context.getString(R.string.workmates_is_joining, databaseUser.getUsername()));
 
         });
     }

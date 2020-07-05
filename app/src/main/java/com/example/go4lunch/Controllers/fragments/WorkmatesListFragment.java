@@ -45,11 +45,6 @@ public class WorkmatesListFragment extends BaseFragment {
         return view;
     }
 
-    @Override
-    protected int getFragmentLayout() {
-        return 0;
-    }
-
     private void configureRecyclerView() {
         // 1 Query
         Query query = UserHelper.getUsersCollection().orderBy("username", Query.Direction.ASCENDING);

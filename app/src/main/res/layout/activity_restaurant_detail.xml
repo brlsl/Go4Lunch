@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/restaurant_activity_detail"
+    android:id="@+id/constraint_layout_restaurant_activity_detail"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary">
@@ -16,7 +16,8 @@
         app:layout_constraintHeight_percent="0.4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/avatars" />
+        tools:srcCompat="@tools:sample/avatars"
+        android:contentDescription="@string/restaurant_photo" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/restaurant_activity_detail_fab_user_choice"
@@ -27,7 +28,8 @@
         app:layout_constraintBottom_toBottomOf="@+id/restaurant_detail_activity_restaurant_photo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/restaurant_detail_activity_restaurant_photo"
-        app:srcCompat="@drawable/ic_baseline_restaurant_24" />
+        app:srcCompat="@drawable/ic_baseline_restaurant_24"
+        android:focusable="true" />
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -52,7 +54,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="32dp"
                 android:layout_marginBottom="8dp"
-                android:text="RestaurantName"
+                android:text="@string/restaurant_name"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -68,7 +70,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
-                android:text="Restaurant address"
+                android:text="@string/restaurant_address"
                 android:textColor="#FFFFFF"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -111,7 +113,7 @@
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
                         android:drawableTop="@drawable/ic_phone_orange_24dp"
-                        android:text="CALL"
+                        android:text="@string/call"
                         android:textColor="@color/colorPrimary"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/restaurant_activity_detail_website_button"
@@ -124,7 +126,7 @@
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
                         android:drawableTop="@drawable/ic_public_restaurant_website_orange_24dp"
-                        android:text="Website"
+                        android:text="@string/website"
                         android:textColor="@color/colorPrimary"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -138,7 +140,7 @@
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
                         android:drawableTop="@drawable/ic_thumb_up_restaurant_like_orange_24dp"
-                        android:text="like"
+                        android:text="@string/like"
                         android:textColor="@color/colorPrimary"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"

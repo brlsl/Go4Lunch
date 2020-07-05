@@ -5,18 +5,18 @@
         android:id="@+id/bottom_navigation_map"
         android:enabled="true"
         android:icon="@drawable/ic_map_white_24dp"
-        android:title="MapView"
+        android:title="@string/mapview"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/bottom_navigation_restaurant_list"
         android:enabled="true"
         android:icon="@drawable/ic_view_list_white_24dp"
-        android:title="ListView"
+        android:title="@string/listview"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/bottom_navigation_workmates_list"
         android:enabled="true"
         android:icon="@drawable/ic_people_white_24dp"
-        android:title="Workmates"
+        android:title="@string/workmates"
         app:showAsAction="ifRoom" />
 </menu>
