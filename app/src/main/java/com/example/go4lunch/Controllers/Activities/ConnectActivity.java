@@ -15,6 +15,7 @@ import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
+import com.firebase.ui.auth.ui.idp.AuthMethodPickerActivity;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -49,7 +50,6 @@ public class ConnectActivity extends BaseActivity {
             overridePendingTransition(R.anim.zoom_in,R.anim.static_animation);}
             );
         }
-
         overridePendingTransition(R.anim.zoom_out,R.anim.static_animation);
     }
 
@@ -59,12 +59,12 @@ public class ConnectActivity extends BaseActivity {
         handleResponseAfterSignIn(requestCode,resultCode, data);
     }
 
-
     AuthMethodPickerLayout customLayout = new AuthMethodPickerLayout
             .Builder(R.layout.connect_activity_signin)
             .setGoogleButtonId(R.id.google_sign_in)
             .setFacebookButtonId(R.id.facebook_sign_in)
             .build();
+
 
     private void startSignInActivity(){
         startActivityForResult(AuthUI.getInstance()
@@ -86,8 +86,6 @@ public class ConnectActivity extends BaseActivity {
         overridePendingTransition(R.anim.zoom_in,R.anim.static_animation);
 
     }
-
-
 
     public void createUserInFirestore(){
         if (this.getCurrentUser() != null ){

@@ -78,26 +78,13 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     private static final float DEFAULT_ZOOM = 15f;
 
-    @Override
-    protected int getFragmentLayout() {
-        return R.layout.map_fragment;
-    }
 
-    // remove sort restaurant in this fragment
-    @Override
-    public void onPrepareOptionsMenu(@NonNull Menu menu) {
-        MenuItem item = menu.findItem(R.id.restaurant_sort);
-        if(item != null)
-            item.setVisible(false);
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         PLACE_API_KEY = requireActivity().getString(R.string.google_place_api_key);
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext());
-
-
 
         setHasOptionsMenu(true); // show item in menu
         getLocationPermission(); // ask for location permission
@@ -119,6 +106,13 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
         return mView;
     }
 
+    // remove sort restaurant in this fragment
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        MenuItem item = menu.findItem(R.id.restaurant_sort);
+        if(item != null)
+            item.setVisible(false);
+    }
 
     @Override
     public void onDestroy() {
@@ -234,19 +228,21 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                     @Override
                     public void onNext(List<ResultDetails> resultDetails) {
                         mMap.clear();
+                        List<ResultDetails> resultDetailsList = new ArrayList<>();
                         for (int i = 0; i <resultDetails.size() ; i++) {
                             double lat = resultDetails.get(i).getResult().getGeometry().getLocation().getLat();
                             double lng = resultDetails.get(i).getResult().getGeometry().getLocation().getLng();
                             LatLng markerLatLng = new LatLng(lat, lng);
-
+                            if (resultDetails.get(i).getResult().getRating() == null){ resultDetails.get(i).getResult().setRating(0.0);}
                             putRestaurantMarker(markerLatLng);
                             myDictionary.put(markerLatLng, resultDetails.get(i).getResult());
+                            resultDetailsList.add(resultDetails.get(i).getResult());
+
                         }
-                        setMyDictionary(myDictionary);
                         // pass list of restaurants nearby details, context and device location to recycler view
                         RestaurantListFragment restaurantListFragment = ((MainActivity) requireActivity()).getRestaurantListFragment();
-                        restaurantListFragment.setRestaurantAdapterNearby(resultDetails, requireActivity(), getDeviceLocation());
-                        putMarkerWhereWorkmateHaveLunch(getMyDictionary());
+                        restaurantListFragment.setRestaurantAdapterNearby(resultDetailsList, requireActivity(), getDeviceLocation());
+                        putMarkerWhereWorkmateHaveLunch(myDictionary);
                     }
 
                     @Override
@@ -277,8 +273,8 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                         mMap.clear();
                         for (int i = 0; i < autoComplete.getPredictions().size(); i++) {
                             String restaurantId = autoComplete.getPredictions().get(i).getPlaceId();
-                            LatLng restaurantLatLng = getLatLngKeyByRestaurantIdValue(getMyDictionary(),restaurantId);
-                            if (restaurantLatLng != null && getMyDictionary().containsKey(restaurantLatLng)){
+                            LatLng restaurantLatLng = getLatLngKeyByRestaurantIdValue(myDictionary,restaurantId);
+                            if (restaurantLatLng != null && myDictionary.containsKey(restaurantLatLng)){
                                 MarkerOptions markerOptions = new MarkerOptions().position(restaurantLatLng).icon(BitmapDescriptorFactory
                                         .defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                                 Marker restaurantMarker = mMap.addMarker(markerOptions);
@@ -376,11 +372,4 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
         this.deviceLocation = location;
     }
 
-    public HashMap<LatLng, ResultDetails> getMyDictionary() {
-        return myDictionary;
-    }
-
-    public void setMyDictionary(HashMap<LatLng, ResultDetails> myDictionary) {
-        this.myDictionary = myDictionary;
-    }
 }

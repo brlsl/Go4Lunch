@@ -3,6 +3,7 @@ package com.example.go4lunch.views.restaurant_list_fragment_rv;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.location.LocationManager;
 import android.view.View;
@@ -33,7 +34,7 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
     private TextView mRestaurantName, mRestaurantAddress, mRestaurantOpeningHours,
             mRestaurantDistance, mNumberOfInterested;
     private ImageView mRestaurantPhoto, mStar1, mStar2, mStar3;
-    private String mRestaurantId;
+    private String mRestaurantId, mOpenMorning, mCloseMorning, mOpenEvening, mCloseEvening;
     private Context mContext;
     private ResultDetails mResultDetails;
 
@@ -56,12 +57,7 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
     void displayData(List<ResultDetails> restaurantDetailsList,
                      Context mContext, Location mDeviceLocation, int position){
 
-        // data depends if we receive from a request result or a list from autocomplete result
-        if (restaurantDetailsList.get(position).getResult() != null)
-            mResultDetails = restaurantDetailsList.get(position).getResult();
-        else
-            mResultDetails = restaurantDetailsList.get(position);
-
+        mResultDetails = restaurantDetailsList.get(position);
         mRestaurantId = mResultDetails.getPlaceId();
 
         configureTextsFields();
@@ -81,15 +77,13 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
         if (mRestaurantOpeningHours.getText().toString().equals(mContext.getString(R.string.closing_soon))){
             mRestaurantOpeningHours.setText(R.string.closing_soon);
             mRestaurantOpeningHours.setTextColor(Color.RED);
-            //mRestaurantOpeningHours.setTypeface(mRestaurantOpeningHours.getTypeface(), Typeface.BOLD);
+            mRestaurantOpeningHours.setTypeface(mRestaurantOpeningHours.getTypeface(), Typeface.BOLD);
             System.out.println("ROUGE ICI ET GRAS: " +mRestaurantOpeningHours.getText().toString());
         } else{
             mRestaurantOpeningHours.setTextColor(Color.BLUE);
-           // mRestaurantOpeningHours.setTypeface(mRestaurantOpeningHours.getTypeface(), Typeface.NORMAL);
+           mRestaurantOpeningHours.setTypeface(mRestaurantOpeningHours.getTypeface(), Typeface.NORMAL);
             System.out.println("BLEU ICI ET PAS GRAS: " +mRestaurantOpeningHours.getText().toString());
         }
-
-
     }
 
     private void configureTextsFields() {
@@ -120,7 +114,12 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
 
     private void configureRating() {
         if (mResultDetails.getRating() != null) {
-            if (mResultDetails.getRating() > 2.3F && mResultDetails.getRating() <= 3.3F) {
+            if (mResultDetails.getRating() <2.3){
+                mStar1.setVisibility(View.GONE);
+                mStar2.setVisibility(View.GONE);
+                mStar3.setVisibility(View.GONE);
+            }
+            else if (mResultDetails.getRating() > 2.3F && mResultDetails.getRating() <= 3.3F) {
                 mStar1.setVisibility(View.VISIBLE);
                 mStar2.setVisibility(View.GONE);
                 mStar3.setVisibility(View.GONE);
@@ -135,10 +134,6 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
                 mStar2.setVisibility(View.VISIBLE);
                 mStar3.setVisibility(View.VISIBLE);
             }
-        } else {
-            mStar1.setVisibility(View.GONE);
-            mStar2.setVisibility(View.GONE);
-            mStar3.setVisibility(View.GONE);
         }
     }
 
@@ -155,7 +150,7 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
         //default picture if no photo of restaurant
         if(mResultDetails.getPhotos() == null) {
             Glide.with(mContext)
-                    .load(R.drawable.connect_activity_food)
+                    .load(R.drawable.ic_meal_24dp)
                     .centerCrop()
                     .into(mRestaurantPhoto);
         }
@@ -174,12 +169,12 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
         String restaurantTodayHours = restaurantHours.get(todayInteger); //Tuesday: 11:00 AM – 11:00 PM
         String[] hoursWithoutDay = restaurantTodayHours.toLowerCase().split(todayString+": "); //11:00 AM – 11:00 PM
         String currentHour = DateUtils.getCurrentHourToStr();
-
+/*
         System.out.println("Horaires du jour: " +restaurantTodayHours);
         System.out.println("Jour en STR:" +DateUtils.getTodayDateToStr());
         System.out.println("Jour en integer:" +todayInteger);
         System.out.println("Horaires sans jour:" +hoursWithoutDay[1]);
-
+ */
         if (restaurantTodayHours.toLowerCase().contains(todayString)){
             if (restaurantTodayHours.toLowerCase().contains("closed"))
                 mRestaurantOpeningHours.setText(R.string.closed);
@@ -197,56 +192,31 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void morningEveningSchedule(String[] hoursWithoutDay, String currentHour){
-        String hours = hoursWithoutDay[1].trim(); //" 11:30 am – 1:30 pm, 6:00 – 9:30 pm"
-        String[] splitHours = hours.split(",");
-
-        String morningHours = splitHours[0].trim(); //"11:30 am – 1:30 pm"
-        String[] splitMorning = morningHours.split("–");
-
-        String openMorning = splitMorning[0].trim(); //11:30 am
-        if (!openMorning.contains("am") && !openMorning.contains("12:")) // 11:00
-            openMorning = openMorning +" am";
-        else if(openMorning.contains("12:") && !openMorning.contains("pm")) // for midday 12:00
-            openMorning = openMorning + " pm";
-
-        String closeMorning = splitMorning[1].trim(); //" 1:30 pm"
-        if(!closeMorning.contains("pm"))
-            closeMorning = closeMorning + " pm";
-
-        String eveningHours = splitHours[1].trim(); // 6:00 – 9:30 PM
-        String[] splitEvening = eveningHours.split("–");
-
-        String openEvening = splitEvening[0].trim();// 6:00
-        if(!openEvening.contains("pm"))
-            openEvening = openEvening +" pm";
-
-        String closeEvening = splitEvening[1].trim(); // 9:30 PM;
-        if (closeEvening.contains("12:") && !closeEvening.contains("am"))
-            closeEvening = closeEvening + " am";
+        configureMorningEveningHours(hoursWithoutDay);
 
         try {
-            if (DateUtils.hour1CompareToHour2(currentHour,closeEvening) < 0 && DateUtils.hour1CompareToHour2(closeEvening,openMorning)<0){
-                mRestaurantOpeningHours.setText("Close at "+ closeEvening);
-                if (DateUtils.isClosingSoon(closeMorning)) // if closing <= 45 minutes
+            if (DateUtils.hour1CompareToHour2(currentHour,mCloseEvening) < 0 && DateUtils.hour1CompareToHour2(mCloseEvening,mOpenMorning)<0){
+                mRestaurantOpeningHours.setText(mContext.getString(R.string.close_at, mCloseEvening));
+                if (DateUtils.isClosingSoon(currentHour,mCloseMorning)) // if closing <= 45 minutes
                     configureClosingSoonText();
             }
-            else if (DateUtils.hour1CompareToHour2(currentHour,openMorning) <0 )// current hours before morning open hours
-                mRestaurantOpeningHours.setText(itemView.getContext().getString(R.string.open_at, openMorning));
-            else if (DateUtils.hour1CompareToHour2(currentHour, closeMorning)<0){ // current hours before closing hours
-                mRestaurantOpeningHours.setText(mContext.getString(R.string.open_from_until, openMorning, closeMorning));
-                if (DateUtils.isClosingSoon(closeMorning)) // if closing <= 45 minutes
+            else if (DateUtils.hour1CompareToHour2(currentHour,mOpenMorning) <0 )// current hours before morning open hours
+                mRestaurantOpeningHours.setText(mContext.getString(R.string.open_at, mOpenMorning));
+            else if (DateUtils.hour1CompareToHour2(currentHour, mCloseMorning)<0){ // current hours before closing hours
+                mRestaurantOpeningHours.setText(mContext.getString(R.string.open_from_until, mOpenMorning, mCloseMorning));
+                if (DateUtils.isClosingSoon(currentHour,mCloseMorning)) // if closing <= 45 minutes
                     configureClosingSoonText();
             }
-            else if (DateUtils.hour1CompareToHour2(currentHour,openEvening) <0) // current hours before evening open hours
-                mRestaurantOpeningHours.setText(mContext.getString(R.string.open_at,openEvening));
-            else if (DateUtils.hour1CompareToHour2(currentHour, closeEvening) < 0){ // current hours before evening closing hours
-                mRestaurantOpeningHours.setText(mContext.getString(R.string.open_from_until, openEvening,closeEvening));
-                if (DateUtils.isClosingSoon(closeEvening)) // if closing <= 45 minutes
+            else if (DateUtils.hour1CompareToHour2(currentHour,mOpenEvening) <0) // current hours before evening open hours
+                mRestaurantOpeningHours.setText(mContext.getString(R.string.open_at,mOpenEvening));
+            else if (DateUtils.hour1CompareToHour2(currentHour, mCloseEvening) < 0){ // current hours before evening closing hours
+                mRestaurantOpeningHours.setText(mContext.getString(R.string.open_from_until, mOpenEvening,mCloseEvening));
+                if (DateUtils.isClosingSoon(currentHour,mCloseEvening)) // if closing <= 45 minutes
                     configureClosingSoonText();
             }
-            else if (DateUtils.hour1CompareToHour2(closeEvening, openMorning)<0) { // case it close after midnight
-                mRestaurantOpeningHours.setText(mContext.getString(R.string.close_tomorrow_at, closeEvening));
-                if (DateUtils.isClosingSoon(closeEvening)) // if closing <= 45 minutes
+            else if (DateUtils.hour1CompareToHour2(mCloseEvening, mOpenMorning)<0) { // case it closes after midnight
+                mRestaurantOpeningHours.setText(mContext.getString(R.string.close_tomorrow_at, mCloseEvening));
+                if (DateUtils.isClosingSoon(currentHour,mCloseEvening)) // if closing <= 45 minutes
                     configureClosingSoonText();
             }
             else
@@ -254,6 +224,35 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
         } catch (ParseException e) {
             System.out.println("RestaurantViewHolder morning evening schedule"+e.getMessage());
         }
+    }
+
+    private void configureMorningEveningHours(String[] hoursWithoutDay) {
+        String hours = hoursWithoutDay[1].trim(); //" 11:30 am – 1:30 pm, 6:00 – 9:30 pm"
+        String[] splitHours = hours.split(",");
+
+        String morningHours = splitHours[0].trim(); //"11:30 am – 1:30 pm"
+        String[] splitMorning = morningHours.split("–");
+
+        mOpenMorning = splitMorning[0].trim(); //11:30 am
+        if (!mOpenMorning.contains("am") && !mOpenMorning.contains("12:")) // 11:00
+            mOpenMorning = mOpenMorning +" am";
+        else if(mOpenMorning.contains("12:") && !mOpenMorning.contains("pm")) // for midday 12:00
+            mOpenMorning = mOpenMorning + " pm";
+
+        mCloseMorning = splitMorning[1].trim(); //" 1:30 pm"
+        if(!mCloseMorning.contains("pm"))
+            mCloseMorning = mCloseMorning + " pm";
+
+        String eveningHours = splitHours[1].trim(); // 6:00 – 9:30 PM
+        String[] splitEvening = eveningHours.split("–");
+
+        mOpenEvening = splitEvening[0].trim();// 6:00
+        if(!mOpenEvening.contains("pm"))
+            mOpenEvening = mOpenEvening +" pm";
+
+        mCloseEvening = splitEvening[1].trim(); // 9:30 PM;
+        if (mCloseEvening.contains("12:") && !mCloseEvening.contains("am"))
+            mCloseEvening = mCloseEvening + " am";
     }
 
     private void configureClosingSoonText() {
@@ -270,33 +269,29 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
         int day = 0;
         if (!openDay.contains("am") && !openDay.contains("12:"))
             openDay = openDay+ " am";
-
-
         String closeDay = splitDay[1].trim(); // 11:00 PM
         if(!closeDay.contains(" pm") && !closeDay.contains("am"))
             closeDay = closeDay + " pm";
         try {
             if(DateUtils.hour1CompareToHour2(currentHour,closeDay) < 0 && DateUtils.hour1CompareToHour2(closeDay,openDay)<0) {
-                mRestaurantOpeningHours.setText("Close at" + closeDay); // if closes after 00:00 am
-                if(DateUtils.isClosingSoon(closeDay))
+                mRestaurantOpeningHours.setText(mContext.getString(R.string.close_at, closeDay)); // if closes after 00:00 am
+                if(DateUtils.isClosingSoon(currentHour,closeDay))
                     configureClosingSoonText();
             }
             else if (DateUtils.hour1CompareToHour2(currentHour, openDay) <0)
                 mRestaurantOpeningHours.setText(mContext.getString(R.string.open_at, openDay));
             else if (DateUtils.hour1CompareToHour2(currentHour, closeDay) <0) {
                 mRestaurantOpeningHours.setText(mContext.getString(R.string.open_from_until, openDay, closeDay)); // 08:00 am - 23:59 pm
-                if(DateUtils.isClosingSoon(closeDay))
-                    configureClosingSoonText(); // ok works
+                if(DateUtils.isClosingSoon(currentHour,closeDay))
+                    configureClosingSoonText();
             }
             else if(DateUtils.hour1CompareToHour2(closeDay,openDay) <0) { // 10:00 am - 01:30 am
                 mRestaurantOpeningHours.setText(mContext.getString(R.string.close_tomorrow_at, closeDay));
-                if(DateUtils.isClosingSoon(closeDay))
-                    configureClosingSoonText(); // ok works
+                if(DateUtils.isClosingSoon(currentHour,closeDay))
+                    configureClosingSoonText();
             }
             else
                 mRestaurantOpeningHours.setText(R.string.closed); // 9:30 am, 00:00 am
-           /* else
-                mRestaurantOpeningHours.setText(R.string.opening_hours_not_available);*/
         } catch (ParseException e) {
             System.out.println("RestaurantViewHolder full day schedule"+e.getMessage());
         }

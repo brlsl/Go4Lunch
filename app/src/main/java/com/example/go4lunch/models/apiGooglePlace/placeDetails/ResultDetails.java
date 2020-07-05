@@ -18,6 +18,7 @@ public class ResultDetails {
     @SerializedName("photos")
     @Expose
     private List<Photo> photos = null;
+
     @SerializedName("rating")
     @Expose
     private Double rating;
@@ -44,6 +45,11 @@ public class ResultDetails {
     @Expose
     private List<String> weekdayText = null;
 
+    // constructor for unit test
+    public ResultDetails(String name, Double rating){
+        this.name = name;
+        this.rating = rating;
+    }
 
     public ResultDetails getResult() {
         return result;
@@ -61,7 +67,6 @@ public class ResultDetails {
         return geometry;
     }
 
-
     public OpeningHours getOpeningHours() {
         return openingHours;
     }
@@ -70,16 +75,17 @@ public class ResultDetails {
         return photos;
     }
 
-
     public Double getRating() {
         return rating;
     }
 
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
 
     public String getVicinity() {
         return vicinity;
     }
-
 
     public String getWebsite() {
         return website;

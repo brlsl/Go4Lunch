@@ -12,47 +12,43 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.apiGooglePlace.placeDetails.ResultDetails;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 
 public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder> {
 
-
-    private List<ResultDetails> resultSearchNearbyList;
+    private List<ResultDetails> resultDetailsList;
     private Context mContext;
     private Location mDeviceLocation;
-    private HashMap<String, List<String>> mRestaurantHoursDictionary;
 
+    // constructor with a initialized list / 0 restaurant around
+    public RestaurantAdapter(List<ResultDetails> items){
+        this.resultDetailsList = items;
+    }
 
     public RestaurantAdapter(List<ResultDetails> items, Context context, Location deviceLocation){
-        this.resultSearchNearbyList = items;
+        this.resultDetailsList = items;
         this.mContext = context;
         this.mDeviceLocation = deviceLocation;
     }
-
 
     @NonNull
     @Override
     public RestaurantViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_restaurant_fragment_restaurant_list,parent,false);
-        switch (viewType){
-
-        }
-
         return new RestaurantViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RestaurantViewHolder holder, int position) {
-        holder.displayData(resultSearchNearbyList,mContext,mDeviceLocation, position);
+        holder.displayData(resultDetailsList,mContext,mDeviceLocation, position);
     }
 
     @Override
     public int getItemCount() {
-        return resultSearchNearbyList.size();
+        return resultDetailsList.size();
     }
-
-
 }

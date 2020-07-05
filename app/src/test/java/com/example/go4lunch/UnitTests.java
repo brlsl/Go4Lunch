@@ -1,12 +1,17 @@
 package com.example.go4lunch;
 
+import com.example.go4lunch.models.apiGooglePlace.placeDetails.ResultDetails;
 import com.example.go4lunch.utils.DateUtils;
+import com.example.go4lunch.utils.SortUtils;
 
 import org.junit.Test;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import static org.junit.Assert.*;
@@ -17,6 +22,11 @@ import static org.junit.Assert.*;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 public class UnitTests {
+    private List<ResultDetails> mResultDetailsList = Arrays.asList(
+            new ResultDetails("C", 2.0),
+            new ResultDetails("A", 4.0),
+            new ResultDetails("B", 3.0)
+    );
 
     @Test
     public void getCurrentDay_isCorrect(){
@@ -64,21 +74,42 @@ public class UnitTests {
         assertTrue(DateUtils.hour1CompareToHour2(currentHour, restaurantHour)<0);
         assertFalse(DateUtils.hour1CompareToHour2(currentHour, restaurantHour)>0);
         assertNotEquals(0, DateUtils.hour1CompareToHour2(currentHour, restaurantHour));
-        //assertEquals(0, DateUtils.hour1CompareToHour2(currentHour, restaurantHour));
-
-    }
-    @Test
-    public void compareOpeningHoursToClosingHours_isCorrect() throws ParseException {
-        String openingHour = "11:30 am";
-        String closingHour = "12:00 pm";
-
-        assertTrue(DateUtils.openingHoursCompareToCloseHours(openingHour,closingHour)< 0);
 
     }
 
     @Test
-    public void closingSoon_isCorrect(){
+    public void closingSoon_isCorrect() throws ParseException {
+        String closingHour = "1:30 pm";
+        String doNotPrint = "12:44 pm";
+        String doNotPrint2 = "01:31 pm";
+        String printMin = "12:45 pm";
+        String printMax = "01:30 pm";
 
+        assertFalse(DateUtils.isClosingSoon(doNotPrint, closingHour));
+        assertFalse(DateUtils.isClosingSoon(doNotPrint2, closingHour));
+        assertTrue(DateUtils.isClosingSoon(printMin,closingHour));
+        assertTrue(DateUtils.isClosingSoon(printMax,closingHour));
     }
 
+    @Test
+    public void sortByName_isCorrect(){
+        assertEquals(mResultDetailsList.get(0).getName(),"C");
+        assertEquals(mResultDetailsList.get(1).getName(),"A");
+        assertEquals(mResultDetailsList.get(2).getName(),"B");
+        SortUtils.sortRestaurantByNameAZ(mResultDetailsList);
+        assertEquals(mResultDetailsList.get(0).getName(),"A");
+        assertEquals(mResultDetailsList.get(1).getName(),"B");
+        assertEquals(mResultDetailsList.get(2).getName(),"C");
+    }
+
+    @Test
+    public void sortByRating_isCorrect(){
+        assertEquals(mResultDetailsList.get(0).getRating(),2.0, 0);
+        assertEquals(mResultDetailsList.get(1).getRating(),4.0, 0);
+        assertEquals(mResultDetailsList.get(2).getRating(),3.0, 0);
+        SortUtils.sortHighRatingFirst(mResultDetailsList);
+        assertEquals(mResultDetailsList.get(0).getRating(),4.0, 0);
+        assertEquals(mResultDetailsList.get(1).getRating(),3.0, 0);
+        assertEquals(mResultDetailsList.get(2).getRating(),2.0, 0);
+    }
 }

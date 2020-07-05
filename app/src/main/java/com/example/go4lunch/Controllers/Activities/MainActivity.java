@@ -54,40 +54,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
         super.onCreate(savedInstanceState, persistentState);
     }
-/*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.search_restaurant_menu, menu);
-
-        SearchView searchView = (SearchView) menu.findItem(R.id.restaurant_action_search).getActionView();
-
-        searchView.setQueryHint("Search a restaurant");
-
-        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-
-                if (query.trim().length() > 3 && mMapFragment.getDeviceLocation() != null) {
-                    mMapFragment.executeHttpRequestAutoCompleteWithRetrofit(query);
-                }
-                return false;
-
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-
- */
 
     @Override
     public int getFragmentLayout() {
@@ -169,11 +135,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private void configureDrawerLayout(){
         this.mDrawerLayout = findViewById(R.id.activity_main_drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this,
-                mDrawerLayout,
-                mToolbar,
-                R.string.navigation_drawer_open,
-                R.string.navigation_drawer_close);
+                this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
     }

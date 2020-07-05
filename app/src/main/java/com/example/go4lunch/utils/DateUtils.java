@@ -44,30 +44,11 @@ public class DateUtils {
         return hour1.getTime() - hour2.getTime();
     }
 
-    public static long openingHoursCompareToCloseHours(String openHour, String closeHour) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa",Locale.ENGLISH);
-        Date open = sdf.parse(openHour);
-        Date close = sdf.parse(closeHour);
-        assert open != null;
-        assert close != null;
-
-        return openHour.compareTo(closeHour);
-    }
-
-    public static boolean isClosingSoon(String closeHour) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa", Locale.ENGLISH);
-        Date restaurantClosingHour = sdf.parse(closeHour);
-        Date currentHour = sdf.parse(getCurrentHourToStr());
-
-        assert restaurantClosingHour != null;
-        assert currentHour != null;
-        long duration = restaurantClosingHour.getTime() - currentHour.getTime();
+    public static boolean isClosingSoon(String inputHour, String closeHour) throws ParseException {
+        long duration = hour1CompareToHour2(inputHour,closeHour);
         long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(duration);
 
-        if (diffInMinutes >= 0 && diffInMinutes <= 45) {
-            return true;
-        }
-        return false;
+        return diffInMinutes >= -45 && diffInMinutes <= 0;
     }
 
 }

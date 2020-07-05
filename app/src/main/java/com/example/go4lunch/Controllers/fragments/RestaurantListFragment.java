@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -20,17 +21,18 @@ import com.example.go4lunch.R;
 
 import com.example.go4lunch.controllers.activities.MainActivity;
 import com.example.go4lunch.models.apiGooglePlace.placeDetails.ResultDetails;
+import com.example.go4lunch.utils.SortUtils;
 import com.example.go4lunch.views.restaurant_list_fragment_rv.RestaurantAdapter;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class RestaurantListFragment extends BaseFragment {
     private RecyclerView mRecyclerView;
-    private RestaurantAdapter mAdapter;
-    private HashMap<String, List<String>> mRestaurantHourDictionary;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private RestaurantAdapter mRestaurantAdapter;
+    private List<ResultDetails> mResultDetailsList = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,15 +48,9 @@ public class RestaurantListFragment extends BaseFragment {
 
         configureRecyclerView(view);
         configureSwipeRefreshLayout(view);
-
         setHasOptionsMenu(true);
 
         return view;
-    }
-
-    @Override
-    protected int getFragmentLayout() {
-        return 0;
     }
 
     @Override
@@ -67,6 +63,8 @@ public class RestaurantListFragment extends BaseFragment {
         this.mRecyclerView = view.findViewById(R.id.recycler_view_restaurants);
         this.mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         this.mRecyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
+        this.mRestaurantAdapter = new RestaurantAdapter(mResultDetailsList);
+        this.mRecyclerView.setAdapter(mRestaurantAdapter);
     }
 
     private void configureSwipeRefreshLayout(View view){
@@ -77,16 +75,34 @@ public class RestaurantListFragment extends BaseFragment {
             Toast.makeText(requireContext(), "Refreshing data", Toast.LENGTH_SHORT).show();
             mSwipeRefreshLayout.setRefreshing(false);
         });
-
     }
 
     void setRestaurantAdapterNearby(List<ResultDetails> resultDetails, Context context, Location deviceLocation) {
-        this.mAdapter = new RestaurantAdapter(resultDetails,context,deviceLocation);
-        this.mRecyclerView.setAdapter(mAdapter);
+        this.mRestaurantAdapter = new RestaurantAdapter(resultDetails, context, deviceLocation);
+        this.mRecyclerView.setAdapter(mRestaurantAdapter);
+        mResultDetailsList = resultDetails;
     }
 
-    public void setRestaurantHourDictionary(HashMap<String, List<String>> restaurantHoursDictionary) {
-        mRestaurantHourDictionary = restaurantHoursDictionary;
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id){
+            case R.id.sortByName:
+                if (mResultDetailsList == null || mResultDetailsList.size() == 0)
+                    Toast.makeText(getContext(), "No restaurant around to sort", Toast.LENGTH_SHORT).show();
+                else {
+                    SortUtils.sortRestaurantByNameAZ(mResultDetailsList);
+                    mRestaurantAdapter.notifyDataSetChanged();
+                }
+                break;
+            case R.id.sortByRating:
+                if (mResultDetailsList == null || mResultDetailsList.size() == 0)
+                    Toast.makeText(getContext(), "No restaurant around to sort", Toast.LENGTH_SHORT).show();
+                else{
+                    SortUtils.sortHighRatingFirst(mResultDetailsList);
+                    mRestaurantAdapter.notifyDataSetChanged();
+                }
+        }
+        return true;
     }
-
 }

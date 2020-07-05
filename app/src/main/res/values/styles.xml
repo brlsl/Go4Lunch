@@ -24,6 +24,10 @@
         <item name="android:textColor">@android:color/black</item>
 
     </style>
+    
+    <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <item name="queryBackground">@color/com_facebook_blue</item>
+    </style>
 
 
 </resources>

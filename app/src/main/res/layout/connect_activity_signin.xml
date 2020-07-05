@@ -10,7 +10,9 @@
         android:layout_height="wrap_content"
         android:src="@drawable/connect_activity_food_blurry"
         android:scaleType="centerCrop"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        android:contentDescription="@string/connect_activity_background" />
+
     <ImageView
         android:id="@+id/logo_app"
         android:layout_width="0dp"
@@ -48,7 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/find_a_restaurant_and_invite_your_co_workers"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:textAlignment="center"
         android:textColor="@color/colorAccent"
         android:shadowColor="#010101"
@@ -72,11 +74,11 @@
         android:focusable="true"
         android:paddingStart="16dp"
         android:paddingTop="10dp"
-        android:paddingRight="16dp"
+        android:paddingEnd="16dp"
         android:paddingBottom="10dp"
         android:text="@string/sign_in_with_facebook"
         android:textColor="#FFFFFF"
-        android:textSize="16dp"
+        android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
