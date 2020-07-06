@@ -23,6 +23,7 @@ import com.example.go4lunch.controllers.activities.MainActivity;
 import com.example.go4lunch.models.apiGooglePlace.placeDetails.ResultDetails;
 import com.example.go4lunch.utils.SortUtils;
 import com.example.go4lunch.views.restaurant_list_fragment_rv.RestaurantAdapter;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,6 @@ public class RestaurantListFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setHasOptionsMenu(true); // show item in menu
     }
 
@@ -89,7 +89,7 @@ public class RestaurantListFragment extends BaseFragment {
         switch (id){
             case R.id.sortByName:
                 if (mResultDetailsList == null || mResultDetailsList.size() == 0)
-                    Toast.makeText(getContext(), "No restaurant around to sort", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(mSwipeRefreshLayout , R.string.no_restaurant_around, Snackbar.LENGTH_SHORT).show();
                 else {
                     SortUtils.sortRestaurantByNameAZ(mResultDetailsList);
                     mRestaurantAdapter.notifyDataSetChanged();
@@ -97,7 +97,7 @@ public class RestaurantListFragment extends BaseFragment {
                 break;
             case R.id.sortByRating:
                 if (mResultDetailsList == null || mResultDetailsList.size() == 0)
-                    Toast.makeText(getContext(), "No restaurant around to sort", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(mSwipeRefreshLayout , R.string.no_restaurant_around, Snackbar.LENGTH_SHORT).show();
                 else{
                     SortUtils.sortHighRatingFirst(mResultDetailsList);
                     mRestaurantAdapter.notifyDataSetChanged();

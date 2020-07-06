@@ -13,10 +13,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,6 +34,7 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.Query;
 
 import java.util.Objects;
@@ -45,6 +46,7 @@ public class RestaurantDetailActivity extends BaseActivity {
 
     // FOR UI
     private static final String BASE_GOOGLE_PHOTO_URL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=1600&photoreference=";
+    private ConstraintLayout mConstraintLayout;
 
     // FOR DATA
     private Disposable mDisposable;
@@ -52,6 +54,7 @@ public class RestaurantDetailActivity extends BaseActivity {
     private Context mContext;
     private Boolean mRestaurantIsLiked;
     private Boolean mUserRestaurantIsChosen;
+
 
     @Override
     public int getFragmentLayout() {
@@ -61,7 +64,7 @@ public class RestaurantDetailActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        mConstraintLayout = findViewById(R.id.constraint_layout_restaurant_activity_detail);
         Intent intent = getIntent();
         String restaurantId = Objects.requireNonNull(intent.getStringExtra("PLACE_ID_KEY")); // recupere id
 
@@ -91,8 +94,6 @@ public class RestaurantDetailActivity extends BaseActivity {
         mAdapter = new JoiningWorkmateAdapter(options, mContext);
         mRecyclerView.setAdapter(mAdapter);
     }
-
-
 
     @Override
     public void onStart() {
@@ -148,7 +149,6 @@ public class RestaurantDetailActivity extends BaseActivity {
                         Glide.with(getApplicationContext())
                                 .load(BASE_GOOGLE_PHOTO_URL + resultDetails.getResult().getPhotos().get(randomNum).getPhotoReference() + "&key=" +PLACE_API_KEY)
                                 .into(mRestaurantPhoto);
-                        System.out.println("Value of random integer:" +randomNum);
                     }
 
                     // call button
@@ -158,7 +158,7 @@ public class RestaurantDetailActivity extends BaseActivity {
                         Intent callIntent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", mRestaurantPhoneNumber, null));
                         startActivity(callIntent);
                         } else{
-                            Toast.makeText(RestaurantDetailActivity.this, R.string.no_phone_number_available, Toast.LENGTH_SHORT).show();
+                            Snackbar.make(mConstraintLayout, R.string.no_phone_number_available, Snackbar.LENGTH_SHORT).show();
                         }
                     });
 
@@ -170,7 +170,7 @@ public class RestaurantDetailActivity extends BaseActivity {
                             intentURL.setData(Uri.parse(mRestaurantWebsite));
                             startActivity(intentURL);
                         } else{
-                            Toast.makeText(RestaurantDetailActivity.this, R.string.no_website_available, Toast.LENGTH_SHORT).show();
+                            Snackbar.make(mConstraintLayout, R.string.no_website_available, Snackbar.LENGTH_SHORT).show();
                         }
                     });
 
@@ -189,13 +189,15 @@ public class RestaurantDetailActivity extends BaseActivity {
                                 UserHelper.updateUserRestaurantChoiceId(getCurrentUser().getUid(), placeID);
                                 UserHelper.updateUserRestaurantChoiceName(getCurrentUser().getUid(), resultDetails.getResult().getName());
                                 mFabUserRestaurantChoice.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_circle_green_24dp));
-
+                                Snackbar.make(mConstraintLayout, mContext.getString(R.string.you_eat_at,
+                                        resultDetails.getResult().getName()), Snackbar.LENGTH_SHORT).show();
                             }
                             else{
                                 mUserRestaurantIsChosen = false;
                                 UserHelper.updateUserRestaurantChoiceId(getCurrentUser().getUid(), null);
                                 UserHelper.updateUserRestaurantChoiceName(getCurrentUser().getUid(), null);
                                 mFabUserRestaurantChoice.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_restaurant_24));
+                                Snackbar.make(mConstraintLayout, mContext.getString(R.string.you_canceled), Snackbar.LENGTH_SHORT).show();
                             }
                         });
 
@@ -206,27 +208,26 @@ public class RestaurantDetailActivity extends BaseActivity {
                         Restaurant restaurantDb = documentSnapshot.toObject(Restaurant.class);
 
                         if(restaurantDb != null && restaurantDb.getRestaurantIsLiked()){
-                            mRestaurantLikeButton.setBackgroundColor(Color.GRAY);
+                            mRestaurantLikeButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
                             mRestaurantIsLiked = true;
                         }
                         mRestaurantLikeButton.setOnClickListener(v -> {
                             if (mRestaurantIsLiked == null || !mRestaurantIsLiked){
                                 UserHelper.createRestaurantLikedByUser(getCurrentUser().getUid(),placeID,true);
                                 mRestaurantIsLiked = true;
-                                v.setBackgroundColor(Color.GRAY);
-                                Toast.makeText(getApplicationContext(), "You like this restaurant", Toast.LENGTH_SHORT).show();
+                                v.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                Snackbar.make(mConstraintLayout, R.string.you_like_this_restaurant, Snackbar.LENGTH_SHORT).show();
                             }
                             else {
                                 UserHelper.deleteRestaurantLikedByUser(getCurrentUser().getUid(),placeID);
                                 mRestaurantIsLiked = false;
                                 mRestaurantLikeButton.setBackgroundColor(Color.WHITE);
-                                Toast.makeText(getApplicationContext(), "You dislike this restaurant", Toast.LENGTH_SHORT).show();
+                                Snackbar.make(mConstraintLayout, R.string.you_dislike_this_restaurant, Snackbar.LENGTH_SHORT).show();
                             }
                         });
                     });
                 }
             }
-
             @Override
             public void onError(Throwable e) {
                 Log.e("TAG","Restaurant Detail Activity on Error:", e);

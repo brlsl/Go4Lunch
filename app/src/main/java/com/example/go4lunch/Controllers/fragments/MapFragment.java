@@ -18,10 +18,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.preference.PreferenceManager;
 
 
@@ -44,8 +44,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 
@@ -77,8 +77,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
     // -- FOR UI
     private GoogleMap mMap;
     private static final float DEFAULT_ZOOM = 15f;
-
-
+    private ConstraintLayout mConstraintLayout;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -97,6 +96,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
         // Inflate layout for this fragment
         View mView = inflater.inflate(R.layout.map_fragment, container, false);
         MapView mMapView = mView.findViewById(R.id.mapView);
+        mConstraintLayout = mView.findViewById(R.id.constraint_layout_map_fragment);
         if (mMapView != null) {
             mMapView.onCreate(savedInstanceState);
             mMapView.onResume();
@@ -153,10 +153,10 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
         if (requestCode == LOCATION_PERMISSION_REQUEST) {// If request is cancelled, the result arrays are empty.
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 mLocationPermissionGranted = 1;
-                Toast.makeText(requireContext(), R.string.permission_granted, Toast.LENGTH_SHORT).show();
+                Snackbar.make(mConstraintLayout, R.string.permission_granted, Snackbar.LENGTH_SHORT).show();
                 getLastKnownLocation();
             } else {
-                Toast.makeText(requireContext(), R.string.permission_refused, Toast.LENGTH_SHORT).show();
+                Snackbar.make(mConstraintLayout, R.string.permission_refused, Snackbar.LENGTH_SHORT).show();
                 EasyPermissions.requestPermissions(this, getString(R.string.ask_for_permission), LOCATION_PERMISSION_REQUEST, permissions);
             }
         }
@@ -201,7 +201,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                         handleDeviceLocation(deviceLocation);
 
                     } else {
-                        Toast.makeText(requireContext(), R.string.unknown_location, Toast.LENGTH_SHORT).show();
+                        Snackbar.make(mConstraintLayout, R.string.unknown_location, Snackbar.LENGTH_SHORT).show();
                         Log.d("MapFragment", "Device location unknown");
                         readLastKnownLocation();
                     }
@@ -232,10 +232,10 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                         for (int i = 0; i <resultDetails.size() ; i++) {
                             double lat = resultDetails.get(i).getResult().getGeometry().getLocation().getLat();
                             double lng = resultDetails.get(i).getResult().getGeometry().getLocation().getLng();
-                            LatLng markerLatLng = new LatLng(lat, lng);
-                            if (resultDetails.get(i).getResult().getRating() == null){ resultDetails.get(i).getResult().setRating(0.0);}
-                            putRestaurantMarker(markerLatLng);
-                            myDictionary.put(markerLatLng, resultDetails.get(i).getResult());
+                            LatLng restaurantPosition = new LatLng(lat, lng);
+                            if (resultDetails.get(i).getResult().getRating() == null){ resultDetails.get(i).getResult().setRating(0.0);} // for sort method
+                            putMarkerOnRestaurantPosition(restaurantPosition,270.0f); //violet color
+                            myDictionary.put(restaurantPosition, resultDetails.get(i).getResult());
                             resultDetailsList.add(resultDetails.get(i).getResult());
 
                         }
@@ -273,12 +273,9 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                         mMap.clear();
                         for (int i = 0; i < autoComplete.getPredictions().size(); i++) {
                             String restaurantId = autoComplete.getPredictions().get(i).getPlaceId();
-                            LatLng restaurantLatLng = getLatLngKeyByRestaurantIdValue(myDictionary,restaurantId);
-                            if (restaurantLatLng != null && myDictionary.containsKey(restaurantLatLng)){
-                                MarkerOptions markerOptions = new MarkerOptions().position(restaurantLatLng).icon(BitmapDescriptorFactory
-                                        .defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                                Marker restaurantMarker = mMap.addMarker(markerOptions);
-                                restaurantMarker.isVisible();
+                            LatLng restaurantPosition = getLatLngKeyByRestaurantIdValue(myDictionary,restaurantId);
+                            if (restaurantPosition != null && myDictionary.containsKey(restaurantPosition)){
+                               putMarkerOnRestaurantPosition(restaurantPosition,120.0f); // green color
                             }
                         }
                         List<ResultDetails> resultDetails =  getResultDetailsFromPrediction(autoComplete.getPredictions());
@@ -309,12 +306,10 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
 
     // --- UI ---
 
-    private void putRestaurantMarker(LatLng markerLatLng){
-        MarkerOptions markerOptions = new MarkerOptions().position(markerLatLng).icon(BitmapDescriptorFactory
-                .defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
-        Marker restaurantMarker = mMap.addMarker(markerOptions);
-        restaurantMarker.isVisible();
-
+    private void putMarkerOnRestaurantPosition(LatLng markerLatLng, float color){
+        mMap.addMarker(new MarkerOptions()
+                .position(markerLatLng)
+                .icon(BitmapDescriptorFactory.defaultMarker(color)));
     }
 
     private void putMarkerWhereWorkmateHaveLunch(HashMap<LatLng, ResultDetails> myDictionary){
@@ -324,12 +319,9 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots){
                             User user = documentSnapshot.toObject(User.class);
-                            LatLng userRestaurantChoiceLatLng = getLatLngKeyByRestaurantIdValue(myDictionary,user.getRestaurantChoiceId());
-                            assert userRestaurantChoiceLatLng != null;
-                            MarkerOptions markerOptions = new MarkerOptions().position(userRestaurantChoiceLatLng).icon(BitmapDescriptorFactory
-                                    .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
-                            Marker restaurantMarker = mMap.addMarker(markerOptions);
-                            restaurantMarker.isVisible();
+                            LatLng restaurantPosition = getLatLngKeyByRestaurantIdValue(myDictionary,user.getRestaurantChoiceId());
+                            assert restaurantPosition != null;
+                            putMarkerOnRestaurantPosition(restaurantPosition,30.0f); //orange color
                         }
 
                     });

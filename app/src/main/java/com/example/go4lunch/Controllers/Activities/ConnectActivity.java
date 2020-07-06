@@ -6,7 +6,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.Toast;
+
 
 import com.example.go4lunch.R;
 
@@ -15,7 +15,8 @@ import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
-import com.firebase.ui.auth.ui.idp.AuthMethodPickerActivity;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -65,7 +66,6 @@ public class ConnectActivity extends BaseActivity {
             .setFacebookButtonId(R.id.facebook_sign_in)
             .build();
 
-
     private void startSignInActivity(){
         startActivityForResult(AuthUI.getInstance()
                         .createSignInIntentBuilder()
@@ -89,10 +89,9 @@ public class ConnectActivity extends BaseActivity {
 
     public void createUserInFirestore(){
         if (this.getCurrentUser() != null ){
-
             String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
             if (urlPicture != null){
-                urlPicture = urlPicture+"?height=250"; // for better resolution of profile picture
+                urlPicture = urlPicture+"?height=450"; // for better resolution of profile picture
             }
             String username = this.getCurrentUser().getDisplayName();
             String uid = this.getCurrentUser().getUid();
@@ -116,15 +115,15 @@ public class ConnectActivity extends BaseActivity {
                 //  FirebaseAuth.getInstance().getCurrentUser();}
                 //else {}
                 this.createUserInFirestore();
-                Toast.makeText(this, R.string.connexion_succeeded, Toast.LENGTH_SHORT).show();
+                Snackbar.make(mConstraintLayout, R.string.connexion_succeeded, Snackbar.LENGTH_SHORT).show();
                 this.startMainActivity();
             } else { // ERRORS
                 if (response == null) {
-                    Toast.makeText(this, R.string.authentification_canceled, Toast.LENGTH_SHORT).show();
+                    Snackbar.make(mConstraintLayout, R.string.authentification_canceled, Snackbar.LENGTH_SHORT).show();
                 } else if (Objects.requireNonNull(response.getError()).getErrorCode() == ErrorCodes.NO_NETWORK) {
-                    Toast.makeText(this, R.string.no_internet_connexion, Toast.LENGTH_SHORT).show();
+                    Snackbar.make(mConstraintLayout, R.string.no_internet_connexion, Snackbar.LENGTH_SHORT).show();
                 } else if (response.getError().getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
-                    Toast.makeText(this, R.string.unknown_error_has_occurred, Toast.LENGTH_SHORT).show();
+                    Snackbar.make(mConstraintLayout, R.string.unknown_error_has_occurred, Snackbar.LENGTH_SHORT).show();
                 }
             }
         }

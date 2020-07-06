@@ -1,5 +1,6 @@
 package com.example.go4lunch.notifications;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -25,28 +26,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@SuppressLint("MissingFirebaseInstanceTokenRefresh")
 public class NotificationsService extends FirebaseMessagingService {
     private static final int NOTIFICATION_ID  = 123456789 ;
     private static final String NOTIFICATION_TAG  = "GO4LUNCH";
 
-    private String mUserRestaurantChoiceName;
-    private String mUserRestaurantChoiceId;
-
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
-
         // 1 - Get message sent by Firebase
-        String message = Objects.requireNonNull(remoteMessage.getNotification()).getBody();
+        //String message = Objects.requireNonNull(remoteMessage.getNotification()).getBody();
         configureMessage();
     }
 
-    @Override
-    public void onNewToken(@NonNull String s) {
-        super.onNewToken(s);
-    }
-
     private void sendVisualNotification(String messageBody) {
-
         // 1 - Create an Intent that will be shown when user will click on the Notification
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
@@ -54,7 +46,7 @@ public class NotificationsService extends FirebaseMessagingService {
         // 2 - Create a Style for the Notification
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
         inboxStyle.setBigContentTitle("Go4Lunch: your lunch");
-       //inboxStyle.addLine(messageBody);
+        inboxStyle.addLine(messageBody);
 
         // 3 - Create a Channel (Android 8)
         String channelId = getString(R.string.default_notification_channel_id);
@@ -74,9 +66,8 @@ public class NotificationsService extends FirebaseMessagingService {
 
         // 6 - Support Version >= Android 8
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence channelName = "Message provenant de Firebase";
             int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel mChannel = new NotificationChannel(channelId, channelName, importance);
+            NotificationChannel mChannel = new NotificationChannel(channelId, messageBody, importance);
             assert notificationManager != null;
             notificationManager.createNotificationChannel(mChannel);
         }
@@ -93,11 +84,10 @@ public class NotificationsService extends FirebaseMessagingService {
                     if (user != null) {
                         String userRestaurantChoiceName = user.getRestaurantChoiceName();
                         String userRestaurantChoiceId = user.getRestaurantChoiceId();
-                        String username = user.getUsername();
                         String userID = user.getUid();
 
                         if (userRestaurantChoiceId == null || userRestaurantChoiceName == null){
-                            sendVisualNotification("You have not choose any restaurant");
+                            sendVisualNotification(getString(R.string.you_have_not_choose_any_restaurant));
                         }
                         else{
                             getWorkmatesJoining(userRestaurantChoiceId, userRestaurantChoiceName, userID);
@@ -114,15 +104,15 @@ public class NotificationsService extends FirebaseMessagingService {
                 .addOnCompleteListener(task ->{
                     List<String> workmatesRestaurantList = new ArrayList<>();
                     for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())){
-                        if (!document.getString("uid").equals(userId)){
+                        if (!Objects.equals(document.getString("uid"), userId)){
                             workmatesRestaurantList.add(document.getString("username"));
                         }
                     }
                     if (workmatesRestaurantList.isEmpty())
-                        sendVisualNotification("You eat at "+restaurantChoiceName+ " alone!");
+                        sendVisualNotification(getString(R.string.you_eat_alone, restaurantChoiceName));
                     else {
                         String workmateSeparatedList = TextUtils.join(", ", workmatesRestaurantList);
-                        sendVisualNotification("You eat at " + restaurantChoiceName + " with " + workmateSeparatedList + " and etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc etc ");
+                        sendVisualNotification(getString(R.string.you_eat_at_with, restaurantChoiceName,workmateSeparatedList));
                     }
                 });
 

@@ -37,20 +37,18 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
                     .into(mUserAvatar);
 
             // configure choice text
+            assert databaseUser != null;
             if (databaseUser.getRestaurantChoiceId() == null ) {
-                mUserChoice.setText(model.getUsername() + " has not chosen yet");
+                mUserChoice.setText(context.getString(R.string.user_has_not_choose_yet, model.getUsername()));
             } else
-                mUserChoice.setText(model.getUsername() + " is eating at " +  model.getRestaurantChoiceName());
+                mUserChoice.setText(context.getString(R.string.is_eating_at_restaurant_name,model.getUsername(), model.getRestaurantChoiceName()));
 
             // open restaurant details on item click
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (databaseUser.getRestaurantChoiceId() != null){
-                        Intent intent = new Intent(context, RestaurantDetailActivity.class);
-                        intent.putExtra("PLACE_ID_KEY", model.getRestaurantChoiceId());
-                        context.startActivity(intent);
-                    }
+            itemView.setOnClickListener(v -> {
+                if (databaseUser.getRestaurantChoiceId() != null){
+                    Intent intent = new Intent(context, RestaurantDetailActivity.class);
+                    intent.putExtra("PLACE_ID_KEY", model.getRestaurantChoiceId());
+                    context.startActivity(intent);
                 }
             });
         });

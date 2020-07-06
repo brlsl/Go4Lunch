@@ -62,8 +62,8 @@ public class SettingsActivity extends AppCompatActivity {
             if (deleteAccount!= null){
                 deleteAccount.setOnPreferenceClickListener(preference -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                    builder.setMessage("Are you sure to delete your account?");
-                    builder.setPositiveButton(DELETE_ACCOUNT_KEY, (dialog, which) ->
+                    builder.setMessage(R.string.delete_account_question);
+                    builder.setPositiveButton("Yes", (dialog, which) ->
                             UserHelper.deleteUser(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
                             .addOnSuccessListener(aVoid -> AuthUI.getInstance()
                                     .signOut(requireContext())
@@ -74,7 +74,7 @@ public class SettingsActivity extends AppCompatActivity {
                                         startActivity(intent);
                                             }
                                     )));
-                    builder.setNegativeButton("No", null);
+                    builder.setNegativeButton(R.string.answer_no, null);
                     builder.show();
                     return true;
                 });
