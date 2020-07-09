@@ -10,7 +10,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -72,9 +71,6 @@ public class UnitTests {
         String restaurantHour = "12:00 pm"; // midday
 
         assertTrue(DateUtils.hour1CompareToHour2(currentHour, restaurantHour)<0);
-        assertFalse(DateUtils.hour1CompareToHour2(currentHour, restaurantHour)>0);
-        assertNotEquals(0, DateUtils.hour1CompareToHour2(currentHour, restaurantHour));
-
     }
 
     @Test
@@ -112,4 +108,5 @@ public class UnitTests {
         assertEquals(mResultDetailsList.get(1).getRating(),3.0, 0);
         assertEquals(mResultDetailsList.get(2).getRating(),2.0, 0);
     }
+
 }

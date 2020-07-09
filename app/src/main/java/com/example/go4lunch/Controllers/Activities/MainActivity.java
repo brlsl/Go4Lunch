@@ -3,16 +3,17 @@ package com.example.go4lunch.controllers.activities;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -27,11 +28,14 @@ import com.example.go4lunch.controllers.fragments.MapFragment;
 import com.example.go4lunch.controllers.fragments.RestaurantListFragment;
 import com.example.go4lunch.controllers.fragments.WorkmatesListFragment;
 import com.example.go4lunch.models.User;
+
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
 
 import java.util.Objects;
 
@@ -53,6 +57,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
         super.onCreate(savedInstanceState, persistentState);
+
     }
 
     @Override
@@ -70,9 +75,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                         Intent intent = new Intent(getApplicationContext(), RestaurantDetailActivity.class);
                         intent.putExtra("PLACE_ID_KEY", userRestaurantChoiceId);
                         startActivity(intent);
-                        Toast.makeText(this, "Your lunch", Toast.LENGTH_SHORT).show();
+                        Snackbar.make(mDrawerLayout, R.string.your_restaurant_choice, Snackbar.LENGTH_SHORT).show();
                     } else
-                        Toast.makeText(this, "You haven't choose any restaurant yet!", Toast.LENGTH_SHORT).show();
+                        Snackbar.make(mDrawerLayout, R.string.you_have_not_choose_any_restaurant, Snackbar.LENGTH_SHORT).show();
                 });
 
                 break;
@@ -96,7 +101,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public void onBackPressed() {
         if (this.mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             this.mDrawerLayout.closeDrawer(GravityCompat.START);
-        } else {
+        } else { // in home activity, permit to go back to home screen
             Intent a = new Intent(Intent.ACTION_MAIN);
             a.addCategory(Intent.CATEGORY_HOME);
             a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

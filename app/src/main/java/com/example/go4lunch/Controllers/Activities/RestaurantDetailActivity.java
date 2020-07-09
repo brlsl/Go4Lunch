@@ -55,7 +55,6 @@ public class RestaurantDetailActivity extends BaseActivity {
     private Boolean mRestaurantIsLiked;
     private Boolean mUserRestaurantIsChosen;
 
-
     @Override
     public int getFragmentLayout() {
         return R.layout.activity_restaurant_detail;
@@ -95,6 +94,133 @@ public class RestaurantDetailActivity extends BaseActivity {
         mRecyclerView.setAdapter(mAdapter);
     }
 
+    public void executeHttpRequestPlaceDetailsWithRetrofit(String placeID){
+        this.mDisposable = GooglePlaceStreams.streamFetchPlaceDetails(placeID, PLACE_API_KEY).subscribeWith(new DisposableObserver<ResultDetails>() {
+            @Override
+            public void onNext(ResultDetails resultDetails) {
+                TextView mRestaurantName = findViewById(R.id.restaurant_detail_activity_restaurant_name);
+                TextView mRestaurantAddress = findViewById(R.id.restaurant_detail_activity_restaurant_address);
+                Button mRestaurantButtonPhoneCall = findViewById(R.id.restaurant_activity_detail_call_button);
+                Button mRestaurantButtonWebsiteURL  = findViewById(R.id.restaurant_activity_detail_website_button);
+                ImageView mRestaurantPhoto = findViewById(R.id.restaurant_detail_activity_restaurant_photo);
+                Button mRestaurantLikeButton = findViewById(R.id.restaurant_activity_detail_like_button);
+                FloatingActionButton mFabUserRestaurantChoice = findViewById(R.id.restaurant_activity_detail_fab_user_choice);
+
+                if(getCurrentUser() != null) {
+
+                    mRestaurantName.setText(resultDetails.getResult().getName());
+                    mRestaurantAddress.setText(resultDetails.getResult().getVicinity());
+
+                    configurePhoto(resultDetails, mRestaurantPhoto);
+                    configurePhoneAndWebsiteButton(resultDetails, mRestaurantButtonPhoneCall, mRestaurantButtonWebsiteURL);
+                    configureLikeButton(placeID, mRestaurantLikeButton);
+                    configureFabRestaurantChoice(placeID,mFabUserRestaurantChoice, resultDetails);
+                }
+            }
+            @Override
+            public void onError(Throwable e) {
+                Log.e("TAG","Restaurant Detail Activity on Error:", e);
+            }
+            @Override
+            public void onComplete() {
+            }
+        });
+    }
+    private void configurePhoto(ResultDetails resultDetails, ImageView mRestaurantPhoto) {
+        if(resultDetails.getResult().getPhotos() == null || resultDetails.getResult().getPhotos().size() < 10) {
+            Glide.with(getApplicationContext())
+                    .load(R.drawable.connect_activity_food)
+                    .into(mRestaurantPhoto);
+        }else{
+            int randomNum = (int) (Math.random() * (10));
+            Glide.with(getApplicationContext())
+                    .load(BASE_GOOGLE_PHOTO_URL + resultDetails.getResult().getPhotos().get(randomNum).getPhotoReference() + "&key=" +PLACE_API_KEY)
+                    .into(mRestaurantPhoto);
+        }
+    }
+
+    private void configurePhoneAndWebsiteButton(ResultDetails resultDetails, Button mRestaurantButtonPhoneCall, Button mRestaurantButtonWebsiteURL) {
+        // call button
+        mRestaurantButtonPhoneCall.setOnClickListener(v -> {
+            String mRestaurantPhoneNumber = resultDetails.getResult().getFormattedPhoneNumber();
+            if (mRestaurantPhoneNumber != null) {
+                Intent callIntent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", mRestaurantPhoneNumber, null));
+                startActivity(callIntent);
+            } else{
+                Snackbar.make(mConstraintLayout, R.string.no_phone_number_available, Snackbar.LENGTH_SHORT).show();
+            }
+        });
+
+        // website button
+        mRestaurantButtonWebsiteURL.setOnClickListener(v -> {
+            String mRestaurantWebsite = resultDetails.getResult().getWebsite();
+            if (mRestaurantWebsite != null) {
+                Intent intentURL = new Intent(Intent.ACTION_VIEW);
+                intentURL.setData(Uri.parse(mRestaurantWebsite));
+                startActivity(intentURL);
+            } else{
+                Snackbar.make(mConstraintLayout, R.string.no_website_available, Snackbar.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void configureLikeButton(String placeID, Button mRestaurantLikeButton) {
+        // Manage like button view and data in Fire Store
+        UserHelper.getUserLikeRestaurant(getCurrentUser().getUid(), placeID).addOnSuccessListener(documentSnapshot -> {
+            Restaurant restaurantDb = documentSnapshot.toObject(Restaurant.class);
+
+            if(restaurantDb != null && restaurantDb.getRestaurantIsLiked()){
+                mRestaurantLikeButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                mRestaurantIsLiked = true;
+            }
+            mRestaurantLikeButton.setOnClickListener(v -> {
+                if (mRestaurantIsLiked == null || !mRestaurantIsLiked){
+                    UserHelper.createRestaurantLikedByUser(getCurrentUser().getUid(),placeID,true);
+                    mRestaurantIsLiked = true;
+                    v.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                    Snackbar.make(mConstraintLayout, R.string.you_like_this_restaurant, Snackbar.LENGTH_SHORT).show();
+                }
+                else {
+                    UserHelper.deleteRestaurantLikedByUser(getCurrentUser().getUid(),placeID);
+                    mRestaurantIsLiked = false;
+                    mRestaurantLikeButton.setBackgroundColor(Color.WHITE);
+                    Snackbar.make(mConstraintLayout, R.string.you_dislike_this_restaurant, Snackbar.LENGTH_SHORT).show();
+                }
+            });
+        });
+    }
+
+    private void configureFabRestaurantChoice(String placeID, FloatingActionButton mFabUserRestaurantChoice, ResultDetails resultDetails) {
+        // manage fab view and user restaurant choice in Fire Store
+        UserHelper.getUser(getCurrentUser().getUid()).addOnSuccessListener(userDocumentSnapshot -> {
+            User databaseUser = userDocumentSnapshot.toObject(User.class);
+            assert databaseUser != null;
+            if (databaseUser.getRestaurantChoiceId() != null && databaseUser.getRestaurantChoiceId().equals(placeID) ){
+                mFabUserRestaurantChoice.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_circle_green_24dp));
+                mUserRestaurantIsChosen = true;
+            }
+            mFabUserRestaurantChoice.setOnClickListener(v -> {
+                if (mUserRestaurantIsChosen == null || !mUserRestaurantIsChosen ) {
+                    mUserRestaurantIsChosen = true;
+                    UserHelper.updateUserRestaurantChoiceId(getCurrentUser().getUid(), placeID);
+                    UserHelper.updateUserRestaurantChoiceName(getCurrentUser().getUid(), resultDetails.getResult().getName());
+                    mFabUserRestaurantChoice.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_circle_green_24dp));
+                    Snackbar.make(mConstraintLayout, mContext.getString(R.string.you_eat_at,
+                            resultDetails.getResult().getName()), Snackbar.LENGTH_SHORT).show();
+                }
+                else{
+                    mUserRestaurantIsChosen = false;
+                    UserHelper.updateUserRestaurantChoiceId(getCurrentUser().getUid(), null);
+                    UserHelper.updateUserRestaurantChoiceName(getCurrentUser().getUid(), null);
+                    mFabUserRestaurantChoice.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_restaurant_24));
+                    Snackbar.make(mConstraintLayout, mContext.getString(R.string.you_canceled), Snackbar.LENGTH_SHORT).show();
+                }
+            });
+        });
+    }
+
+    // LIFECYCLE
+
     @Override
     public void onStart() {
         super.onStart();
@@ -122,119 +248,4 @@ public class RestaurantDetailActivity extends BaseActivity {
             this.mDisposable.dispose();
     }
 
-    public void executeHttpRequestPlaceDetailsWithRetrofit(String placeID){
-        this.mDisposable = GooglePlaceStreams.streamFetchPlaceDetails(placeID, PLACE_API_KEY).subscribeWith(new DisposableObserver<ResultDetails>() {
-            @Override
-            public void onNext(ResultDetails resultDetails) {
-                TextView mRestaurantName = findViewById(R.id.restaurant_detail_activity_restaurant_name);
-                TextView mRestaurantAddress = findViewById(R.id.restaurant_detail_activity_restaurant_address);
-                Button mRestaurantButtonPhoneCall = findViewById(R.id.restaurant_activity_detail_call_button);
-                Button mRestaurantButtonWebsiteURL  = findViewById(R.id.restaurant_activity_detail_website_button);
-                ImageView mRestaurantPhoto = findViewById(R.id.restaurant_detail_activity_restaurant_photo);
-                Button mRestaurantLikeButton = findViewById(R.id.restaurant_activity_detail_like_button);
-                FloatingActionButton mFabUserRestaurantChoice = findViewById(R.id.restaurant_activity_detail_fab_user_choice);
-
-                if(getCurrentUser() != null) {
-
-                    mRestaurantName.setText(resultDetails.getResult().getName());
-                    mRestaurantAddress.setText(resultDetails.getResult().getVicinity());
-
-                    // photo
-                    if(resultDetails.getResult().getPhotos() == null || resultDetails.getResult().getPhotos().size() < 10) {
-                        Glide.with(getApplicationContext())
-                                .load(R.drawable.connect_activity_food)
-                                .into(mRestaurantPhoto);
-                    }else{
-                        int randomNum = (int) (Math.random() * (10));
-                        Glide.with(getApplicationContext())
-                                .load(BASE_GOOGLE_PHOTO_URL + resultDetails.getResult().getPhotos().get(randomNum).getPhotoReference() + "&key=" +PLACE_API_KEY)
-                                .into(mRestaurantPhoto);
-                    }
-
-                    // call button
-                    mRestaurantButtonPhoneCall.setOnClickListener(v -> {
-                        String mRestaurantPhoneNumber = resultDetails.getResult().getFormattedPhoneNumber();
-                        if (mRestaurantPhoneNumber != null) {
-                        Intent callIntent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", mRestaurantPhoneNumber, null));
-                        startActivity(callIntent);
-                        } else{
-                            Snackbar.make(mConstraintLayout, R.string.no_phone_number_available, Snackbar.LENGTH_SHORT).show();
-                        }
-                    });
-
-                    // website button
-                    mRestaurantButtonWebsiteURL.setOnClickListener(v -> {
-                        String mRestaurantWebsite = resultDetails.getResult().getWebsite();
-                        if (mRestaurantWebsite != null) {
-                            Intent intentURL = new Intent(Intent.ACTION_VIEW);
-                            intentURL.setData(Uri.parse(mRestaurantWebsite));
-                            startActivity(intentURL);
-                        } else{
-                            Snackbar.make(mConstraintLayout, R.string.no_website_available, Snackbar.LENGTH_SHORT).show();
-                        }
-                    });
-
-
-                    // manage fab view and user restaurant choice in Fire Store
-                    UserHelper.getUser(getCurrentUser().getUid()).addOnSuccessListener(userDocumentSnapshot -> {
-                        User databaseUser = userDocumentSnapshot.toObject(User.class);
-                        assert databaseUser != null;
-                        if (databaseUser.getRestaurantChoiceId() != null && databaseUser.getRestaurantChoiceId().equals(placeID) ){
-                            mFabUserRestaurantChoice.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_circle_green_24dp));
-                            mUserRestaurantIsChosen = true;
-                        }
-                        mFabUserRestaurantChoice.setOnClickListener(v -> {
-                            if (mUserRestaurantIsChosen == null || !mUserRestaurantIsChosen ) {
-                                mUserRestaurantIsChosen = true;
-                                UserHelper.updateUserRestaurantChoiceId(getCurrentUser().getUid(), placeID);
-                                UserHelper.updateUserRestaurantChoiceName(getCurrentUser().getUid(), resultDetails.getResult().getName());
-                                mFabUserRestaurantChoice.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_circle_green_24dp));
-                                Snackbar.make(mConstraintLayout, mContext.getString(R.string.you_eat_at,
-                                        resultDetails.getResult().getName()), Snackbar.LENGTH_SHORT).show();
-                            }
-                            else{
-                                mUserRestaurantIsChosen = false;
-                                UserHelper.updateUserRestaurantChoiceId(getCurrentUser().getUid(), null);
-                                UserHelper.updateUserRestaurantChoiceName(getCurrentUser().getUid(), null);
-                                mFabUserRestaurantChoice.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_restaurant_24));
-                                Snackbar.make(mConstraintLayout, mContext.getString(R.string.you_canceled), Snackbar.LENGTH_SHORT).show();
-                            }
-                        });
-
-                    });
-
-                    // Manage like button view and data in Fire Store
-                    UserHelper.getUserLikeRestaurant(getCurrentUser().getUid(), placeID).addOnSuccessListener(documentSnapshot -> {
-                        Restaurant restaurantDb = documentSnapshot.toObject(Restaurant.class);
-
-                        if(restaurantDb != null && restaurantDb.getRestaurantIsLiked()){
-                            mRestaurantLikeButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                            mRestaurantIsLiked = true;
-                        }
-                        mRestaurantLikeButton.setOnClickListener(v -> {
-                            if (mRestaurantIsLiked == null || !mRestaurantIsLiked){
-                                UserHelper.createRestaurantLikedByUser(getCurrentUser().getUid(),placeID,true);
-                                mRestaurantIsLiked = true;
-                                v.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                                Snackbar.make(mConstraintLayout, R.string.you_like_this_restaurant, Snackbar.LENGTH_SHORT).show();
-                            }
-                            else {
-                                UserHelper.deleteRestaurantLikedByUser(getCurrentUser().getUid(),placeID);
-                                mRestaurantIsLiked = false;
-                                mRestaurantLikeButton.setBackgroundColor(Color.WHITE);
-                                Snackbar.make(mConstraintLayout, R.string.you_dislike_this_restaurant, Snackbar.LENGTH_SHORT).show();
-                            }
-                        });
-                    });
-                }
-            }
-            @Override
-            public void onError(Throwable e) {
-                Log.e("TAG","Restaurant Detail Activity on Error:", e);
-            }
-            @Override
-            public void onComplete() {
-            }
-        });
-    }
 }

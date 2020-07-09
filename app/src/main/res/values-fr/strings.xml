@@ -67,4 +67,10 @@
     <string name="you_have_not_choose_any_restaurant">Vous n\'avez pas choisi de restaurant</string>
     <string name="you_eat_alone">Vous mangez à %1$s seul(e)!</string>
     <string name="you_eat_at_with">Vous mangez à %1$s avec %2$s</string>
+    <string name="delete_account">Supprimer le compte</string>
+    <string name="notification_title">Go4Lunch: votre déjeuner</string>
+    <string name="enable_disable_notifications">Activer/Désactiver les notifications</string>
+    <string name="answer_yes">Oui</string>
+    <string name="notification_disabled">Notifications désactivées</string>
+    <string name="notification_enabled">Notifications activées</string>
 </resources>

@@ -13,12 +13,24 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="Delete Account">
+    <PreferenceCategory app:title="@string/delete_account">
         <Preference
-            app:title="Delete Account"
             app:key="delete_account"
+            app:title="@string/delete_account"
             />
 
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Notifications"
+        >
+        <SwitchPreference
+            app:key="notification_preferences_key"
+            android:title="@string/enable_disable_notifications"
+            android:summaryOff="@string/notification_disabled"
+            android:summaryOn="@string/notification_enabled"
+            android:defaultValue="true"
+            />
     </PreferenceCategory>
 
 </PreferenceScreen>

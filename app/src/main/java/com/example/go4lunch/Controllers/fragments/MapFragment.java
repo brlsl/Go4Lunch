@@ -3,28 +3,24 @@ package com.example.go4lunch.controllers.fragments;
 import android.Manifest;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
-
 import android.os.Bundle;
-
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.preference.PreferenceManager;
-
-
 import com.example.go4lunch.R;
 import com.example.go4lunch.api.UserHelper;
 import com.example.go4lunch.controllers.activities.MainActivity;
@@ -33,39 +29,35 @@ import com.example.go4lunch.models.User;
 import com.example.go4lunch.models.apiGooglePlace.placeAutoComplete.AutoComplete;
 import com.example.go4lunch.models.apiGooglePlace.placeAutoComplete.Prediction;
 import com.example.go4lunch.models.apiGooglePlace.placeDetails.ResultDetails;
+import com.example.go4lunch.notifications.NotificationReceiver;
 import com.example.go4lunch.utils.GooglePlaceStreams;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
-
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-
-
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-
 public class MapFragment extends BaseFragment implements OnMapReadyCallback {
 
-    // -- FOR DATA
+    // ----- FOR DATA -----
     private Location deviceLocation;
     private int mLocationPermissionGranted = 0; // refused by default
     private Disposable mDisposable;
@@ -73,11 +65,16 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private static final int LOCATION_PERMISSION_REQUEST = 1234;
     private static String PLACE_API_KEY;
+    private static final String PREFERENCES_NOTIFICATION_KEY ="notification_preferences_key";
+    private static final String PREFERENCES_RADIUS_KEY = "radius";
 
-    // -- FOR UI
+
+    // ----- FOR UI -----
     private GoogleMap mMap;
     private static final float DEFAULT_ZOOM = 15f;
     private ConstraintLayout mConstraintLayout;
+
+    // ---- LIFE CYCLE -----
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,10 +84,10 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
 
         setHasOptionsMenu(true); // show item in menu
         getLocationPermission(); // ask for location permission
+        scheduleNotification(); // schedule a notification for 12:00
     }
 
 
-    @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate layout for this fragment
@@ -102,16 +99,13 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
             mMapView.onResume();
             mMapView.getMapAsync(this);
         }
-
         return mView;
     }
 
-    // remove sort restaurant in this fragment
     @Override
-    public void onPrepareOptionsMenu(@NonNull Menu menu) {
-        MenuItem item = menu.findItem(R.id.restaurant_sort);
-        if(item != null)
-            item.setVisible(false);
+    public void onResume() {
+        super.onResume();
+        scheduleNotification();
     }
 
     @Override
@@ -123,9 +117,15 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
     private void disposeWhenDestroy() {
         if (this.mDisposable != null && !this.mDisposable.isDisposed())
             this.mDisposable.dispose();
-
     }
 
+   // ----- MENU -----
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {  // remove sort restaurant from menu in this fragment
+        MenuItem item = menu.findItem(R.id.restaurant_sort);
+        if(item != null)
+            item.setVisible(false);
+    }
 
     @AfterPermissionGranted(LOCATION_PERMISSION_REQUEST) // made with Easy Permission
     private void getLocationPermission() {
@@ -171,7 +171,6 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                 getLastKnownLocation();
                 return false;
             });
-
         }
     }
 
@@ -184,8 +183,10 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
     private void readLastKnownLocation(){
         String lat = requireActivity().getPreferences(Context.MODE_PRIVATE).getString("device_latitude", "48.8534");
         String lng = requireActivity().getPreferences(Context.MODE_PRIVATE).getString("device_longitude", "2.3488");
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)), DEFAULT_ZOOM));
+        if (lat != null && lng != null) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)), DEFAULT_ZOOM));
+        }
 
     }
 
@@ -218,10 +219,10 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
         executeHttpSearchNearbyAndDetailsWithRetrofit();
     }
 
-
+    // ----- REFROFIT REQUESTS -----
     public void executeHttpSearchNearbyAndDetailsWithRetrofit(){
         String deviceLocationStr = getDeviceLocation().getLatitude()+","+ getDeviceLocation().getLongitude();
-        String radiusPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getString("radius","500");
+        String radiusPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getString(PREFERENCES_RADIUS_KEY,"500");
 
         this.mDisposable = GooglePlaceStreams.streamNearbyThenFetchPlaceDetails(deviceLocationStr,radiusPreferences,PLACE_API_KEY)
                 .subscribeWith(new DisposableObserver<List<ResultDetails>>() {
@@ -233,11 +234,10 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                             double lat = resultDetails.get(i).getResult().getGeometry().getLocation().getLat();
                             double lng = resultDetails.get(i).getResult().getGeometry().getLocation().getLng();
                             LatLng restaurantPosition = new LatLng(lat, lng);
-                            if (resultDetails.get(i).getResult().getRating() == null){ resultDetails.get(i).getResult().setRating(0.0);} // for sort method
+                            if (resultDetails.get(i).getResult().getRating() == null){resultDetails.get(i).getResult().setRating(0.0);} // for sort method
                             putMarkerOnRestaurantPosition(restaurantPosition,270.0f); //violet color
                             myDictionary.put(restaurantPosition, resultDetails.get(i).getResult());
                             resultDetailsList.add(resultDetails.get(i).getResult());
-
                         }
                         // pass list of restaurants nearby details, context and device location to recycler view
                         RestaurantListFragment restaurantListFragment = ((MainActivity) requireActivity()).getRestaurantListFragment();
@@ -255,12 +255,11 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                         onMarkerClick();
                     }
                 });
-
     }
 
     public void executeHttpRequestAutoCompleteWithRetrofit(String input){
         String deviceLocationStr = getDeviceLocation().getLatitude()+","+ getDeviceLocation().getLongitude();
-        String radiusPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getString("radius","500");
+        String radiusPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getString(PREFERENCES_RADIUS_KEY,"500");
 
         UUID uuid = UUID.randomUUID(); // Universally Unique Identifier
         String sessionToken = uuid.toString();
@@ -304,7 +303,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
         });
     }
 
-    // --- UI ---
+    // ----- UI -----
 
     private void putMarkerOnRestaurantPosition(LatLng markerLatLng, float color){
         mMap.addMarker(new MarkerOptions()
@@ -323,12 +322,41 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                             assert restaurantPosition != null;
                             putMarkerOnRestaurantPosition(restaurantPosition,30.0f); //orange color
                         }
-
                     });
         }
     }
 
-    // --- UTILS ---
+    private void scheduleNotification(){
+        SharedPreferences preferences =  PreferenceManager.getDefaultSharedPreferences(requireContext());
+        boolean isNotificationEnable = preferences.getBoolean(PREFERENCES_NOTIFICATION_KEY,true); // notification settings
+
+        Intent intent = new Intent(requireActivity(), NotificationReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(requireActivity(), 0, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) requireActivity().getSystemService(Context.ALARM_SERVICE);
+
+        Calendar now = Calendar.getInstance();
+        Calendar notificationTime = Calendar.getInstance();
+        notificationTime.set(Calendar.HOUR_OF_DAY, 12);
+        notificationTime.set(Calendar.MINUTE, 0);
+        notificationTime.set(Calendar.SECOND, 0);
+        notificationTime.set(Calendar.MILLISECOND, 0);
+
+        if (alarmManager !=null){
+            if (isNotificationEnable){ // notifications are enabled in settings
+                if (now.before(notificationTime)) { // now before  12:00
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, notificationTime.getTimeInMillis(), pendingIntent);
+                } else { // now after 12:00
+                    notificationTime.set(Calendar.DAY_OF_YEAR, now.get(Calendar.DAY_OF_YEAR)+1);
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, notificationTime.getTimeInMillis(), pendingIntent);
+                }
+            } else { // notifications are disabled in settings
+                alarmManager.cancel(pendingIntent); // cancel next scheduled notification
+            }
+        }
+
+    }
+
+    // ----- UTILS -----
 
     public static LatLng getLatLngKeyByRestaurantIdValue(Map<LatLng,ResultDetails> map, String id) {
         for (Map.Entry<LatLng,ResultDetails> entry : map.entrySet()) {
@@ -352,10 +380,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
         return resultDetails;
     }
 
-    // -------------------
-    // GETTERS AND SETTERS
-    // -------------------
-
+    // ----- GETTERS AND SETTERS -----
     public Location getDeviceLocation() {
         return deviceLocation;
     }

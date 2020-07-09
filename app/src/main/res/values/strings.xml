@@ -16,13 +16,6 @@
     <string name="logout">Logout</string>
     <string name="title_activity_settings">Settings</string>
 
-    <!-- Preference Titles -->
-    <string name="radius_header">Radius Search</string>
-
-    <!-- Radius Preferences -->
-    <string name="radius_title">Radius search</string>
-
-
     <!--Restaurant view holder-->
     <string name="open">Open 24 hours</string>
     <string name="closed">Closed</string>
@@ -95,7 +88,7 @@
     <string name="listview">ListView</string>
     <string name="workmates">Workmates</string>
     <string name="delete_account_question">Are you sure to delete your account?</string>
-    <string name="answer_no">No</string>
+
 
     <!--Joining Workmates View Holder-->
     <string name="workmates_is_joining">%1$s is joining!</string>
@@ -108,6 +101,18 @@
     <string name="you_eat_alone">You eat at  %1$s alone!</string>
     <string name="you_eat_at_with">You eat %1$s at with %2$s</string>
 
+    <!-- Notifications-->
+    <string name="notification_title">Go4Lunch: your lunch</string>
+
+    <!--Settings Activity-->
+    <string name="enable_disable_notifications">Enable/Disable notifications</string>
+    <string name="delete_account">Delete account</string>
+    <string name="radius_header">Radius Search</string>
+    <string name="radius_title">Radius search</string>
+    <string name="answer_yes">Yes</string>
+    <string name="answer_no">No</string>
+    <string name="notification_disabled">Notifications disabled</string>
+    <string name="notification_enabled">Notifications enabled</string>
 
 
 </resources>
