@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.net.Uri;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
+
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -33,7 +33,6 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 
@@ -41,24 +40,15 @@ import java.util.Objects;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    // ----- FOR UI -----
     private androidx.appcompat.widget.Toolbar mToolbar;
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
-
-    //private ActivityMainBinding activityMainBinding;
-
-    // bottom navigation View fragments configuration
     final MapFragment mMapFragment = new MapFragment();
     final RestaurantListFragment mRestaurantListFragment = new RestaurantListFragment();
     final Fragment mWorkmatesListFragment = new WorkmatesListFragment();
     final FragmentManager fm = getSupportFragmentManager();
     private Fragment active = mMapFragment; // first fragment active when app opens
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
-
-    }
 
     @Override
     public int getFragmentLayout() {
@@ -96,7 +86,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
 
-    //manage back button
     @Override
     public void onBackPressed() {
         if (this.mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -112,48 +101,35 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       // this.configureViewBinding();
         this.configureToolBar();
         this.configureDrawerLayout();
         this.configureNavigationView();
         this.configureHeaderNavigationView();
         this.configureBottomView();
-
-
     }
 
-    // 1 configure ViewBinding
-    private void configureViewBinding(){
-       /* // Main Activity Layout
-        activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
-        View viewActivityMain =  activityMainBinding.getRoot();
-        setContentView(viewActivityMain);*/
-    }
+    // ----- UI CONFIGURATION -----
 
-    // 2 - Configure Toolbar
     private void configureToolBar(){
-        this.mToolbar =  findViewById(R.id.activity_main_toolbar);
+        this.mToolbar =  findViewById(R.id.toolbar_main_activity);
         setSupportActionBar(mToolbar);
     }
 
-    // 3 - Configure Drawer Layout (left menu drawer)
+    // left menu drawer
     private void configureDrawerLayout(){
-        this.mDrawerLayout = findViewById(R.id.activity_main_drawer_layout);
+        this.mDrawerLayout = findViewById(R.id.drawer_layout_main_activity);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
     }
 
-    // 4 - Configure NavigationView
+    // menu drawer contents
     private void configureNavigationView(){
-        this.mNavigationView = findViewById(R.id.activity_main_navigation_view);
+        this.mNavigationView = findViewById(R.id.navigation_view_main_activity);
         mNavigationView.setNavigationItemSelectedListener(this);
-
     }
 
-
-    // 5
     private void configureHeaderNavigationView() {
         View mHeaderView =  mNavigationView.getHeaderView(0);
 
@@ -161,10 +137,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         TextView mUserName = mHeaderView.findViewById(R.id.user_name);
         TextView mUserEmail = mHeaderView.findViewById(R.id.user_email);
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser user = getCurrentUser();
 
         if (user != null) {
-            // Name, email address, and profile photo Url
+            // User name, email address, and avatar picture
             String name = user.getDisplayName();
             String email = user.getEmail();
             Uri photoUrl = user.getPhotoUrl();
@@ -177,17 +153,12 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                     .circleCrop()
                     .into(mUserAvatar);
         }
-
-    /*
-    // pour le binding
-        //activityMainNavHeaderBinding.userEmail.setText(email);
-        }*/
     }
 
-    // 6 - configure BottomView
     private void configureBottomView(){
         BottomNavigationView mBottomNavigationView = findViewById(R.id.bottom_navigation_view);
 
+        //prevent fragment recreation each time we swap fragments
         fm.beginTransaction()
                 .add(R.id.fragment_container, mMapFragment)
                 .add(R.id.fragment_container, mRestaurantListFragment).hide(mRestaurantListFragment)
@@ -242,5 +213,4 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public RestaurantListFragment getRestaurantListFragment() {
         return mRestaurantListFragment;
     }
-
 }
