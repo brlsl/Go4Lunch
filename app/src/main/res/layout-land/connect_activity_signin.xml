@@ -6,51 +6,55 @@
     android:layout_height="match_parent">
 
     <ImageView
+        android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/connect_activity_food_blurry"
+        android:contentDescription="@string/connect_activity_background"
         android:scaleType="centerCrop"
-        tools:ignore="MissingConstraints"
-        android:contentDescription="@string/connect_activity_background" />
+        android:src="@drawable/connect_activity_food_blurry"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints" />
 
     <ImageView
         android:id="@+id/logo_app"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="50dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="16dp"
         android:contentDescription="@string/logo_connect_activity"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/connect_activity_name_app"
+        app:layout_constraintEnd_toEndOf="@+id/connect_activity_name_app"
         app:layout_constraintHeight_percent="0.4"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_meal_24dp"
-        />
+        app:layout_constraintStart_toStartOf="@+id/connect_activity_name_app"
+        app:srcCompat="@drawable/ic_meal_24dp" />
 
     <TextView
         android:id="@+id/connect_activity_name_app"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textColor="@color/colorAccent"
+        android:layout_marginStart="32dp"
         android:shadowColor="#010101"
         android:shadowDx="12"
         android:shadowDy="15"
         android:shadowRadius="1"
+        android:text="@string/app_name"
+        android:textAlignment="center"
+        android:textColor="@color/colorAccent"
         android:textSize="50sp"
         android:textStyle="bold"
-        android:textAlignment="center"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHeight_percent="0.2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logo_app" />
+        app:layout_constraintStart_toStartOf="@+id/imageView"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/connect_activity_subtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:shadowColor="#010101"
         android:shadowDx="5"
         android:shadowDy="5"
@@ -60,15 +64,18 @@
         android:textColor="@color/colorAccent"
         android:textSize="22sp"
         android:textStyle="italic|bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/connect_activity_name_app" />
+        app:layout_constraintBottom_toTopOf="@+id/google_sign_in"
+        app:layout_constraintEnd_toEndOf="@+id/connect_activity_name_app"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/connect_activity_name_app"
+        app:layout_constraintTop_toBottomOf="@+id/connect_activity_name_app"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/facebook_sign_in"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="24dp"
         android:background="@color/com_facebook_blue"
         android:clickable="true"
         android:drawableStart="@drawable/com_facebook_button_login_logo"
@@ -82,15 +89,15 @@
         android:textColor="#FFFFFF"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/connect_activity_name_app"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/connect_activity_name_app"
+        app:layout_constraintTop_toBottomOf="@+id/connect_activity_name_app" />
 
     <TextView
         android:id="@+id/google_sign_in"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
         android:background="#FFFFFFFF"
         android:clickable="true"
         android:drawableStart="@drawable/fui_ic_googleg_color_24dp"
@@ -104,9 +111,11 @@
         android:textColor="#000000"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/facebook_sign_in"
+        app:layout_constraintBottom_toTopOf="@+id/connect_activity_name_app"
         app:layout_constraintEnd_toEndOf="@+id/facebook_sign_in"
-        app:layout_constraintStart_toStartOf="@+id/facebook_sign_in" />
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/facebook_sign_in"
+        app:layout_constraintTop_toTopOf="@+id/connect_activity_name_app" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

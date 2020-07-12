@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +21,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+
 import androidx.preference.PreferenceManager;
 import com.example.go4lunch.R;
 import com.example.go4lunch.api.UserHelper;
@@ -37,6 +39,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -183,10 +186,8 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
     private void readLastKnownLocation(){
         String lat = requireActivity().getPreferences(Context.MODE_PRIVATE).getString("device_latitude", "48.8534");
         String lng = requireActivity().getPreferences(Context.MODE_PRIVATE).getString("device_longitude", "2.3488");
-        if (lat != null && lng != null) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                    new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)), DEFAULT_ZOOM));
-        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)), DEFAULT_ZOOM));
 
     }
 
@@ -235,7 +236,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                             double lng = resultDetails.get(i).getResult().getGeometry().getLocation().getLng();
                             LatLng restaurantPosition = new LatLng(lat, lng);
                             if (resultDetails.get(i).getResult().getRating() == null){resultDetails.get(i).getResult().setRating(0.0);} // for sort method
-                            putMarkerOnRestaurantPosition(restaurantPosition,270.0f); //violet color
+                            putMarkerOnRestaurantPosition(restaurantPosition,R.drawable.food_blue);
                             myDictionary.put(restaurantPosition, resultDetails.get(i).getResult());
                             resultDetailsList.add(resultDetails.get(i).getResult());
                         }
@@ -274,7 +275,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                             String restaurantId = autoComplete.getPredictions().get(i).getPlaceId();
                             LatLng restaurantPosition = getLatLngKeyByRestaurantIdValue(myDictionary,restaurantId);
                             if (restaurantPosition != null && myDictionary.containsKey(restaurantPosition)){
-                               putMarkerOnRestaurantPosition(restaurantPosition,120.0f); // green color
+                               putMarkerOnRestaurantPosition(restaurantPosition, R.drawable.food_orange); // green color
                             }
                         }
                         List<ResultDetails> resultDetails =  getResultDetailsFromPrediction(autoComplete.getPredictions());
@@ -305,10 +306,10 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
 
     // ----- UI -----
 
-    private void putMarkerOnRestaurantPosition(LatLng markerLatLng, float color){
+    private void putMarkerOnRestaurantPosition(LatLng markerLatLng, int icon){
         mMap.addMarker(new MarkerOptions()
                 .position(markerLatLng)
-                .icon(BitmapDescriptorFactory.defaultMarker(color)));
+                .icon(BitmapDescriptorFactory.fromResource(icon)));
     }
 
     private void putMarkerWhereWorkmateHaveLunch(HashMap<LatLng, ResultDetails> myDictionary){
@@ -320,7 +321,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                             User user = documentSnapshot.toObject(User.class);
                             LatLng restaurantPosition = getLatLngKeyByRestaurantIdValue(myDictionary,user.getRestaurantChoiceId());
                             assert restaurantPosition != null;
-                            putMarkerOnRestaurantPosition(restaurantPosition,30.0f); //orange color
+                            putMarkerOnRestaurantPosition(restaurantPosition, R.drawable.food_green);
                         }
                     });
         }

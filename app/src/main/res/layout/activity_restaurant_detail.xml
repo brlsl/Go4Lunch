@@ -46,13 +46,49 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <ImageView
+                android:id="@+id/detailActivityStar3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@+id/detailActivityStar2"
+                app:layout_constraintStart_toEndOf="@+id/detailActivityStar2"
+                app:layout_constraintTop_toTopOf="@+id/detailActivityStar2"
+                app:srcCompat="@drawable/ic_star_yellow_restaurant_grade_24dp"
+                tools:ignore="ContentDescription" />
+
+            <ImageView
+                android:id="@+id/detailActivityStar2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@+id/detailActivityStar1"
+                app:layout_constraintStart_toEndOf="@+id/detailActivityStar1"
+                app:layout_constraintTop_toTopOf="@+id/detailActivityStar1"
+                app:srcCompat="@drawable/ic_star_yellow_restaurant_grade_24dp"
+                tools:ignore="ContentDescription"/>
+
+            <ImageView
+                android:id="@+id/detailActivityStar1"
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@+id/restaurant_detail_activity_restaurant_name"
+                app:layout_constraintStart_toEndOf="@+id/restaurant_detail_activity_restaurant_name"
+                app:layout_constraintTop_toTopOf="@+id/restaurant_detail_activity_restaurant_name"
+                app:srcCompat="@drawable/ic_star_yellow_restaurant_grade_24dp"
+                tools:ignore="ContentDescription" />
+
             <TextView
                 android:id="@+id/restaurant_detail_activity_restaurant_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="32dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="120dp"
                 android:layout_marginBottom="8dp"
                 android:text="@string/restaurant_name"
                 android:textColor="#FFFFFF"

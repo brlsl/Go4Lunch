@@ -4,13 +4,12 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-
 
 import com.example.go4lunch.R;
 
 import com.example.go4lunch.api.UserHelper;
+
 import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
@@ -84,7 +83,6 @@ public class ConnectActivity extends BaseActivity {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         overridePendingTransition(R.anim.zoom_in,R.anim.static_animation);
-
     }
 
     public void createUserInFirestore(){
@@ -95,28 +93,27 @@ public class ConnectActivity extends BaseActivity {
             }
             String username = this.getCurrentUser().getDisplayName();
             String uid = this.getCurrentUser().getUid();
-            SharedPreferences pref = getPreferences(MODE_PRIVATE);
-            pref.edit().putString("uid_key",getCurrentUser().getUid()).apply();
 
-         //   if (UserHelper.getExistingUser(getCurrentUser().getUid())) { }
             UserHelper.createUser(uid,username,urlPicture).addOnFailureListener(this.onFailureListener());
         }
     }
 
     private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data) {
-
         IdpResponse response = IdpResponse.fromResultIntent(data);
 
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) { // SUCCESS
-                //if( user exists in firebase){
-                // query
-                //  recupere si existe dans firebase
-                //  FirebaseAuth.getInstance().getCurrentUser();}
-                //else {}
-                this.createUserInFirestore();
-                Snackbar.make(mConstraintLayout, R.string.connexion_succeeded, Snackbar.LENGTH_SHORT).show();
-                this.startMainActivity();
+                UserHelper.getUser(getCurrentUser().getUid()).addOnSuccessListener(documentSnapshot -> {
+                    if(documentSnapshot.exists()){
+                        Snackbar.make(mConstraintLayout, R.string.connexion_succeeded, Snackbar.LENGTH_SHORT).show();
+                        startMainActivity();
+                    }
+                    if (!documentSnapshot.exists()){
+                        Snackbar.make(mConstraintLayout, R.string.connexion_succeeded, Snackbar.LENGTH_SHORT).show();
+                        createUserInFirestore();
+                        startMainActivity();
+                    }
+                });
             } else { // ERRORS
                 if (response == null) {
                     Snackbar.make(mConstraintLayout, R.string.authentification_canceled, Snackbar.LENGTH_SHORT).show();
@@ -128,8 +125,4 @@ public class ConnectActivity extends BaseActivity {
             }
         }
     }
-
-
 }
-
-

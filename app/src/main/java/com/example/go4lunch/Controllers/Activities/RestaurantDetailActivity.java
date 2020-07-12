@@ -65,10 +65,10 @@ public class RestaurantDetailActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         mConstraintLayout = findViewById(R.id.constraint_layout_restaurant_activity_detail);
         Intent intent = getIntent();
-        String restaurantId = Objects.requireNonNull(intent.getStringExtra("PLACE_ID_KEY")); // recupere id
+        String restaurantId = Objects.requireNonNull(intent.getStringExtra("PLACE_ID_KEY")); // get id
 
         executeHttpRequestPlaceDetailsWithRetrofit(restaurantId);
-        configureRecyclerView(restaurantId);
+        configureWorkmatesRecyclerView(restaurantId);
     }
 
     @Nullable
@@ -78,43 +78,31 @@ public class RestaurantDetailActivity extends BaseActivity {
         return super.onCreateView(name, context, attrs);
     }
 
-    private void configureRecyclerView(String restaurantId) {
-        RecyclerView mRecyclerView = findViewById(R.id.workmates_joining_list_rv_restaurant_detail_activity);
-
-        Query query = UserHelper.getUsersCollection()
-                .whereEqualTo("restaurantChoiceId",restaurantId)
-                .orderBy("username", Query.Direction.ASCENDING);
-
-        FirestoreRecyclerOptions<User> options = new FirestoreRecyclerOptions.Builder<User>()
-                .setQuery(query, User.class)
-                .build();
-
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL,false));
-        mAdapter = new JoiningWorkmateAdapter(options, mContext);
-        mRecyclerView.setAdapter(mAdapter);
-    }
-
     public void executeHttpRequestPlaceDetailsWithRetrofit(String placeID){
         this.mDisposable = GooglePlaceStreams.streamFetchPlaceDetails(placeID, PLACE_API_KEY).subscribeWith(new DisposableObserver<ResultDetails>() {
             @Override
             public void onNext(ResultDetails resultDetails) {
-                TextView mRestaurantName = findViewById(R.id.restaurant_detail_activity_restaurant_name);
-                TextView mRestaurantAddress = findViewById(R.id.restaurant_detail_activity_restaurant_address);
-                Button mRestaurantButtonPhoneCall = findViewById(R.id.restaurant_activity_detail_call_button);
-                Button mRestaurantButtonWebsiteURL  = findViewById(R.id.restaurant_activity_detail_website_button);
-                ImageView mRestaurantPhoto = findViewById(R.id.restaurant_detail_activity_restaurant_photo);
-                Button mRestaurantLikeButton = findViewById(R.id.restaurant_activity_detail_like_button);
-                FloatingActionButton mFabUserRestaurantChoice = findViewById(R.id.restaurant_activity_detail_fab_user_choice);
+                TextView restaurantName = findViewById(R.id.restaurant_detail_activity_restaurant_name);
+                TextView restaurantAddress = findViewById(R.id.restaurant_detail_activity_restaurant_address);
+                Button restaurantButtonPhoneCall = findViewById(R.id.restaurant_activity_detail_call_button);
+                Button restaurantButtonWebsiteURL  = findViewById(R.id.restaurant_activity_detail_website_button);
+                ImageView restaurantPhoto = findViewById(R.id.restaurant_detail_activity_restaurant_photo);
+                Button restaurantLikeButton = findViewById(R.id.restaurant_activity_detail_like_button);
+                FloatingActionButton fabUserRestaurantChoice = findViewById(R.id.restaurant_activity_detail_fab_user_choice);
+                ImageView star1 = findViewById(R.id.detailActivityStar1);
+                ImageView star2 = findViewById(R.id.detailActivityStar2);
+                ImageView star3 = findViewById(R.id.detailActivityStar3);
 
                 if(getCurrentUser() != null) {
 
-                    mRestaurantName.setText(resultDetails.getResult().getName());
-                    mRestaurantAddress.setText(resultDetails.getResult().getVicinity());
+                    restaurantName.setText(resultDetails.getResult().getName());
+                    restaurantAddress.setText(resultDetails.getResult().getVicinity());
 
-                    configurePhoto(resultDetails, mRestaurantPhoto);
-                    configurePhoneAndWebsiteButton(resultDetails, mRestaurantButtonPhoneCall, mRestaurantButtonWebsiteURL);
-                    configureLikeButton(placeID, mRestaurantLikeButton);
-                    configureFabRestaurantChoice(placeID,mFabUserRestaurantChoice, resultDetails);
+                    configurePhoto(resultDetails, restaurantPhoto);
+                    configureRating(resultDetails,star1,star2,star3);
+                    configurePhoneAndWebsiteButton(resultDetails, restaurantButtonPhoneCall, restaurantButtonWebsiteURL);
+                    configureLikeButton(placeID, restaurantLikeButton);
+                    configureFabRestaurantChoice(placeID,fabUserRestaurantChoice, resultDetails);
                 }
             }
             @Override
@@ -126,6 +114,7 @@ public class RestaurantDetailActivity extends BaseActivity {
             }
         });
     }
+
     private void configurePhoto(ResultDetails resultDetails, ImageView mRestaurantPhoto) {
         if(resultDetails.getResult().getPhotos() == null || resultDetails.getResult().getPhotos().size() < 10) {
             Glide.with(getApplicationContext())
@@ -136,6 +125,31 @@ public class RestaurantDetailActivity extends BaseActivity {
             Glide.with(getApplicationContext())
                     .load(BASE_GOOGLE_PHOTO_URL + resultDetails.getResult().getPhotos().get(randomNum).getPhotoReference() + "&key=" +PLACE_API_KEY)
                     .into(mRestaurantPhoto);
+        }
+    }
+
+    private void configureRating(ResultDetails resultDetails, ImageView star1, ImageView star2, ImageView star3) {
+        if (resultDetails.getResult().getRating() != null) {
+            if (resultDetails.getResult().getRating() <2.3){
+                star1.setVisibility(View.GONE);
+                star2.setVisibility(View.GONE);
+                star3.setVisibility(View.GONE);
+            }
+            else if (resultDetails.getResult().getRating() > 2.3F && resultDetails.getResult().getRating() <= 3.3F) {
+                star1.setVisibility(View.VISIBLE);
+                star2.setVisibility(View.GONE);
+                star3.setVisibility(View.GONE);
+            }
+            else if (resultDetails.getResult().getRating() > 3.3F && resultDetails.getResult().getRating() < 4.3F){
+                star1.setVisibility(View.VISIBLE);
+                star2.setVisibility(View.VISIBLE);
+                star3.setVisibility(View.GONE);
+            }
+            else if(resultDetails.getResult().getRating() >= 4.3F) {
+                star1.setVisibility(View.VISIBLE);
+                star2.setVisibility(View.VISIBLE);
+                star3.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -217,6 +231,22 @@ public class RestaurantDetailActivity extends BaseActivity {
                 }
             });
         });
+    }
+
+    private void configureWorkmatesRecyclerView(String restaurantId) {
+        RecyclerView mRecyclerView = findViewById(R.id.workmates_joining_list_rv_restaurant_detail_activity);
+
+        Query query = UserHelper.getUsersCollection()
+                .whereEqualTo("restaurantChoiceId",restaurantId)
+                .orderBy("username", Query.Direction.ASCENDING);
+
+        FirestoreRecyclerOptions<User> options = new FirestoreRecyclerOptions.Builder<User>()
+                .setQuery(query, User.class)
+                .build();
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL,false));
+        mAdapter = new JoiningWorkmateAdapter(options, mContext);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     // LIFECYCLE

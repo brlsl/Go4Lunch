@@ -26,6 +26,8 @@
     <string name="closing_soon">Closing soon</string>
     <string name="close_tomorrow_at">Close tomorrow at %1$s</string>
     <string name="close_at">Close at %1$s</string>
+    <string name="restaurant_opening_hours">restaurant opening hours</string>
+    <string name="distance">distance</string>
 
 
     <!--Restaurant detail activity-->
@@ -113,6 +115,7 @@
     <string name="answer_no">No</string>
     <string name="notification_disabled">Notifications disabled</string>
     <string name="notification_enabled">Notifications enabled</string>
+
 
 
 </resources>

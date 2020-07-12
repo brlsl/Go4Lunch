@@ -3,7 +3,6 @@ package com.example.go4lunch.views.restaurant_list_fragment_rv;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.location.Location;
 import android.location.LocationManager;
 import android.view.View;
@@ -75,7 +74,6 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
         });
 
         if (mRestaurantOpeningHours.getText().toString().equals(mContext.getString(R.string.closing_soon))){
-            //mRestaurantOpeningHours.setText(R.string.closing_soon);
             mRestaurantOpeningHours.setTextColor(Color.RED);
         } else{
             mRestaurantOpeningHours.setTextColor(Color.BLUE);
@@ -107,6 +105,7 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
 
         });
     }
+
 
     private void configureRating() {
         if (mResultDetails.getRating() != null) {
@@ -249,7 +248,6 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
         String dayHours = hoursWithoutDay[1].trim(); //11:00 AM – 11:00 PM
         String[] splitDay = dayHours.split("–");
         String openDay = splitDay[0].trim(); // 11:00 AM
-        int day = 0;
         if (!openDay.contains("am") && !openDay.contains("12:"))
             openDay = openDay+ " am";
         String closeDay = splitDay[1].trim(); // 11:00 PM

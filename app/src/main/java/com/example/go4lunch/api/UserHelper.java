@@ -36,10 +36,6 @@ public class UserHelper {
 
     // --- GET ---
 
-    public static Query getExistingUser(String uid){
-        return UserHelper.getUsersCollection().whereEqualTo("uid", uid);
-    }
-
     public static Task<DocumentSnapshot> getUser(String uid){
         return UserHelper.getUsersCollection().document(uid).get();
     }

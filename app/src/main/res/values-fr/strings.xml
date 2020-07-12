@@ -73,4 +73,6 @@
     <string name="answer_yes">Oui</string>
     <string name="notification_disabled">Notifications désactivées</string>
     <string name="notification_enabled">Notifications activées</string>
+    <string name="restaurant_opening_hours">Heures d\'ouverture</string>
+    <string name="distance">distance</string>
 </resources>
