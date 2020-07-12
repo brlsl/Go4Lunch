@@ -27,14 +27,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 class RestaurantViewHolder extends RecyclerView.ViewHolder {
-    private static final String BASE_GOOGLE_PHOTO_URL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=300&photoreference=" ;
-    private static String API_KEY;
 
+    // ----- FOR DATA -----
+
+    private static String API_KEY;
+    private Context mContext;
+
+    // ----- FOR UI -----
     private TextView mRestaurantName, mRestaurantAddress, mRestaurantOpeningHours,
             mRestaurantDistance, mNumberOfInterested;
     private ImageView mRestaurantPhoto, mStar1, mStar2, mStar3;
     private String mRestaurantId, mOpenMorning, mCloseMorning, mOpenEvening, mCloseEvening;
-    private Context mContext;
+    private static final String BASE_GOOGLE_PHOTO_URL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=300&photoreference=" ;
+
     private ResultDetails mResultDetails;
 
     RestaurantViewHolder(@NonNull View itemView) {
@@ -80,6 +85,8 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
+    // ----- CONFIGURE DATA -----
+
     private void configureTextsFields() {
         mRestaurantName.setText(mResultDetails.getName());
         mRestaurantAddress.setText(mResultDetails.getVicinity());
@@ -105,7 +112,6 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
 
         });
     }
-
 
     private void configureRating() {
         if (mResultDetails.getRating() != null) {
@@ -178,7 +184,6 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
                 mRestaurantOpeningHours.setText(R.string.opening_hours_not_available);
         } else
             mRestaurantOpeningHours.setText(R.string.opening_hours_not_available);
-
     }
 
     private void morningEveningSchedule(String[] hoursWithoutDay, String currentHour){
