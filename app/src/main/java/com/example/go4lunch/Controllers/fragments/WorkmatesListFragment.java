@@ -25,11 +25,11 @@ public class WorkmatesListFragment extends BaseFragment {
     private WorkmateAdapter mAdapter;
     private Context mContext;
 
+    // ----- LIFE CYCLE -----
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(false);
-
     }
 
     @Nullable
@@ -45,28 +45,12 @@ public class WorkmatesListFragment extends BaseFragment {
         return view;
     }
 
-    private void configureRecyclerView() {
-        // 1 Query
-        Query query = UserHelper.getUsersCollection().orderBy("username", Query.Direction.ASCENDING);
-
-        // 2 FirestoreRecyclerOptions
-        FirestoreRecyclerOptions<User> options = new FirestoreRecyclerOptions.Builder<User>()
-                .setQuery(query, User.class)
-                .build();
-
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(mRecyclerView.getContext(),LinearLayoutManager.VERTICAL,false));
-        mAdapter = new WorkmateAdapter(options, mContext);
-        mRecyclerView.setAdapter(mAdapter);
-
-    }
-
     @Override
     public void onStart() {
         super.onStart();
         if (mAdapter != null) {
             mAdapter.startListening();
         }
-
     }
 
     @Override
@@ -75,6 +59,20 @@ public class WorkmatesListFragment extends BaseFragment {
         if (mAdapter != null) {
             mAdapter.stopListening();
         }
-
     }
+
+    // ----- CONFIGURE DATA -----
+
+    private void configureRecyclerView() {
+        Query query = UserHelper.getUsersCollection().orderBy("username", Query.Direction.ASCENDING);
+
+        FirestoreRecyclerOptions<User> options = new FirestoreRecyclerOptions.Builder<User>()
+                .setQuery(query, User.class)
+                .build();
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mRecyclerView.getContext(),LinearLayoutManager.VERTICAL,false));
+        mAdapter = new WorkmateAdapter(options, mContext);
+        mRecyclerView.setAdapter(mAdapter);
+    }
+
 }

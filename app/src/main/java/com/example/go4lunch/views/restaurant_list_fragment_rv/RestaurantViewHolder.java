@@ -19,7 +19,7 @@ import com.example.go4lunch.controllers.activities.RestaurantDetailActivity;
 import com.example.go4lunch.models.User;
 
 import com.example.go4lunch.models.apiGooglePlace.placeDetails.ResultDetails;
-import com.example.go4lunch.utils.DateUtils;
+import com.example.go4lunch.utils.Utils;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.ParseException;
@@ -165,11 +165,11 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void updateHoursUI(List<String> restaurantHours) {
-        String todayString = DateUtils.getTodayDateToStr(); // monday, tuesday, ... sunday
-        int todayInteger = DateUtils.getTodayToInteger(todayString); // 0,1,... 6
+        String todayString = Utils.getTodayDateToStr(); // monday, tuesday, ... sunday
+        int todayInteger = Utils.getTodayToInteger(todayString); // 0,1,... 6
         String restaurantTodayHours = restaurantHours.get(todayInteger); //Tuesday: 11:00 AM – 11:00 PM
         String[] hoursWithoutDay = restaurantTodayHours.toLowerCase().split(todayString+": "); //11:00 AM – 11:00 PM
-        String currentHour = DateUtils.getCurrentHourToStr();
+        String currentHour = Utils.getCurrentHourToStr();
 
         if (restaurantTodayHours.toLowerCase().contains(todayString)){
             if (restaurantTodayHours.toLowerCase().contains("closed"))
@@ -189,28 +189,28 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
     private void morningEveningSchedule(String[] hoursWithoutDay, String currentHour){
         configureMorningEveningHours(hoursWithoutDay);
         try {
-            if (DateUtils.hour1CompareToHour2(currentHour,mCloseEvening) < 0 && DateUtils.hour1CompareToHour2(mCloseEvening,mOpenMorning)<0){
+            if (Utils.hour1CompareToHour2(currentHour,mCloseEvening) < 0 && Utils.hour1CompareToHour2(mCloseEvening,mOpenMorning)<0){
                 mRestaurantOpeningHours.setText(mContext.getString(R.string.close_at, mCloseEvening));
-                if (DateUtils.isClosingSoon(currentHour,mCloseMorning)) // if closing <= 45 minutes
+                if (Utils.isClosingSoon(currentHour,mCloseMorning)) // if closing <= 45 minutes
                     mRestaurantOpeningHours.setText(R.string.closing_soon);
             }
-            else if (DateUtils.hour1CompareToHour2(currentHour,mOpenMorning) <0 )// current hours before morning open hours
+            else if (Utils.hour1CompareToHour2(currentHour,mOpenMorning) <0 )// current hours before morning open hours
                 mRestaurantOpeningHours.setText(mContext.getString(R.string.open_at, mOpenMorning));
-            else if (DateUtils.hour1CompareToHour2(currentHour, mCloseMorning)<0){ // current hours before closing hours
+            else if (Utils.hour1CompareToHour2(currentHour, mCloseMorning)<0){ // current hours before closing hours
                 mRestaurantOpeningHours.setText(mContext.getString(R.string.open_from_until, mOpenMorning, mCloseMorning));
-                if (DateUtils.isClosingSoon(currentHour,mCloseMorning)) // if closing <= 45 minutes
+                if (Utils.isClosingSoon(currentHour,mCloseMorning)) // if closing <= 45 minutes
                     mRestaurantOpeningHours.setText(R.string.closing_soon);
             }
-            else if (DateUtils.hour1CompareToHour2(currentHour,mOpenEvening) <0) // current hours before evening open hours
+            else if (Utils.hour1CompareToHour2(currentHour,mOpenEvening) <0) // current hours before evening open hours
                 mRestaurantOpeningHours.setText(mContext.getString(R.string.open_at,mOpenEvening));
-            else if (DateUtils.hour1CompareToHour2(currentHour, mCloseEvening) < 0){ // current hours before evening closing hours
+            else if (Utils.hour1CompareToHour2(currentHour, mCloseEvening) < 0){ // current hours before evening closing hours
                 mRestaurantOpeningHours.setText(mContext.getString(R.string.open_from_until, mOpenEvening,mCloseEvening));
-                if (DateUtils.isClosingSoon(currentHour,mCloseEvening)) // if closing <= 45 minutes
+                if (Utils.isClosingSoon(currentHour,mCloseEvening)) // if closing <= 45 minutes
                     mRestaurantOpeningHours.setText(R.string.closing_soon);
             }
-            else if (DateUtils.hour1CompareToHour2(mCloseEvening, mOpenMorning)<0) { // case it closes after midnight
+            else if (Utils.hour1CompareToHour2(mCloseEvening, mOpenMorning)<0) { // case it closes after midnight
                 mRestaurantOpeningHours.setText(mContext.getString(R.string.close_tomorrow_at, mCloseEvening));
-                if (DateUtils.isClosingSoon(currentHour,mCloseEvening)) // if closing <= 45 minutes
+                if (Utils.isClosingSoon(currentHour,mCloseEvening)) // if closing <= 45 minutes
                     mRestaurantOpeningHours.setText(R.string.closing_soon);
             }
             else
@@ -259,21 +259,21 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
         if(!closeDay.contains(" pm") && !closeDay.contains("am"))
             closeDay = closeDay + " pm";
         try {
-            if(DateUtils.hour1CompareToHour2(currentHour,closeDay) < 0 && DateUtils.hour1CompareToHour2(closeDay,openDay)<0) {
+            if(Utils.hour1CompareToHour2(currentHour,closeDay) < 0 && Utils.hour1CompareToHour2(closeDay,openDay)<0) {
                 mRestaurantOpeningHours.setText(mContext.getString(R.string.close_at, closeDay)); // if closes after 00:00 am
-                if(DateUtils.isClosingSoon(currentHour,closeDay))
+                if(Utils.isClosingSoon(currentHour,closeDay))
                     mRestaurantOpeningHours.setText(R.string.closing_soon);
             }
-            else if (DateUtils.hour1CompareToHour2(currentHour, openDay) <0)
+            else if (Utils.hour1CompareToHour2(currentHour, openDay) <0)
                 mRestaurantOpeningHours.setText(mContext.getString(R.string.open_at, openDay));
-            else if (DateUtils.hour1CompareToHour2(currentHour, closeDay) <0) {
+            else if (Utils.hour1CompareToHour2(currentHour, closeDay) <0) {
                 mRestaurantOpeningHours.setText(mContext.getString(R.string.open_from_until, openDay, closeDay)); // 08:00 am - 23:59 pm
-                if(DateUtils.isClosingSoon(currentHour,closeDay))
+                if(Utils.isClosingSoon(currentHour,closeDay))
                     mRestaurantOpeningHours.setText(R.string.closing_soon);
             }
-            else if(DateUtils.hour1CompareToHour2(closeDay,openDay) <0) { // 10:00 am - 01:30 am
+            else if(Utils.hour1CompareToHour2(closeDay,openDay) <0) { // 10:00 am - 01:30 am
                 mRestaurantOpeningHours.setText(mContext.getString(R.string.close_tomorrow_at, closeDay));
-                if(DateUtils.isClosingSoon(currentHour,closeDay))
+                if(Utils.isClosingSoon(currentHour,closeDay))
                     mRestaurantOpeningHours.setText(R.string.closing_soon);
             }
             else

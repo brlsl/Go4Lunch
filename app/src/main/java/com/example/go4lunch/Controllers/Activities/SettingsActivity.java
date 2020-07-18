@@ -19,6 +19,7 @@ import androidx.preference.SwitchPreference;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.api.UserHelper;
+import com.example.go4lunch.utils.Utils;
 import com.firebase.ui.auth.AuthUI;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -91,11 +92,13 @@ public class SettingsActivity extends AppCompatActivity {
             if (enableNotification != null) {
                 enableNotification.setOnPreferenceClickListener(preference -> {
                     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+                    Utils.scheduleNotification(requireContext());
                     Log.d("Setting Activity","Value of preferences: "
                             +preferences.getBoolean(PREFERENCES_NOTIFICATION_KEY, true)); // for debug
                     return false;
                 });
             }
+
         }
     }
 }

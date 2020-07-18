@@ -1,7 +1,7 @@
 package com.example.go4lunch;
 
 import com.example.go4lunch.models.apiGooglePlace.placeDetails.ResultDetails;
-import com.example.go4lunch.utils.DateUtils;
+import com.example.go4lunch.utils.Utils;
 import com.example.go4lunch.utils.SortUtils;
 
 import org.junit.Test;
@@ -32,7 +32,7 @@ public class UnitTests {
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE", Locale.ENGLISH);
         String today = sdf.format(cal.getTime()).toLowerCase();
-        assertEquals(today, DateUtils.getTodayDateToStr());
+        assertEquals(today, Utils.getTodayDateToStr());
     }
 
     @Test
@@ -40,12 +40,12 @@ public class UnitTests {
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa", Locale.ENGLISH);
         String now = sdf.format(cal.getTime());
-        assertEquals(now, DateUtils.getCurrentHourToStr());
+        assertEquals(now, Utils.getCurrentHourToStr());
     }
 
     @Test
     public void getTodayToInteger_isCorrect() {
-        String today = DateUtils.getTodayDateToStr();
+        String today = Utils.getTodayDateToStr();
         int dayInteger = 99;
         if (today.equals("monday"))
             dayInteger = 0;
@@ -61,7 +61,7 @@ public class UnitTests {
             dayInteger = 5;
         if(today.equals("sunday"))
             dayInteger = 6;
-        assertEquals(dayInteger, (int) DateUtils.getTodayToInteger(today));
+        assertEquals(dayInteger, (int) Utils.getTodayToInteger(today));
 
     }
 
@@ -70,7 +70,7 @@ public class UnitTests {
         String currentHour = "12:00 am"; // midnight
         String restaurantHour = "12:00 pm"; // midday
 
-        assertTrue(DateUtils.hour1CompareToHour2(currentHour, restaurantHour)<0);
+        assertTrue(Utils.hour1CompareToHour2(currentHour, restaurantHour)<0);
     }
 
     @Test
@@ -81,10 +81,10 @@ public class UnitTests {
         String printMin = "12:45 pm";
         String printMax = "01:30 pm";
 
-        assertFalse(DateUtils.isClosingSoon(doNotPrint, closingHour));
-        assertFalse(DateUtils.isClosingSoon(doNotPrint2, closingHour));
-        assertTrue(DateUtils.isClosingSoon(printMin,closingHour));
-        assertTrue(DateUtils.isClosingSoon(printMax,closingHour));
+        assertFalse(Utils.isClosingSoon(doNotPrint, closingHour));
+        assertFalse(Utils.isClosingSoon(doNotPrint2, closingHour));
+        assertTrue(Utils.isClosingSoon(printMin,closingHour));
+        assertTrue(Utils.isClosingSoon(printMax,closingHour));
     }
 
     @Test

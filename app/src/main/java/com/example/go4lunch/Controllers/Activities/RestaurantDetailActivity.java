@@ -60,6 +60,8 @@ public class RestaurantDetailActivity extends BaseActivity {
         return R.layout.activity_restaurant_detail;
     }
 
+    // ----- LIFE CYCLE -----
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +79,36 @@ public class RestaurantDetailActivity extends BaseActivity {
         mContext = context;
         return super.onCreateView(name, context, attrs);
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (mAdapter != null) {
+            mAdapter.startListening();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAdapter != null) {
+            mAdapter.stopListening();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        disposeWhenDestroy();
+    }
+
+    private void disposeWhenDestroy() {
+        if (this.mDisposable != null && !this.mDisposable.isDisposed())
+            this.mDisposable.dispose();
+    }
+
+
+    // ----- RETROFIT REQUEST -----
 
     public void executeHttpRequestPlaceDetailsWithRetrofit(String placeID){
         this.mDisposable = GooglePlaceStreams.streamFetchPlaceDetails(placeID, PLACE_API_KEY).subscribeWith(new DisposableObserver<ResultDetails>() {
@@ -114,6 +146,8 @@ public class RestaurantDetailActivity extends BaseActivity {
             }
         });
     }
+
+    // ----- CONFIGURE DATA -----
 
     private void configurePhoto(ResultDetails resultDetails, ImageView mRestaurantPhoto) {
         if(resultDetails.getResult().getPhotos() == null || resultDetails.getResult().getPhotos().size() < 10) {
@@ -183,7 +217,7 @@ public class RestaurantDetailActivity extends BaseActivity {
         UserHelper.getUserLikeRestaurant(getCurrentUser().getUid(), placeID).addOnSuccessListener(documentSnapshot -> {
             Restaurant restaurantDb = documentSnapshot.toObject(Restaurant.class);
 
-            if(restaurantDb != null && restaurantDb.getRestaurantIsLiked()){
+            if(restaurantDb != null){
                 mRestaurantLikeButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
                 mRestaurantIsLiked = true;
             }
@@ -249,33 +283,5 @@ public class RestaurantDetailActivity extends BaseActivity {
         mRecyclerView.setAdapter(mAdapter);
     }
 
-    // LIFECYCLE
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (mAdapter != null) {
-            mAdapter.startListening();
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mAdapter != null) {
-            mAdapter.stopListening();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        disposeWhenDestroy();
-    }
-
-    private void disposeWhenDestroy() {
-        if (this.mDisposable != null && !this.mDisposable.isDisposed())
-            this.mDisposable.dispose();
-    }
 
 }

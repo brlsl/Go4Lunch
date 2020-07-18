@@ -30,10 +30,13 @@ import java.util.List;
 import java.util.Objects;
 
 public class RestaurantListFragment extends BaseFragment {
+
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RestaurantAdapter mRestaurantAdapter;
     private List<ResultDetails> mResultDetailsList = new ArrayList<>();
+
+    // ----- LIFE CYCLE -----
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,6 +62,8 @@ public class RestaurantListFragment extends BaseFragment {
         Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setTitle(R.string.restaurant_list_title);
     }
 
+    // ----- CONFIGURE DATA -----
+
     private void configureRecyclerView(View view){
         this.mRecyclerView = view.findViewById(R.id.recycler_view_restaurants);
         this.mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
@@ -77,11 +82,7 @@ public class RestaurantListFragment extends BaseFragment {
         });
     }
 
-    void setRestaurantAdapterNearby(List<ResultDetails> resultDetails, Context context, Location deviceLocation) {
-        this.mRestaurantAdapter = new RestaurantAdapter(resultDetails, context, deviceLocation);
-        this.mRecyclerView.setAdapter(mRestaurantAdapter);
-        mResultDetailsList = resultDetails;
-    }
+    // ----- SORT MENU -----
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -104,5 +105,13 @@ public class RestaurantListFragment extends BaseFragment {
                 }
         }
         return true;
+    }
+
+    // ----- SETTER -----
+
+    void setRestaurantAdapterNearby(List<ResultDetails> resultDetails, Context context, Location deviceLocation) {
+        this.mRestaurantAdapter = new RestaurantAdapter(resultDetails, context, deviceLocation);
+        this.mRecyclerView.setAdapter(mRestaurantAdapter);
+        mResultDetailsList = resultDetails;
     }
 }

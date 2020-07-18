@@ -24,13 +24,10 @@ public class User {
     public String getRestaurantChoiceName() { return restaurantChoiceName;}
     public String getRestaurantChoiceId() {return restaurantChoiceId;}
 
-
-
-
-        // --- SETTERS ---
-   // public void setUsername(String username) { this.username = username; }
-  //  public void setUid(String uid) { this.uid = uid; }
-    //public void setUrlPicture(String urlPicture) { this.urlPicture = urlPicture; }
-   // public void setRestaurantChoiceName(String restaurantChoiceName) { this.restaurantChoiceName = restaurantChoiceName;}
-   // public void setRestaurantChoiceId(String restaurantChoiceId) {this.restaurantChoiceId = restaurantChoiceId;}
-}
+    // --- SETTERS ---
+    public void setUsername(String username) { this.username = username; }
+    public void setUid(String uid) { this.uid = uid; }
+    public void setUrlPicture(String urlPicture) { this.urlPicture = urlPicture; }
+    public void setRestaurantChoiceName(String restaurantChoiceName) { this.restaurantChoiceName = restaurantChoiceName;}
+    public void setRestaurantChoiceId(String restaurantChoiceId) {this.restaurantChoiceId = restaurantChoiceId;}
+    }

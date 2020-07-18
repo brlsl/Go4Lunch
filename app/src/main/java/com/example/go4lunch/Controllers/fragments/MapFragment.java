@@ -3,8 +3,7 @@ package com.example.go4lunch.controllers.fragments;
 import android.Manifest;
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,7 +30,8 @@ import com.example.go4lunch.models.User;
 import com.example.go4lunch.models.apiGooglePlace.placeAutoComplete.AutoComplete;
 import com.example.go4lunch.models.apiGooglePlace.placeAutoComplete.Prediction;
 import com.example.go4lunch.models.apiGooglePlace.placeDetails.ResultDetails;
-import com.example.go4lunch.notifications.NotificationReceiver;
+
+import com.example.go4lunch.utils.Utils;
 import com.example.go4lunch.utils.GooglePlaceStreams;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -46,7 +46,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
-import java.util.Calendar;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,9 +68,8 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private static final int LOCATION_PERMISSION_REQUEST = 1234;
     private static String PLACE_API_KEY;
-    private static final String PREFERENCES_NOTIFICATION_KEY ="notification_preferences_key";
-    private static final String PREFERENCES_RADIUS_KEY = "radius";
 
+    private static final String PREFERENCES_RADIUS_KEY = "radius";
 
     // ----- FOR UI -----
     private GoogleMap mMap;
@@ -87,7 +86,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
 
         setHasOptionsMenu(true); // show item in menu
         getLocationPermission(); // ask for location permission
-        scheduleNotification(); // schedule a notification for 12:00
+        Utils.scheduleNotification(requireContext()); // schedule a notification for 12:00
     }
 
 
@@ -108,7 +107,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
     @Override
     public void onResume() {
         super.onResume();
-        scheduleNotification();
+        Utils.scheduleNotification(requireContext());
     }
 
     @Override
@@ -145,6 +144,8 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
             EasyPermissions.requestPermissions(this, getString(R.string.ask_for_permission), LOCATION_PERMISSION_REQUEST, permissions);
         }
     }
+
+    // ----- MAP METHODS -----
 
     // ask User permission with a dialog
     @Override
@@ -221,6 +222,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
     }
 
     // ----- REFROFIT REQUESTS -----
+
     public void executeHttpSearchNearbyAndDetailsWithRetrofit(){
         String deviceLocationStr = getDeviceLocation().getLatitude()+","+ getDeviceLocation().getLongitude();
         String radiusPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getString(PREFERENCES_RADIUS_KEY,"500");
@@ -236,7 +238,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                             double lng = resultDetails.get(i).getResult().getGeometry().getLocation().getLng();
                             LatLng restaurantPosition = new LatLng(lat, lng);
                             if (resultDetails.get(i).getResult().getRating() == null){resultDetails.get(i).getResult().setRating(0.0);} // for sort method
-                            putMarkerOnRestaurantPosition(restaurantPosition,R.drawable.food_blue);
+                            putMarkerOnRestaurantPosition(restaurantPosition,R.drawable.food_orange);
                             myDictionary.put(restaurantPosition, resultDetails.get(i).getResult());
                             resultDetailsList.add(resultDetails.get(i).getResult());
                         }
@@ -275,7 +277,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                             String restaurantId = autoComplete.getPredictions().get(i).getPlaceId();
                             LatLng restaurantPosition = getLatLngKeyByRestaurantIdValue(myDictionary,restaurantId);
                             if (restaurantPosition != null && myDictionary.containsKey(restaurantPosition)){
-                               putMarkerOnRestaurantPosition(restaurantPosition, R.drawable.food_orange); // green color
+                               putMarkerOnRestaurantPosition(restaurantPosition, R.drawable.food_blue);
                             }
                         }
                         List<ResultDetails> resultDetails =  getResultDetailsFromPrediction(autoComplete.getPredictions());
@@ -295,6 +297,8 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                 });
     }
 
+
+    // ------ LISTENER ------
     private void onMarkerClick(){
         mMap.setOnMarkerClickListener(marker -> {
             Intent intentDetail = new Intent(requireContext(), RestaurantDetailActivity.class);
@@ -327,35 +331,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
         }
     }
 
-    private void scheduleNotification(){
-        SharedPreferences preferences =  PreferenceManager.getDefaultSharedPreferences(requireContext());
-        boolean isNotificationEnable = preferences.getBoolean(PREFERENCES_NOTIFICATION_KEY,true); // notification settings
 
-        Intent intent = new Intent(requireActivity(), NotificationReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(requireActivity(), 0, intent, 0);
-        AlarmManager alarmManager = (AlarmManager) requireActivity().getSystemService(Context.ALARM_SERVICE);
-
-        Calendar now = Calendar.getInstance();
-        Calendar notificationTime = Calendar.getInstance();
-        notificationTime.set(Calendar.HOUR_OF_DAY, 12);
-        notificationTime.set(Calendar.MINUTE, 0);
-        notificationTime.set(Calendar.SECOND, 0);
-        notificationTime.set(Calendar.MILLISECOND, 0);
-
-        if (alarmManager !=null){
-            if (isNotificationEnable){ // notifications are enabled in settings
-                if (now.before(notificationTime)) { // now before  12:00
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, notificationTime.getTimeInMillis(), pendingIntent);
-                } else { // now after 12:00
-                    notificationTime.set(Calendar.DAY_OF_YEAR, now.get(Calendar.DAY_OF_YEAR)+1);
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, notificationTime.getTimeInMillis(), pendingIntent);
-                }
-            } else { // notifications are disabled in settings
-                alarmManager.cancel(pendingIntent); // cancel next scheduled notification
-            }
-        }
-
-    }
 
     // ----- UTILS -----
 

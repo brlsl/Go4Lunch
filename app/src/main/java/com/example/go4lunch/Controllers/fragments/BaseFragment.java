@@ -1,28 +1,18 @@
 package com.example.go4lunch.controllers.fragments;
 
-import android.graphics.Color;
-import android.os.Bundle;
 import android.text.InputType;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
-
 import com.example.go4lunch.R;
 import com.example.go4lunch.controllers.activities.MainActivity;
 
-import java.util.Objects;
-
 public abstract class BaseFragment extends Fragment {
 
+    // ----- SEARCH MENU -----
     @Override
     public void onCreateOptionsMenu(@NonNull Menu item, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(item, inflater);
