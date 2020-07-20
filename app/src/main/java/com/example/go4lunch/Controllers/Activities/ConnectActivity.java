@@ -25,7 +25,7 @@ public class ConnectActivity extends BaseActivity {
     private ConstraintLayout mConstraintLayout;
 
     @Override
-    public int getFragmentLayout() {
+    public int getActivityLayout() {
         return R.layout.connect_activity_first;
     }
 
@@ -59,45 +59,6 @@ public class ConnectActivity extends BaseActivity {
         handleResponseAfterSignIn(requestCode,resultCode, data);
     }
 
-    AuthMethodPickerLayout customLayout = new AuthMethodPickerLayout
-            .Builder(R.layout.connect_activity_signin)
-            .setGoogleButtonId(R.id.google_sign_in)
-            .setFacebookButtonId(R.id.facebook_sign_in)
-            .build();
-
-    private void startSignInActivity(){
-        startActivityForResult(AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(Arrays.asList(
-                                new AuthUI.IdpConfig.GoogleBuilder().build() ,
-                                new AuthUI.IdpConfig.FacebookBuilder().build()))
-                        .setIsSmartLockEnabled(false, true)
-                        .setTheme(R.style.AppTheme_NoTitle)
-                        .setAuthMethodPickerLayout(customLayout)
-                        .build(),
-                RC_SIGN_IN
-        );
-    }
-
-    private void startMainActivity(){
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        overridePendingTransition(R.anim.zoom_in,R.anim.static_animation);
-    }
-
-    public void createUserInFirestore(){
-        if (this.getCurrentUser() != null ){
-            String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
-            if (urlPicture != null){
-                urlPicture = urlPicture+"?height=450"; // for better resolution of profile picture
-            }
-            String username = this.getCurrentUser().getDisplayName();
-            String uid = this.getCurrentUser().getUid();
-
-            UserHelper.createUser(uid,username,urlPicture).addOnFailureListener(this.onFailureListener());
-        }
-    }
-
     private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data) {
         IdpResponse response = IdpResponse.fromResultIntent(data);
 
@@ -123,6 +84,45 @@ public class ConnectActivity extends BaseActivity {
                     Snackbar.make(mConstraintLayout, R.string.unknown_error_has_occurred, Snackbar.LENGTH_SHORT).show();
                 }
             }
+        }
+    }
+
+    private void startSignInActivity(){
+        startActivityForResult(AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(Arrays.asList(
+                                new AuthUI.IdpConfig.GoogleBuilder().build() ,
+                                new AuthUI.IdpConfig.FacebookBuilder().build()))
+                        .setIsSmartLockEnabled(false, true)
+                        .setTheme(R.style.AppTheme_NoTitle)
+                        .setAuthMethodPickerLayout(customLayout)
+                        .build(),
+                RC_SIGN_IN
+        );
+    }
+
+    private AuthMethodPickerLayout customLayout = new AuthMethodPickerLayout
+            .Builder(R.layout.connect_activity_signin)
+            .setGoogleButtonId(R.id.google_sign_in)
+            .setFacebookButtonId(R.id.facebook_sign_in)
+            .build();
+
+    private void startMainActivity(){
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        overridePendingTransition(R.anim.zoom_in,R.anim.static_animation);
+    }
+
+    public void createUserInFirestore(){
+        if (this.getCurrentUser() != null ){
+            String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
+            if (urlPicture != null){
+                urlPicture = urlPicture+"?height=450"; // for better resolution of profile picture
+            }
+            String username = this.getCurrentUser().getDisplayName();
+            String uid = this.getCurrentUser().getUid();
+
+            UserHelper.createUser(uid,username,urlPicture).addOnFailureListener(this.onFailureListener());
         }
     }
 }

@@ -56,7 +56,7 @@ public class RestaurantDetailActivity extends BaseActivity {
     private Boolean mUserRestaurantIsChosen;
 
     @Override
-    public int getFragmentLayout() {
+    public int getActivityLayout() {
         return R.layout.activity_restaurant_detail;
     }
 
@@ -126,7 +126,6 @@ public class RestaurantDetailActivity extends BaseActivity {
                 ImageView star3 = findViewById(R.id.detailActivityStar3);
 
                 if(getCurrentUser() != null) {
-
                     restaurantName.setText(resultDetails.getResult().getName());
                     restaurantAddress.setText(resultDetails.getResult().getVicinity());
 
@@ -157,11 +156,11 @@ public class RestaurantDetailActivity extends BaseActivity {
         }else{
             int randomNum = (int) (Math.random() * (10));
             Glide.with(getApplicationContext())
-                    .load(BASE_GOOGLE_PHOTO_URL + resultDetails.getResult().getPhotos().get(randomNum).getPhotoReference() + "&key=" +PLACE_API_KEY)
+                    .load(BASE_GOOGLE_PHOTO_URL + resultDetails.getResult().getPhotos().get(randomNum).getPhotoReference() +
+                            "&key=" +PLACE_API_KEY)
                     .into(mRestaurantPhoto);
         }
     }
-
     private void configureRating(ResultDetails resultDetails, ImageView star1, ImageView star2, ImageView star3) {
         if (resultDetails.getResult().getRating() != null) {
             if (resultDetails.getResult().getRating() <2.3){
@@ -282,6 +281,4 @@ public class RestaurantDetailActivity extends BaseActivity {
         mAdapter = new JoiningWorkmateAdapter(options, mContext);
         mRecyclerView.setAdapter(mAdapter);
     }
-
-
 }

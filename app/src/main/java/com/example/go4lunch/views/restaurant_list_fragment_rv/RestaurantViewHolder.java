@@ -166,9 +166,9 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
 
     private void updateHoursUI(List<String> restaurantHours) {
         String todayString = Utils.getTodayDateToStr(); // monday, tuesday, ... sunday
-        int todayInteger = Utils.getTodayToInteger(todayString); // 0,1,... 6
+        int todayInteger = Utils.getTodayToInteger(todayString); // convert to int : 0,1,... 6
         String restaurantTodayHours = restaurantHours.get(todayInteger); //Tuesday: 11:00 AM – 11:00 PM
-        String[] hoursWithoutDay = restaurantTodayHours.toLowerCase().split(todayString+": "); //11:00 AM – 11:00 PM
+        String hoursWithoutDay = Utils.hoursWithoutDay(restaurantTodayHours); //11:00 AM – 11:00 PM
         String currentHour = Utils.getCurrentHourToStr();
 
         if (restaurantTodayHours.toLowerCase().contains(todayString)){
@@ -186,7 +186,7 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
             mRestaurantOpeningHours.setText(R.string.opening_hours_not_available);
     }
 
-    private void morningEveningSchedule(String[] hoursWithoutDay, String currentHour){
+    private void morningEveningSchedule(String hoursWithoutDay, String currentHour){
         configureMorningEveningHours(hoursWithoutDay);
         try {
             if (Utils.hour1CompareToHour2(currentHour,mCloseEvening) < 0 && Utils.hour1CompareToHour2(mCloseEvening,mOpenMorning)<0){
@@ -220,9 +220,8 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-    private void configureMorningEveningHours(String[] hoursWithoutDay) {
-        String hours = hoursWithoutDay[1].trim(); //" 11:30 am – 1:30 pm, 6:00 – 9:30 pm"
-        String[] splitHours = hours.split(",");
+    private void configureMorningEveningHours(String hoursWithoutDay) {
+        String[] splitHours = hoursWithoutDay.split(","); //" 11:30 am – 1:30 pm, 6:00 – 9:30 pm"
 
         String morningHours = splitHours[0].trim(); //"11:30 am – 1:30 pm"
         String[] splitMorning = morningHours.split("–");
@@ -249,9 +248,8 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
             mCloseEvening = mCloseEvening + " am";
     }
 
-    private void fullDaySchedule(String[] hoursWithoutDay, String currentHour) {
-        String dayHours = hoursWithoutDay[1].trim(); //11:00 AM – 11:00 PM
-        String[] splitDay = dayHours.split("–");
+    private void fullDaySchedule(String hoursWithoutDay, String currentHour) {
+        String[] splitDay = hoursWithoutDay.split("–"); //11:00 AM – 11:00 PM
         String openDay = splitDay[0].trim(); // 11:00 AM
         if (!openDay.contains("am") && !openDay.contains("12:"))
             openDay = openDay+ " am";

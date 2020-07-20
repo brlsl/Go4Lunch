@@ -35,7 +35,6 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseUser;
 
-
 import java.util.Objects;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -51,12 +50,21 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private Fragment active = mMapFragment; // first fragment active when app opens
 
     @Override
-    public int getFragmentLayout() {
+    public int getActivityLayout() {
         return R.layout.activity_main;
     }
 
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.configureToolBar();
+        this.configureDrawerLayout();
+        this.configureNavigationView();
+        this.configureHeaderNavigationView();
+        this.configureBottomView();
+    }
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) { // menu drawer
         switch (menuItem.getItemId()) {
             case R.id.activity_main_your_meal:
                 UserHelper.getUser(getCurrentUser().getUid()).addOnSuccessListener(documentSnapshot -> {
@@ -69,7 +77,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                     } else
                         Snackbar.make(mDrawerLayout, R.string.you_have_not_choose_any_restaurant, Snackbar.LENGTH_SHORT).show();
                 });
-
                 break;
             case R.id.activity_main_drawer_settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
@@ -78,10 +85,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             case R.id.activity_main_drawer_logout:
                 this.signOutUserFromFirebase();
                 break;
-
         }
-        //close navigation drawer after choice
-        mDrawerLayout.closeDrawer(GravityCompat.START);
+        mDrawerLayout.closeDrawer(GravityCompat.START);  //close navigation drawer after choice
         return true;
     }
 
@@ -98,18 +103,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
     }
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.configureToolBar();
-        this.configureDrawerLayout();
-        this.configureNavigationView();
-        this.configureHeaderNavigationView();
-        this.configureBottomView();
-    }
-
     // ----- UI CONFIGURATION -----
-
     private void configureToolBar(){
         this.mToolbar =  findViewById(R.id.toolbar_main_activity);
         setSupportActionBar(mToolbar);

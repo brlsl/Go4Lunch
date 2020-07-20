@@ -8,13 +8,16 @@ import android.content.SharedPreferences;
 
 import androidx.preference.PreferenceManager;
 
+import com.example.go4lunch.models.apiGooglePlace.placeDetails.ResultDetails;
 import com.example.go4lunch.notifications.NotificationReceiver;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +30,6 @@ public class Utils {
         return sdf.format(today).toLowerCase();
     }
 
-    // ok
     public static String getCurrentHourToStr(){
         Date now = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa",Locale.ENGLISH);
@@ -44,6 +46,12 @@ public class Utils {
         map.put("saturday",5);
         map.put("sunday",6);
         return map.get(day);
+    }
+
+    public static String hoursWithoutDay(String day){
+        String todayString = Utils.getTodayDateToStr();
+        String[] hours = day.toLowerCase().split(todayString+": ");
+        return hours[1].trim();
     }
 
     public static long hour1CompareToHour2(String inputHour1, String inputHour2) throws ParseException {
@@ -63,6 +71,15 @@ public class Utils {
         return diffInMinutes >= -45 && diffInMinutes <= 0;
     }
 
+    public static void sortRestaurantByNameAZ(List<ResultDetails> resultDetailsList){
+        Collections.sort(resultDetailsList, (o1, o2) ->
+                o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase()));
+    }
+
+    public static void sortHighRatingFirst(List<ResultDetails> resultDetailsList){
+        Collections.sort(resultDetailsList,
+                (o1, o2) -> Double.compare(o2.getRating(), o1.getRating()));
+    }
 
     public static void scheduleNotification(Context context){
         SharedPreferences preferences =  PreferenceManager.getDefaultSharedPreferences(context);
@@ -80,7 +97,7 @@ public class Utils {
 
         if (alarmManager !=null){
             if (isNotificationEnable){ // notifications are enabled in settings
-                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, notificationTime.getTimeInMillis(),1000*60*60*24, pendingIntent);
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, notificationTime.getTimeInMillis(),1000*60*60*24, pendingIntent);
             } else { // notifications are disabled in settings
                 alarmManager.cancel(pendingIntent); // cancel next scheduled notification
             }

@@ -2,7 +2,6 @@ package com.example.go4lunch;
 
 import com.example.go4lunch.models.apiGooglePlace.placeDetails.ResultDetails;
 import com.example.go4lunch.utils.Utils;
-import com.example.go4lunch.utils.SortUtils;
 
 import org.junit.Test;
 
@@ -34,7 +33,6 @@ public class UnitTests {
         String today = sdf.format(cal.getTime()).toLowerCase();
         assertEquals(today, Utils.getTodayDateToStr());
     }
-
     @Test
     public void getCurrentTime_isCorrect() {
         Calendar cal = Calendar.getInstance();
@@ -42,7 +40,6 @@ public class UnitTests {
         String now = sdf.format(cal.getTime());
         assertEquals(now, Utils.getCurrentHourToStr());
     }
-
     @Test
     public void getTodayToInteger_isCorrect() {
         String today = Utils.getTodayDateToStr();
@@ -62,7 +59,14 @@ public class UnitTests {
         if(today.equals("sunday"))
             dayInteger = 6;
         assertEquals(dayInteger, (int) Utils.getTodayToInteger(today));
+    }
 
+    @Test
+    public void hoursWithoutDay_isCorrect(){
+        String todayString = Utils.getTodayDateToStr();
+        String day = todayString+": 11:00 AM – 11:00 PM ";
+
+        assertEquals("11:00 am – 11:00 pm", Utils.hoursWithoutDay(day));
     }
 
     @Test
@@ -92,7 +96,7 @@ public class UnitTests {
         assertEquals(mResultDetailsList.get(0).getName(),"C");
         assertEquals(mResultDetailsList.get(1).getName(),"A");
         assertEquals(mResultDetailsList.get(2).getName(),"B");
-        SortUtils.sortRestaurantByNameAZ(mResultDetailsList);
+        Utils.sortRestaurantByNameAZ(mResultDetailsList);
         assertEquals(mResultDetailsList.get(0).getName(),"A");
         assertEquals(mResultDetailsList.get(1).getName(),"B");
         assertEquals(mResultDetailsList.get(2).getName(),"C");
@@ -103,10 +107,11 @@ public class UnitTests {
         assertEquals(mResultDetailsList.get(0).getRating(),2.0, 0);
         assertEquals(mResultDetailsList.get(1).getRating(),4.0, 0);
         assertEquals(mResultDetailsList.get(2).getRating(),3.0, 0);
-        SortUtils.sortHighRatingFirst(mResultDetailsList);
+        Utils.sortHighRatingFirst(mResultDetailsList);
         assertEquals(mResultDetailsList.get(0).getRating(),4.0, 0);
         assertEquals(mResultDetailsList.get(1).getRating(),3.0, 0);
         assertEquals(mResultDetailsList.get(2).getRating(),2.0, 0);
     }
+
 
 }

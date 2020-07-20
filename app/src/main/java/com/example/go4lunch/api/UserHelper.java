@@ -10,7 +10,6 @@ import com.google.firebase.firestore.SetOptions;
 
 
 public class UserHelper {
-
     private static final String COLLECTION_USERS = "users";
     private static final String COLLECTION_RESTAURANTS_LIKED = "restaurants";
 

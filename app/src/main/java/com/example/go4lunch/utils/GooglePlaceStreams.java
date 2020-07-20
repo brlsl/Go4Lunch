@@ -14,10 +14,10 @@ import io.reactivex.schedulers.Schedulers;
 
 public class GooglePlaceStreams {
 
-    private static final String PLACE_DETAILS_SEARCH_FIELDS = "name,photos,rating,formatted_phone_number,vicinity,opening_hours,website,geometry,place_id";
+    private static final String PLACE_DETAILS_SEARCH_FIELDS = "name,photos,rating,formatted_phone_number," +
+            "vicinity,opening_hours,website,geometry,place_id";
     private static final String PLACE_TYPE = "restaurant";
     private static final String STRICT_BOUNDS = "";
-
 
     public static Observable<ResultSearchNearby> streamFetchNearbySearch(String location, String radius, String apiKey){
         GooglePlaceApiService mService = GooglePlaceApiService.retrofit.create(GooglePlaceApiService.class);
@@ -50,6 +50,6 @@ public class GooglePlaceStreams {
                 .flatMap(resultSearchNearby -> streamFetchPlaceDetails(resultSearchNearby.getPlaceId(), apiKey))
                 .toList()
                 .toObservable()
-                .subscribeOn(AndroidSchedulers.mainThread()).timeout(10, TimeUnit.SECONDS);
+                .subscribeOn(AndroidSchedulers.mainThread()).timeout(20, TimeUnit.SECONDS);
     }
 }

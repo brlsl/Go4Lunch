@@ -10,7 +10,6 @@ public class User {
 
     public User(){} // Empty constructor required for Firestore's automatic data mapping.
 
-
     public User(String uid, String username, String urlPicture) {
         this.uid = uid;
         this.username = username;

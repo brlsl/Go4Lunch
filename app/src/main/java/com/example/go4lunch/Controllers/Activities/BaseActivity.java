@@ -21,13 +21,13 @@ public abstract class BaseActivity extends AppCompatActivity
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(this.getFragmentLayout());
+        setContentView(this.getActivityLayout());
         PLACE_API_KEY =  getApplicationContext().getString(R.string.google_place_api_key);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // prevent screen orientation change
 
     }
 
-    public abstract int getFragmentLayout();
+    public abstract int getActivityLayout();
 
     protected FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
 

@@ -4,6 +4,9 @@
     <!--Google Place api key -->
     <string name="google_place_api_key" translatable="false">AIzaSyAK366wqKIdy-Td7snXrjIRaI9MkXb2VZE</string>
 
+    <!--Google Maps api key -->
+    <string name="google_maps_api_key" translatable="false">"AIzaSyAuoABTy9XWos-Dgtli_OV9ctmhanrmhx0"</string>
+
     <!--Facebook configuration -->
     <string name="facebook_application_id" translatable="false">239273297312721</string>
     <string name="facebook_login_protocol_scheme" translatable="false">fb239273297312721</string>

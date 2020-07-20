@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,13 +20,12 @@ import com.example.go4lunch.R;
 
 import com.example.go4lunch.controllers.activities.MainActivity;
 import com.example.go4lunch.models.apiGooglePlace.placeDetails.ResultDetails;
-import com.example.go4lunch.utils.SortUtils;
+import com.example.go4lunch.utils.Utils;
 import com.example.go4lunch.views.restaurant_list_fragment_rv.RestaurantAdapter;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class RestaurantListFragment extends BaseFragment {
 
@@ -56,12 +54,6 @@ public class RestaurantListFragment extends BaseFragment {
         return view;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setTitle(R.string.restaurant_list_title);
-    }
-
     // ----- CONFIGURE DATA -----
 
     private void configureRecyclerView(View view){
@@ -83,7 +75,6 @@ public class RestaurantListFragment extends BaseFragment {
     }
 
     // ----- SORT MENU -----
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
@@ -92,7 +83,7 @@ public class RestaurantListFragment extends BaseFragment {
                 if (mResultDetailsList == null || mResultDetailsList.size() == 0)
                     Snackbar.make(mSwipeRefreshLayout , R.string.no_restaurant_around, Snackbar.LENGTH_SHORT).show();
                 else {
-                    SortUtils.sortRestaurantByNameAZ(mResultDetailsList);
+                    Utils.sortRestaurantByNameAZ(mResultDetailsList);
                     mRestaurantAdapter.notifyDataSetChanged();
                 }
                 break;
@@ -100,7 +91,7 @@ public class RestaurantListFragment extends BaseFragment {
                 if (mResultDetailsList == null || mResultDetailsList.size() == 0)
                     Snackbar.make(mSwipeRefreshLayout , R.string.no_restaurant_around, Snackbar.LENGTH_SHORT).show();
                 else{
-                    SortUtils.sortHighRatingFirst(mResultDetailsList);
+                    Utils.sortHighRatingFirst(mResultDetailsList);
                     mRestaurantAdapter.notifyDataSetChanged();
                 }
         }
@@ -108,7 +99,6 @@ public class RestaurantListFragment extends BaseFragment {
     }
 
     // ----- SETTER -----
-
     void setRestaurantAdapterNearby(List<ResultDetails> resultDetails, Context context, Location deviceLocation) {
         this.mRestaurantAdapter = new RestaurantAdapter(resultDetails, context, deviceLocation);
         this.mRecyclerView.setAdapter(mRestaurantAdapter);

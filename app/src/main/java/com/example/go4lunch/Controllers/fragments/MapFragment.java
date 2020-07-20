@@ -87,7 +87,6 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
         getLocationPermission(); // ask for location permission
     }
 
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate layout for this fragment
@@ -138,7 +137,6 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
     }
 
     // ----- MAP METHODS -----
-
     // ask User permission with a dialog
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -171,6 +169,24 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
         }
     }
 
+    @SuppressLint("MissingPermission")
+    public void getLastKnownLocation() {
+        mFusedLocationProviderClient.getLastLocation()
+                .addOnSuccessListener(requireActivity(), deviceLocation -> {
+                    // Got last known location. In some rare situations this can be null.
+                    if (deviceLocation != null) {
+                        // Logic to handle location object
+                        setDeviceLocation(deviceLocation);
+                        writeLastKnownLocation(deviceLocation);
+                        handleDeviceLocation(deviceLocation);
+                    } else {
+                        Snackbar.make(mConstraintLayout, R.string.unknown_location, Snackbar.LENGTH_SHORT).show();
+                        Log.d("MapFragment", "Device location unknown");
+                        readLastKnownLocation();
+                    }
+                });
+    }
+
     private void writeLastKnownLocation(Location deviceLocation){
         SharedPreferences pref = requireActivity().getPreferences(Context.MODE_PRIVATE);
         deviceLocation.getLongitude();
@@ -182,27 +198,6 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
         String lng = requireActivity().getPreferences(Context.MODE_PRIVATE).getString("device_longitude", "2.3488");
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                 new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)), DEFAULT_ZOOM));
-
-    }
-
-    @SuppressLint("MissingPermission")
-    public void getLastKnownLocation() {
-        mFusedLocationProviderClient.getLastLocation()
-                .addOnSuccessListener(requireActivity(), deviceLocation -> {
-                    // Got last known location. In some rare situations this can be null.
-                    if (deviceLocation != null) {
-                        // Logic to handle location object
-                        setDeviceLocation(deviceLocation);
-                        writeLastKnownLocation(deviceLocation);
-                        handleDeviceLocation(deviceLocation);
-
-                    } else {
-                        Snackbar.make(mConstraintLayout, R.string.unknown_location, Snackbar.LENGTH_SHORT).show();
-                        Log.d("MapFragment", "Device location unknown");
-                        readLastKnownLocation();
-                    }
-                });
-
     }
 
     @SuppressLint("MissingPermission")
@@ -215,7 +210,6 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
     }
 
     // ----- REFROFIT REQUESTS -----
-
     public void executeHttpSearchNearbyAndDetailsWithRetrofit(){
         String deviceLocationStr = getDeviceLocation().getLatitude()+","+ getDeviceLocation().getLongitude();
         String radiusPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getString(PREFERENCES_RADIUS_KEY,"500");
@@ -240,10 +234,8 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                         restaurantListFragment.setRestaurantAdapterNearby(resultDetailsList, requireActivity(), getDeviceLocation());
                         putMarkerWhereWorkmateHaveLunch(myDictionary);
                     }
-
                     @Override
                     public void onError(Throwable e) {
-
                     }
 
                     @Override
@@ -278,11 +270,9 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                         RestaurantListFragment restaurantListFragment = ((MainActivity) requireActivity()).getRestaurantListFragment();
                         restaurantListFragment.setRestaurantAdapterNearby(resultDetails, requireContext(), getDeviceLocation());
                     }
-
                     @Override
                     public void onError(Throwable e) {
                     }
-
                     @Override
                     public void onComplete() {
                         onMarkerClick();

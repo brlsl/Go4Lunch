@@ -98,7 +98,6 @@ public class SettingsActivity extends AppCompatActivity {
                     return false;
                 });
             }
-
         }
     }
 }

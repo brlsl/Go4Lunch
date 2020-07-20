@@ -16,7 +16,6 @@ import com.example.go4lunch.controllers.activities.RestaurantDetailActivity;
 import com.example.go4lunch.models.User;
 
 public class WorkmateViewHolder extends RecyclerView.ViewHolder {
-
     public ImageView mUserAvatar;
     public TextView mUserChoice;
 
@@ -25,7 +24,6 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
         mUserChoice = itemView.findViewById(R.id.rv_item_workmate_choice);
         mUserAvatar = itemView.findViewById(R.id.rv_item_workmate_avatar);
     }
-
     public void displayData(User model, Context context) {
         UserHelper.getUser(model.getUid()).addOnSuccessListener(documentSnapshot -> {
             User databaseUser = documentSnapshot.toObject(User.class);
