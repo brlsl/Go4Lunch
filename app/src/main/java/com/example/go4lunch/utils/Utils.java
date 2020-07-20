@@ -72,7 +72,6 @@ public class Utils {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        Calendar now = Calendar.getInstance();
         Calendar notificationTime = Calendar.getInstance();
         notificationTime.set(Calendar.HOUR_OF_DAY, 12);
         notificationTime.set(Calendar.MINUTE, 0);
@@ -81,12 +80,7 @@ public class Utils {
 
         if (alarmManager !=null){
             if (isNotificationEnable){ // notifications are enabled in settings
-                if (now.before(notificationTime)) { // now before  12:00
                     alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, notificationTime.getTimeInMillis(),1000*60*60*24, pendingIntent);
-                } else { // now after 12:00
-                    notificationTime.set(Calendar.DAY_OF_YEAR, now.get(Calendar.DAY_OF_YEAR)+1);
-                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, notificationTime.getTimeInMillis(), 1000*60*60*24, pendingIntent);
-                }
             } else { // notifications are disabled in settings
                 alarmManager.cancel(pendingIntent); // cancel next scheduled notification
             }

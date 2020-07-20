@@ -68,7 +68,6 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private static final int LOCATION_PERMISSION_REQUEST = 1234;
     private static String PLACE_API_KEY;
-
     private static final String PREFERENCES_RADIUS_KEY = "radius";
 
     // ----- FOR UI -----
@@ -86,7 +85,6 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
 
         setHasOptionsMenu(true); // show item in menu
         getLocationPermission(); // ask for location permission
-        Utils.scheduleNotification(requireContext()); // schedule a notification for 12:00
     }
 
 
@@ -102,12 +100,6 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
             mMapView.getMapAsync(this);
         }
         return mView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Utils.scheduleNotification(requireContext());
     }
 
     @Override
@@ -168,6 +160,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Utils.scheduleNotification(requireContext());
         mMap = googleMap;
         if (mLocationPermissionGranted == 1) {
             getLastKnownLocation();
@@ -330,8 +323,6 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
                     });
         }
     }
-
-
 
     // ----- UTILS -----
 
