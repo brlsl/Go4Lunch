@@ -1,4 +1,7 @@
 # Projet Go4Lunch
+
+## Aperçu de l'application
+
 <img src = "https://user-images.githubusercontent.com/53181289/100548378-7d997d80-326c-11eb-95cd-038c8872e017.png" witdh = "200" height = "399"/>  <img src = "https://user-images.githubusercontent.com/53181289/100548619-01079e80-326e-11eb-823d-84eba052d194.png" witdh = "200" height = "399"/>
 <img src = "https://user-images.githubusercontent.com/53181289/100548742-b9cddd80-326e-11eb-91f1-0ca730703f4d.png" witdh = "200" height = "399"/> <img src = "https://user-images.githubusercontent.com/53181289/100548760-d8cc6f80-326e-11eb-8583-d6c50301fe52.png" witdh = "200" height = "399"/> <img src = "https://user-images.githubusercontent.com/53181289/100548813-3cef3380-326f-11eb-8a3b-644575e6066b.png" witdh = "200" height = "399"/>
 <img src = "https://user-images.githubusercontent.com/53181289/100548957-593fa000-3270-11eb-9c4f-6f9d38eb5a91.png" witdh = "200" height = "399"/>
@@ -7,7 +10,7 @@
 
 ## Description de l'application
 
-L’application Go4Lunch est une application qui permet de rechercher un restaurant dans les environs, puis de sélectionner celui de son choix en faisant part à ses collègues.
+Go4Lunch est une application qui permet de rechercher un restaurant dans les environs, puis de sélectionner celui de son choix en faisant part à ses collègues.
 De la même manière, il est possible de consulter les restaurants sélectionnés par les collègues afin de se joindre à eux. 
 Un peu avant l’heure du déjeuner, l’application notifie les différents collègues pour les inviter à rejoindre leurs collègues.
 
