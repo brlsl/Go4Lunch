@@ -84,11 +84,13 @@ public class UnitTests {
         String doNotPrint2 = "01:31 pm";
         String printMin = "12:45 pm";
         String printMax = "01:30 pm";
+        String printIn = "01:15 pm";
 
         assertFalse(Utils.isClosingSoon(doNotPrint, closingHour));
         assertFalse(Utils.isClosingSoon(doNotPrint2, closingHour));
         assertTrue(Utils.isClosingSoon(printMin,closingHour));
         assertTrue(Utils.isClosingSoon(printMax,closingHour));
+        assertTrue(Utils.isClosingSoon(printIn, closingHour));
     }
 
     @Test
@@ -112,6 +114,4 @@ public class UnitTests {
         assertEquals(mResultDetailsList.get(1).getRating(),3.0, 0);
         assertEquals(mResultDetailsList.get(2).getRating(),2.0, 0);
     }
-
-
 }

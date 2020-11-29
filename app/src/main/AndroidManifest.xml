@@ -35,7 +35,7 @@
         <!-- main activity of the app with its fragments -->
         <activity
             android:name=".controllers.activities.MainActivity"
-            android:theme="@style/AppTheme_NoTitle">
+                android:theme="@style/AppTheme_NoTitle">
 
         </activity>
         <!-- Restaurant Detail Activity:child of main activity -->

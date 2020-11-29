@@ -83,7 +83,7 @@ public class Utils {
 
     public static void scheduleNotification(Context context){
         SharedPreferences preferences =  PreferenceManager.getDefaultSharedPreferences(context);
-        boolean isNotificationEnable = preferences.getBoolean(PREFERENCES_NOTIFICATION_KEY,true); // notification settings
+        boolean isNotificationEnabled = preferences.getBoolean(PREFERENCES_NOTIFICATION_KEY,true); // notification settings
 
         Intent intent = new Intent(context, NotificationReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
@@ -96,7 +96,7 @@ public class Utils {
         notificationTime.set(Calendar.MILLISECOND, 0);
 
         if (alarmManager !=null){
-            if (isNotificationEnable){ // notifications are enabled in settings
+            if (isNotificationEnabled){ // notifications are enabled in settings
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, notificationTime.getTimeInMillis(),1000*60*60*24, pendingIntent);
             } else { // notifications are disabled in settings
                 alarmManager.cancel(pendingIntent); // cancel next scheduled notification

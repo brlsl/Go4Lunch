@@ -14,7 +14,7 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
 public class JoiningWorkmateAdapter extends FirestoreRecyclerAdapter<User,JoiningWorkmateViewHolder> {
 
-    private Context mContext;;
+    private Context mContext;
 
     public JoiningWorkmateAdapter(@NonNull FirestoreRecyclerOptions<User> options, Context context) {
         super(options);
