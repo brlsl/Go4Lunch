@@ -9,7 +9,7 @@ Un peu avant l’heure du déjeuner, l’application notifie les différents col
 * Géolocaliser la position du téléphone
 * Rechercher et afficher les restaurants aux alentours sous forme de liste ou de carte
 * Filtrer les restaurants de la liste ou de la carte
-* Choisir un restaurant et l'indiquer aux autres utilisateurs de l'application
+* Choisir un restaurant et faire part de son choix aux autres utilisateurs de l'application
 
 ## Aperçu de l'application
 
